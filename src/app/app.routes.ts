@@ -7,6 +7,16 @@ export const routes: Routes = [
     title: 'Bienvenida · Bocado Sano',
     loadComponent: () => import('./pages/bienvenida/bienvenida').then((m) => m.Bienvenida),
   },
+  {
+    path: 'login',
+    title: 'Iniciar sesión · Bocado Sano',
+    loadComponent: () => import('./pages/login/login').then((m) => m.Login),
+  },
+  {
+    path: 'registro',
+    title: 'Registro · Bocado Sano',
+    loadComponent: () => import('./pages/registro/registro').then((m) => m.Registro),
+  },
 
   // Páginas dentro del layout (Shell)
   {
