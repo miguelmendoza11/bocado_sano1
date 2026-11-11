@@ -1,5 +1,27 @@
 <main class="auth-page">
   <section class="sano-card">
-    <!-- Aquí irá el formulario de login -->
+    <header class="text-center mb-4">
+      <span class="logo"><i class="bi bi-egg-fried"></i></span>
+      <h1 class="fs-2xl mt-3 mb-1">Iniciar sesión</h1>
+      <p class="text-secondary-sano mb-0">Qué bueno verte de nuevo.</p>
+    </header>
+
+    <form>
+      <div class="mb-3">
+        <label for="login-email" class="form-label">Correo electrónico</label>
+        <input id="login-email" type="email" class="form-control" placeholder="tu@correo.com" autocomplete="email" />
+      </div>
+
+      <div class="mb-4">
+        <label for="login-password" class="form-label">Contraseña</label>
+        <input id="login-password" type="password" class="form-control" placeholder="••••••••" autocomplete="current-password" />
+      </div>
+
+      <button type="submit" class="btn btn-solid theme-warning sano-btn-orange w-100">Iniciar sesión</button>
+    </form>
+
+    <p class="text-center text-secondary-sano mt-4 mb-0">
+      ¿No tienes cuenta? <a routerLink="/registro" class="link-sano">Regístrate</a>
+    </p>
   </section>
 </main>
