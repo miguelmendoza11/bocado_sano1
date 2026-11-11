@@ -1,7 +1,7 @@
 <header class="inicio-header mb-4">
   <div>
-    <p class="text-secondary-sano mb-1">Martes, 11 de noviembre</p>
-    <h1 class="fs-2xl mb-0">¡Hola! 👋</h1>
+    <p class="text-secondary-sano mb-1 capitalize">{{ today | date: "EEEE, d 'de' MMMM" }}</p>
+    <h1 class="fs-2xl mb-0">¡Hola, {{ nutrition.profile().name }}! 👋</h1>
   </div>
   <button type="button" class="icon-btn" aria-label="Notificaciones">
     <i class="bi bi-bell"></i>
@@ -14,27 +14,27 @@
     <section class="sano-card sano-card-lime card-calorias">
       <div class="d-flex align-items-center justify-content-between mb-3">
         <h2 class="fs-lg mb-0">Calorías de hoy</h2>
-        <span class="chip"><i class="bi bi-fire"></i> 43%</span>
+        <span class="chip"><i class="bi bi-fire"></i> {{ percent() }}%</span>
       </div>
 
       <div class="calorias-body">
-        <app-calorie-ring [value]="950" [max]="2200">
-          <span class="fs-3xl fw-bold lh-1">1.250</span>
+        <app-calorie-ring [value]="nutrition.consumedKcal()" [max]="nutrition.calorieGoal()">
+          <span class="fs-3xl fw-bold lh-1">{{ nutrition.remainingKcal() | number }}</span>
           <span class="fs-sm">kcal restantes</span>
         </app-calorie-ring>
 
         <div class="calorias-resumen">
           <div>
             <p class="fs-sm mb-0">Consumidas</p>
-            <p class="fs-lg fw-bold mb-0">950</p>
+            <p class="fs-lg fw-bold mb-0">{{ nutrition.consumedKcal() | number }}</p>
           </div>
           <div>
             <p class="fs-sm mb-0">Quemadas</p>
-            <p class="fs-lg fw-bold mb-0">180</p>
+            <p class="fs-lg fw-bold mb-0">{{ nutrition.burnedKcal() | number }}</p>
           </div>
           <div>
             <p class="fs-sm mb-0">Meta</p>
-            <p class="fs-lg fw-bold mb-0">2.200</p>
+            <p class="fs-lg fw-bold mb-0">{{ nutrition.calorieGoal() | number }}</p>
           </div>
         </div>
       </div>
@@ -46,29 +46,15 @@
     <section class="sano-card card-macros">
       <h2 class="fs-lg mb-3">Macronutrientes</h2>
 
-      <div class="macro">
-        <div class="d-flex justify-content-between fs-sm mb-1">
-          <span class="fw-semibold">Proteínas</span>
-          <span class="text-secondary-sano">60 / 138 g</span>
+      @for (m of macros(); track m.label) {
+        <div class="macro">
+          <div class="d-flex justify-content-between fs-sm mb-1">
+            <span class="fw-semibold">{{ m.label }}</span>
+            <span class="text-secondary-sano">{{ m.done }} / {{ m.goal }} g</span>
+          </div>
+          <div class="sano-progress"><span [style.width.%]="m.pct"></span></div>
         </div>
-        <div class="sano-progress"><span style="width: 43%"></span></div>
-      </div>
-
-      <div class="macro">
-        <div class="d-flex justify-content-between fs-sm mb-1">
-          <span class="fw-semibold">Carbohidratos</span>
-          <span class="text-secondary-sano">120 / 275 g</span>
-        </div>
-        <div class="sano-progress"><span style="width: 44%"></span></div>
-      </div>
-
-      <div class="macro">
-        <div class="d-flex justify-content-between fs-sm mb-1">
-          <span class="fw-semibold">Grasas</span>
-          <span class="text-secondary-sano">30 / 61 g</span>
-        </div>
-        <div class="sano-progress"><span style="width: 49%"></span></div>
-      </div>
+      }
     </section>
   </div>
 
@@ -77,8 +63,8 @@
     <section class="sano-card bg-blue-soft card-mini">
       <i class="bi bi-droplet-fill mini-icon"></i>
       <p class="fs-sm text-secondary-sano mb-0">Agua</p>
-      <p class="fs-xl fw-bold mb-0">1,2 L</p>
-      <p class="fs-sm text-secondary-sano mb-0">de 2,5 L</p>
+      <p class="fs-xl fw-bold mb-0">{{ nutrition.waterMl() / 1000 | number: '1.1-1' }} L</p>
+      <p class="fs-sm text-secondary-sano mb-0">de {{ nutrition.waterGoalMl / 1000 | number: '1.1-1' }} L</p>
     </section>
   </div>
 
@@ -87,8 +73,8 @@
     <section class="sano-card bg-orange-soft card-mini">
       <i class="bi bi-person-walking mini-icon"></i>
       <p class="fs-sm text-secondary-sano mb-0">Pasos</p>
-      <p class="fs-xl fw-bold mb-0">6.540</p>
-      <p class="fs-sm text-secondary-sano mb-0">de 10.000</p>
+      <p class="fs-xl fw-bold mb-0">{{ nutrition.steps() | number }}</p>
+      <p class="fs-sm text-secondary-sano mb-0">de {{ nutrition.stepsGoal | number }}</p>
     </section>
   </div>
 
@@ -97,8 +83,12 @@
     <section class="sano-card sano-card-dark card-mini">
       <i class="bi bi-speedometer2 mini-icon"></i>
       <p class="fs-sm mb-0 opacity-75">Peso actual</p>
-      <p class="fs-xl fw-bold mb-0">72,4 kg</p>
-      <p class="fs-sm mb-0 peso-cambio"><i class="bi bi-arrow-down-right"></i> 0,6 kg esta semana</p>
+      <p class="fs-xl fw-bold mb-0">{{ nutrition.currentWeight() | number: '1.1-1' }} kg</p>
+      @let cambio = nutrition.weightChange();
+      <p class="fs-sm mb-0 peso-cambio">
+        <i class="bi" [class.bi-arrow-down-right]="cambio <= 0" [class.bi-arrow-up-right]="cambio > 0"></i>
+        {{ (cambio < 0 ? -cambio : cambio) | number: '1.1-1' }} kg esta semana
+      </p>
     </section>
   </div>
 
@@ -107,46 +97,23 @@
     <section class="sano-card">
       <div class="d-flex align-items-center justify-content-between mb-2">
         <h2 class="fs-lg mb-0">Comidas de hoy</h2>
-        <a href="#" class="link-sano fs-sm">Ver diario <i class="bi bi-chevron-right"></i></a>
+        <a routerLink="/diario" class="link-sano fs-sm">Ver diario <i class="bi bi-chevron-right"></i></a>
       </div>
 
       <ul class="list-unstyled mb-0">
-        <li class="comida">
-          <span class="comida-icon bg-orange-soft"><i class="bi bi-cup-hot"></i></span>
-          <div class="flex-grow-1">
-            <p class="fw-semibold mb-0">Desayuno</p>
-            <p class="fs-sm text-secondary-sano mb-0">Avena con frutas, café</p>
-          </div>
-          <span class="kcal-pill">420 kcal</span>
-          <button type="button" class="icon-btn" aria-label="Agregar a desayuno"><i class="bi bi-plus-lg"></i></button>
-        </li>
-        <li class="comida">
-          <span class="comida-icon bg-lime-soft"><i class="bi bi-sun"></i></span>
-          <div class="flex-grow-1">
-            <p class="fw-semibold mb-0">Almuerzo</p>
-            <p class="fs-sm text-secondary-sano mb-0">Pollo, arroz integral, ensalada</p>
-          </div>
-          <span class="kcal-pill">530 kcal</span>
-          <button type="button" class="icon-btn" aria-label="Agregar a almuerzo"><i class="bi bi-plus-lg"></i></button>
-        </li>
-        <li class="comida">
-          <span class="comida-icon bg-blue-soft"><i class="bi bi-moon-stars"></i></span>
-          <div class="flex-grow-1">
-            <p class="fw-semibold mb-0">Cena</p>
-            <p class="fs-sm text-secondary-sano mb-0">Sin registrar</p>
-          </div>
-          <span class="kcal-pill">0 kcal</span>
-          <button type="button" class="icon-btn" aria-label="Agregar a cena"><i class="bi bi-plus-lg"></i></button>
-        </li>
-        <li class="comida">
-          <span class="comida-icon bg-orange-soft"><i class="bi bi-apple"></i></span>
-          <div class="flex-grow-1">
-            <p class="fw-semibold mb-0">Snacks</p>
-            <p class="fs-sm text-secondary-sano mb-0">Sin registrar</p>
-          </div>
-          <span class="kcal-pill">0 kcal</span>
-          <button type="button" class="icon-btn" aria-label="Agregar a snacks"><i class="bi bi-plus-lg"></i></button>
-        </li>
+        @for (meal of nutrition.meals; track meal.type) {
+          <li class="comida">
+            <span class="comida-icon {{ meal.colorClass }}"><i class="bi {{ meal.icon }}"></i></span>
+            <div class="flex-grow-1 min-w-0">
+              <p class="fw-semibold mb-0">{{ meal.label }}</p>
+              <p class="fs-sm text-secondary-sano mb-0 text-truncate">{{ summary(meal.type) }}</p>
+            </div>
+            <span class="kcal-pill">{{ nutrition.kcalFor(meal.type) | number }} kcal</span>
+            <a routerLink="/diario" class="icon-btn" [attr.aria-label]="'Agregar a ' + meal.label">
+              <i class="bi bi-plus-lg"></i>
+            </a>
+          </li>
+        }
       </ul>
     </section>
   </div>
