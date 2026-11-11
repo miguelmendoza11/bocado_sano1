@@ -1,4 +1,142 @@
-<header class="mb-4">
-  <h1 class="fs-2xl mb-1">Inicio</h1>
-  <p class="text-secondary-sano mb-0">Tu resumen del día.</p>
+<header class="inicio-header mb-4">
+  <div>
+    <p class="text-secondary-sano mb-1 capitalize">{{ today | date: "EEEE, d 'de' MMMM" }}</p>
+    <h1 class="fs-2xl mb-0">¡Hola, {{ nutrition.profile().name }}! 👋</h1>
+  </div>
+  <button type="button" class="icon-btn" aria-label="Notificaciones">
+    <i class="bi bi-bell"></i>
+  </button>
 </header>
+
+<div class="row g-3">
+  <!-- Calorías del día -->
+  <div class="col-12 lg:col-7">
+    <section class="sano-card sano-card-lime card-calorias">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <h2 class="fs-lg mb-0">Calorías de hoy</h2>
+        <span class="chip"><i class="bi bi-fire"></i> {{ percent() }}%</span>
+      </div>
+
+      <div class="calorias-body">
+        <app-calorie-ring [value]="nutrition.consumedKcal()" [max]="nutrition.calorieGoal()">
+          <span class="fs-3xl fw-bold lh-1">{{ nutrition.remainingKcal() | number }}</span>
+          <span class="fs-sm">kcal restantes</span>
+        </app-calorie-ring>
+
+        <div class="calorias-resumen">
+          <div>
+            <p class="fs-sm mb-0">Consumidas</p>
+            <p class="fs-lg fw-bold mb-0">{{ nutrition.consumedKcal() | number }}</p>
+          </div>
+          <div>
+            <p class="fs-sm mb-0">Quemadas</p>
+            <p class="fs-lg fw-bold mb-0">{{ nutrition.burnedKcal() | number }}</p>
+          </div>
+          <div>
+            <p class="fs-sm mb-0">Meta</p>
+            <p class="fs-lg fw-bold mb-0">{{ nutrition.calorieGoal() | number }}</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Macros -->
+  <div class="col-12 lg:col-5">
+    <section class="sano-card card-macros">
+      <h2 class="fs-lg mb-3">Macronutrientes</h2>
+
+      @for (m of macros(); track m.label) {
+        <div class="macro">
+          <div class="d-flex justify-content-between fs-sm mb-1">
+            <span class="fw-semibold">{{ m.label }}</span>
+            <span class="text-secondary-sano">{{ m.done }} / {{ m.goal }} g</span>
+          </div>
+          <div class="sano-progress"><span [style.width.%]="m.pct"></span></div>
+        </div>
+      }
+    </section>
+  </div>
+
+  <!-- Agua -->
+  <div class="col-6 lg:col-4">
+    <section class="sano-card bg-blue-soft card-mini">
+      <div class="mini-top">
+        <i class="bi bi-droplet-fill mini-icon"></i>
+        <div class="mini-actions">
+          <button type="button" class="mini-btn" aria-label="Quitar 250 ml de agua" (click)="nutrition.addWater(-250)">
+            <i class="bi bi-dash-lg"></i>
+          </button>
+          <button type="button" class="mini-btn" aria-label="Agregar 250 ml de agua" (click)="nutrition.addWater(250)">
+            <i class="bi bi-plus-lg"></i>
+          </button>
+        </div>
+      </div>
+      <p class="fs-sm text-secondary-sano mb-0">Agua</p>
+      <p class="fs-xl fw-bold mb-0">{{ nutrition.waterMl() / 1000 | number: '1.1-2' }} L</p>
+      <p class="fs-sm text-secondary-sano mb-2">de {{ nutrition.waterGoalMl / 1000 | number: '1.1-1' }} L</p>
+      <div class="sano-progress progress-agua"><span [style.width.%]="waterPct()"></span></div>
+    </section>
+  </div>
+
+  <!-- Pasos -->
+  <div class="col-6 lg:col-4">
+    <section class="sano-card bg-orange-soft card-mini">
+      <div class="mini-top">
+        <i class="bi bi-person-walking mini-icon"></i>
+        <div class="mini-actions">
+          <button type="button" class="mini-btn" aria-label="Quitar 1.000 pasos" (click)="nutrition.setSteps(nutrition.steps() - 1000)">
+            <i class="bi bi-dash-lg"></i>
+          </button>
+          <button type="button" class="mini-btn" aria-label="Agregar 1.000 pasos" (click)="nutrition.setSteps(nutrition.steps() + 1000)">
+            <i class="bi bi-plus-lg"></i>
+          </button>
+        </div>
+      </div>
+      <p class="fs-sm text-secondary-sano mb-0">Pasos</p>
+      <p class="fs-xl fw-bold mb-0">{{ nutrition.steps() | number }}</p>
+      <p class="fs-sm text-secondary-sano mb-2">de {{ nutrition.stepsGoal | number }}</p>
+      <div class="sano-progress progress-pasos"><span [style.width.%]="stepsPct()"></span></div>
+    </section>
+  </div>
+
+  <!-- Peso -->
+  <div class="col-12 lg:col-4">
+    <section class="sano-card sano-card-dark card-mini">
+      <i class="bi bi-speedometer2 mini-icon"></i>
+      <p class="fs-sm mb-0 opacity-75">Peso actual</p>
+      <p class="fs-xl fw-bold mb-0">{{ nutrition.currentWeight() | number: '1.1-1' }} kg</p>
+      @let cambio = nutrition.weightChange();
+      <p class="fs-sm mb-0 peso-cambio">
+        <i class="bi" [class.bi-arrow-down-right]="cambio <= 0" [class.bi-arrow-up-right]="cambio > 0"></i>
+        {{ (cambio < 0 ? -cambio : cambio) | number: '1.1-1' }} kg esta semana
+      </p>
+    </section>
+  </div>
+
+  <!-- Comidas del día -->
+  <div class="col-12">
+    <section class="sano-card">
+      <div class="d-flex align-items-center justify-content-between mb-2">
+        <h2 class="fs-lg mb-0">Comidas de hoy</h2>
+        <a routerLink="/diario" class="link-sano fs-sm">Ver diario <i class="bi bi-chevron-right"></i></a>
+      </div>
+
+      <ul class="list-unstyled mb-0">
+        @for (meal of nutrition.meals; track meal.type) {
+          <li class="comida">
+            <span class="comida-icon {{ meal.colorClass }}"><i class="bi {{ meal.icon }}"></i></span>
+            <div class="flex-grow-1 min-w-0">
+              <p class="fw-semibold mb-0">{{ meal.label }}</p>
+              <p class="fs-sm text-secondary-sano mb-0 text-truncate">{{ summary(meal.type) }}</p>
+            </div>
+            <span class="kcal-pill">{{ nutrition.kcalFor(meal.type) | number }} kcal</span>
+            <a routerLink="/diario" class="icon-btn" [attr.aria-label]="'Agregar a ' + meal.label">
+              <i class="bi bi-plus-lg"></i>
+            </a>
+          </li>
+        }
+      </ul>
+    </section>
+  </div>
+</div>

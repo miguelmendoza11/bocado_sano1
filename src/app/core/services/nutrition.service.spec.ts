@@ -1,0 +1,55 @@
+import { TestBed } from '@angular/core/testing';
+import { NutritionService } from './nutrition.service';
+
+describe('NutritionService', () => {
+  let service: NutritionService;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({});
+    service = TestBed.inject(NutritionService);
+  });
+
+  it('calculates the calorie goal with Mifflin-St Jeor', () => {
+    // (10·72,4 + 6,25·175 − 5·24 + 5) × 1,55 − 500 ≈ 2139 → 2140
+    expect(service.calorieGoal()).toBe(2140);
+  });
+
+  it('splits macros 50/25/25', () => {
+    expect(service.macroGoals()).toEqual({ carbs: 268, protein: 134, fat: 59 });
+  });
+
+  it('adds up the calories of the sample entries', () => {
+    expect(service.consumedKcal()).toBe(950);
+    expect(service.kcalFor('desayuno')).toBe(420);
+    expect(service.kcalFor('cena')).toBe(0);
+  });
+
+  it('calculates remaining calories including steps', () => {
+    // 2140 − 950 + 262 (6540 pasos × 0,04)
+    expect(service.remainingKcal()).toBe(1452);
+  });
+
+  it('updates totals when a food is added and removed', () => {
+    service.addFood(7, 'snacks', 2);
+    expect(service.kcalFor('snacks')).toBe(190);
+
+    const added = service.entriesFor('snacks')[0];
+    service.removeEntry(added.id);
+    expect(service.kcalFor('snacks')).toBe(0);
+  });
+
+  it('never lets water go below zero', () => {
+    service.addWater(-5000);
+    expect(service.waterMl()).toBe(0);
+  });
+
+  it('reports the latest weight change', () => {
+    expect(service.currentWeight()).toBe(72.4);
+    expect(service.weightChange()).toBe(-0.6);
+  });
+
+  it('recalculates the goal when the profile changes', () => {
+    service.updateProfile({ goal: 'mantener' });
+    expect(service.calorieGoal()).toBe(2640);
+  });
+});
