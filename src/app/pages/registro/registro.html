@@ -1,5 +1,37 @@
 <main class="auth-page">
   <section class="sano-card">
-    <!-- Aquí irá el formulario de registro -->
+    <header class="text-center mb-4">
+      <span class="logo"><i class="bi bi-egg-fried"></i></span>
+      <h1 class="fs-2xl mt-3 mb-1">Crear cuenta</h1>
+      <p class="text-secondary-sano mb-0">Empieza a comer rico y contar fácil.</p>
+    </header>
+
+    <form>
+      <div class="mb-3">
+        <label for="registro-nombre" class="form-label">Nombre</label>
+        <input id="registro-nombre" type="text" class="form-control" placeholder="Tu nombre" autocomplete="name" />
+      </div>
+
+      <div class="mb-3">
+        <label for="registro-email" class="form-label">Correo electrónico</label>
+        <input id="registro-email" type="email" class="form-control" placeholder="tu@correo.com" autocomplete="email" />
+      </div>
+
+      <div class="mb-3">
+        <label for="registro-password" class="form-label">Contraseña</label>
+        <input id="registro-password" type="password" class="form-control" placeholder="Mínimo 6 caracteres" autocomplete="new-password" />
+      </div>
+
+      <div class="mb-4">
+        <label for="registro-confirmar" class="form-label">Confirmar contraseña</label>
+        <input id="registro-confirmar" type="password" class="form-control" placeholder="Repite tu contraseña" autocomplete="new-password" />
+      </div>
+
+      <button type="submit" class="btn btn-solid theme-warning sano-btn-orange w-100">Crear cuenta</button>
+    </form>
+
+    <p class="text-center text-secondary-sano mt-4 mb-0">
+      ¿Ya tienes cuenta? <a routerLink="/login" class="link-sano">Inicia sesión</a>
+    </p>
   </section>
 </main>
