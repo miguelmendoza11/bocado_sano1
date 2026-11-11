@@ -21,6 +21,14 @@ export class Inicio {
     Math.round((this.nutrition.consumedKcal() / this.nutrition.calorieGoal()) * 100),
   );
 
+  /** Avance de agua y pasos (0–100) para las barras. */
+  protected readonly waterPct = computed(() =>
+    Math.min((this.nutrition.waterMl() / this.nutrition.waterGoalMl) * 100, 100),
+  );
+  protected readonly stepsPct = computed(() =>
+    Math.min((this.nutrition.steps() / this.nutrition.stepsGoal) * 100, 100),
+  );
+
   /** Filas de la tarjeta de macros. */
   protected readonly macros = computed(() => {
     const done = this.nutrition.consumedMacros();

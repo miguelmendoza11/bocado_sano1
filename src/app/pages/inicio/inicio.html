@@ -61,20 +61,42 @@
   <!-- Agua -->
   <div class="col-6 lg:col-4">
     <section class="sano-card bg-blue-soft card-mini">
-      <i class="bi bi-droplet-fill mini-icon"></i>
+      <div class="mini-top">
+        <i class="bi bi-droplet-fill mini-icon"></i>
+        <div class="mini-actions">
+          <button type="button" class="mini-btn" aria-label="Quitar 250 ml de agua" (click)="nutrition.addWater(-250)">
+            <i class="bi bi-dash-lg"></i>
+          </button>
+          <button type="button" class="mini-btn" aria-label="Agregar 250 ml de agua" (click)="nutrition.addWater(250)">
+            <i class="bi bi-plus-lg"></i>
+          </button>
+        </div>
+      </div>
       <p class="fs-sm text-secondary-sano mb-0">Agua</p>
-      <p class="fs-xl fw-bold mb-0">{{ nutrition.waterMl() / 1000 | number: '1.1-1' }} L</p>
-      <p class="fs-sm text-secondary-sano mb-0">de {{ nutrition.waterGoalMl / 1000 | number: '1.1-1' }} L</p>
+      <p class="fs-xl fw-bold mb-0">{{ nutrition.waterMl() / 1000 | number: '1.1-2' }} L</p>
+      <p class="fs-sm text-secondary-sano mb-2">de {{ nutrition.waterGoalMl / 1000 | number: '1.1-1' }} L</p>
+      <div class="sano-progress progress-agua"><span [style.width.%]="waterPct()"></span></div>
     </section>
   </div>
 
   <!-- Pasos -->
   <div class="col-6 lg:col-4">
     <section class="sano-card bg-orange-soft card-mini">
-      <i class="bi bi-person-walking mini-icon"></i>
+      <div class="mini-top">
+        <i class="bi bi-person-walking mini-icon"></i>
+        <div class="mini-actions">
+          <button type="button" class="mini-btn" aria-label="Quitar 1.000 pasos" (click)="nutrition.setSteps(nutrition.steps() - 1000)">
+            <i class="bi bi-dash-lg"></i>
+          </button>
+          <button type="button" class="mini-btn" aria-label="Agregar 1.000 pasos" (click)="nutrition.setSteps(nutrition.steps() + 1000)">
+            <i class="bi bi-plus-lg"></i>
+          </button>
+        </div>
+      </div>
       <p class="fs-sm text-secondary-sano mb-0">Pasos</p>
       <p class="fs-xl fw-bold mb-0">{{ nutrition.steps() | number }}</p>
-      <p class="fs-sm text-secondary-sano mb-0">de {{ nutrition.stepsGoal | number }}</p>
+      <p class="fs-sm text-secondary-sano mb-2">de {{ nutrition.stepsGoal | number }}</p>
+      <div class="sano-progress progress-pasos"><span [style.width.%]="stepsPct()"></span></div>
     </section>
   </div>
 

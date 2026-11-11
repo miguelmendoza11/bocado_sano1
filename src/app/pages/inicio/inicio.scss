@@ -34,9 +34,54 @@
   gap: 0.15rem;
 }
 
+.mini-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
 .mini-icon {
   font-size: 1.4rem;
-  margin-bottom: 0.5rem;
+}
+
+.mini-actions {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.mini-btn {
+  display: grid;
+  place-items: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  border: 0;
+  border-radius: 50%;
+  background: #fff;
+  color: var(--sano-ink);
+  font-size: 0.85rem;
+  cursor: pointer;
+
+  &:active {
+    transform: scale(0.92);
+  }
+}
+
+.card-mini .sano-progress {
+  margin-top: auto;
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.progress-agua > span {
+  background: #4a90e2;
+}
+
+.progress-pasos > span {
+  background: var(--sano-orange);
+}
+
+.sano-progress > span {
+  transition: width 0.4s ease;
 }
 
 .peso-cambio {
