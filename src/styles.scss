@@ -1,1 +1,178 @@
-/* You can add global styles to this file, and also import other style files */
+/* ==========================================================
+   Bocado Sano · sistema de diseño global
+   Bootstrap 6 usa @layer, así que estos estilos (sin capa)
+   siempre ganan sobre los de Bootstrap.
+   ========================================================== */
+
+/* ---------- Tokens de la marca ---------- */
+:root {
+  --sano-lime: #c6f432;
+  --sano-lime-strong: #9fd116;
+  --sano-lime-soft: #eefbc4;
+  --sano-orange: #ff8a3d;
+  --sano-gradient-orange: linear-gradient(135deg, #ffb347 0%, #ff7a2f 100%);
+  --sano-ink: #1c1f1a;
+  --sano-muted: #7b8073;
+  --sano-bg: #f4f5f0;
+  --sano-border: #e6e8df;
+  --sano-radius: 24px;
+  --sano-shadow: 0 8px 24px rgba(28, 31, 26, 0.06);
+
+  /* ---------- Bootstrap: primary = lima, warning = naranja ---------- */
+  --bs-primary-base: var(--sano-lime);
+  --bs-primary-bg: var(--sano-lime);
+  --bs-primary-fg: #5f7f05;
+  --bs-primary-fg-emphasis: #3f5503;
+  --bs-primary-bg-subtle: var(--sano-lime-soft);
+  --bs-primary-bg-muted: #def78f;
+  --bs-primary-border: var(--sano-lime-strong);
+  --bs-primary-focus-ring: color-mix(in oklch, var(--sano-lime) 60%, transparent);
+  --bs-primary-contrast: var(--sano-ink);
+
+  --bs-warning-base: var(--sano-orange);
+  --bs-warning-bg: var(--sano-orange);
+  --bs-warning-fg: #c25412;
+  --bs-warning-bg-subtle: #ffeedd;
+  --bs-warning-border: #ffb27f;
+  --bs-warning-contrast: #fff;
+
+  --bs-body-font-family: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --bs-bg-body: var(--sano-bg);
+  --bs-fg-body: var(--sano-ink);
+  --bs-link-color: var(--sano-ink);
+}
+
+/* ---------- Base ---------- */
+body {
+  background: var(--sano-bg);
+  color: var(--sano-ink);
+  font-family: var(--bs-body-font-family);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* ---------- Tarjetas ---------- */
+.sano-card {
+  background: #fff;
+  border-radius: var(--sano-radius);
+  box-shadow: var(--sano-shadow);
+  padding: 1.25rem;
+}
+
+.sano-card-lime {
+  background: var(--sano-lime);
+  color: var(--sano-ink);
+}
+
+.sano-card-dark {
+  background: var(--sano-ink);
+  color: #fff;
+}
+
+/* ---------- Botones ---------- */
+/* Usar junto con: class="btn btn-solid theme-warning sano-btn-orange" */
+.sano-btn-orange {
+  background: var(--sano-gradient-orange);
+  border: 0;
+  color: #fff;
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+.icon-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  border: 1px solid var(--sano-border);
+  background: #fff;
+  color: var(--sano-ink);
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+/* ---------- Pastillas y chips ---------- */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+  background: #fff;
+  border: 1px solid var(--sano-border);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.kcal-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  background: var(--sano-lime-soft);
+  color: #3f5503;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.tabs-pill {
+  display: inline-flex;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  border-radius: 999px;
+  background: #fff;
+  border: 1px solid var(--sano-border);
+}
+
+/* ---------- Barra de progreso ---------- */
+.sano-progress {
+  height: 0.5rem;
+  border-radius: 999px;
+  background: var(--sano-border);
+  overflow: hidden;
+
+  > span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--sano-lime-strong);
+  }
+}
+
+/* ---------- Utilidades ---------- */
+.text-secondary-sano {
+  color: var(--sano-muted);
+}
+
+.link-sano {
+  color: var(--sano-ink);
+  font-weight: 600;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.bg-lime-soft {
+  background: var(--sano-lime-soft);
+}
+
+.bg-orange-soft {
+  background: #ffeedd;
+}
+
+.bg-blue-soft {
+  background: #e3f0ff;
+}

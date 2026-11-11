@@ -1,0 +1,42 @@
+<div class="shell">
+  <!-- Barra lateral (escritorio, ≥ 992px) -->
+  <aside class="sidebar">
+    <a routerLink="/inicio" class="brand">
+      <span class="brand-logo"><i class="bi bi-egg-fried"></i></span>
+      Bocado Sano
+    </a>
+
+    <nav class="side-nav">
+      @for (item of nav; track item.path) {
+        <a [routerLink]="item.path" routerLinkActive="active" class="side-link">
+          <i class="bi {{ item.icon }}"></i>
+          {{ item.label }}
+        </a>
+      }
+    </nav>
+
+    <a routerLink="/diario" class="btn btn-solid theme-warning sano-btn-orange w-100">
+      <i class="bi bi-plus-lg"></i> Registrar comida
+    </a>
+  </aside>
+
+  <!-- Contenido de cada página -->
+  <main class="content">
+    <router-outlet />
+  </main>
+
+  <!-- Barra inferior (móvil, < 992px) -->
+  <nav class="bottom-nav">
+    @for (item of nav; track item.path; let i = $index) {
+      @if (i === 2) {
+        <a routerLink="/diario" class="fab" aria-label="Registrar comida">
+          <i class="bi bi-plus-lg"></i>
+        </a>
+      }
+      <a [routerLink]="item.path" routerLinkActive="active" class="bottom-link">
+        <i class="bi {{ item.icon }}"></i>
+        <span>{{ item.label }}</span>
+      </a>
+    }
+  </nav>
+</div>
