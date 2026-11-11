@@ -1,0 +1,24 @@
+<svg [attr.width]="size()" [attr.height]="size()" [attr.viewBox]="'0 0 ' + size() + ' ' + size()">
+  <!-- Pista de fondo -->
+  <circle
+    class="track"
+    [attr.cx]="size() / 2"
+    [attr.cy]="size() / 2"
+    [attr.r]="radius()"
+    [attr.stroke-width]="stroke()"
+  />
+  <!-- Progreso (empieza arriba gracias al rotate del CSS) -->
+  <circle
+    class="bar"
+    [attr.cx]="size() / 2"
+    [attr.cy]="size() / 2"
+    [attr.r]="radius()"
+    [attr.stroke-width]="stroke()"
+    [attr.stroke-dasharray]="circumference()"
+    [attr.stroke-dashoffset]="dashOffset()"
+  />
+</svg>
+
+<div class="center">
+  <ng-content />
+</div>

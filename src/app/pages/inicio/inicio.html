@@ -14,20 +14,28 @@
     <section class="sano-card sano-card-lime card-calorias">
       <div class="d-flex align-items-center justify-content-between mb-3">
         <h2 class="fs-lg mb-0">Calorías de hoy</h2>
-        <span class="chip"><i class="bi bi-fire"></i> Meta 2.200</span>
+        <span class="chip"><i class="bi bi-fire"></i> 43%</span>
       </div>
 
-      <p class="fs-4xl fw-bold mb-0">1.250</p>
-      <p class="mb-4">kcal restantes</p>
+      <div class="calorias-body">
+        <app-calorie-ring [value]="950" [max]="2200">
+          <span class="fs-3xl fw-bold lh-1">1.250</span>
+          <span class="fs-sm">kcal restantes</span>
+        </app-calorie-ring>
 
-      <div class="calorias-resumen">
-        <div>
-          <p class="fs-sm mb-0">Consumidas</p>
-          <p class="fs-lg fw-bold mb-0">950</p>
-        </div>
-        <div>
-          <p class="fs-sm mb-0">Quemadas</p>
-          <p class="fs-lg fw-bold mb-0">180</p>
+        <div class="calorias-resumen">
+          <div>
+            <p class="fs-sm mb-0">Consumidas</p>
+            <p class="fs-lg fw-bold mb-0">950</p>
+          </div>
+          <div>
+            <p class="fs-sm mb-0">Quemadas</p>
+            <p class="fs-lg fw-bold mb-0">180</p>
+          </div>
+          <div>
+            <p class="fs-sm mb-0">Meta</p>
+            <p class="fs-lg fw-bold mb-0">2.200</p>
+          </div>
         </div>
       </div>
     </section>
