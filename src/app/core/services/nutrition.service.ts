@@ -1,0 +1,180 @@
+import { Injectable, computed, signal } from '@angular/core';
+import {
+  ACTIVITY_LEVELS,
+  DayHistory,
+  Food,
+  LoggedFood,
+  Macros,
+  MealInfo,
+  MealType,
+  UserProfile,
+  WeightEntry,
+} from '../models/nutrition.models';
+
+/** Catálogo de alimentos de prueba (valores por porción). */
+const FOODS: Food[] = [
+  { id: 1, name: 'Avena con frutas', portion: '1 tazón', kcal: 320, macros: { protein: 10, carbs: 56, fat: 6 } },
+  { id: 2, name: 'Café con leche', portion: '1 taza', kcal: 100, macros: { protein: 6, carbs: 10, fat: 4 } },
+  { id: 3, name: 'Pechuga de pollo', portion: '150 g', kcal: 250, macros: { protein: 46, carbs: 0, fat: 6 } },
+  { id: 4, name: 'Arroz integral', portion: '1 taza', kcal: 215, macros: { protein: 5, carbs: 45, fat: 2 } },
+  { id: 5, name: 'Ensalada verde', portion: '1 plato', kcal: 65, macros: { protein: 2, carbs: 8, fat: 3 } },
+  { id: 6, name: 'Huevo cocido', portion: '1 unidad', kcal: 78, macros: { protein: 6, carbs: 1, fat: 5 } },
+  { id: 7, name: 'Manzana', portion: '1 mediana', kcal: 95, macros: { protein: 0, carbs: 25, fat: 0 } },
+  { id: 8, name: 'Yogur griego', portion: '170 g', kcal: 150, macros: { protein: 15, carbs: 8, fat: 6 } },
+  { id: 9, name: 'Salmón a la plancha', portion: '150 g', kcal: 310, macros: { protein: 34, carbs: 0, fat: 19 } },
+  { id: 10, name: 'Pan integral', portion: '2 rebanadas', kcal: 160, macros: { protein: 8, carbs: 28, fat: 2 } },
+];
+
+const MEALS: MealInfo[] = [
+  { type: 'desayuno', label: 'Desayuno', icon: 'bi-cup-hot', colorClass: 'bg-orange-soft' },
+  { type: 'almuerzo', label: 'Almuerzo', icon: 'bi-sun', colorClass: 'bg-lime-soft' },
+  { type: 'cena', label: 'Cena', icon: 'bi-moon-stars', colorClass: 'bg-blue-soft' },
+  { type: 'snacks', label: 'Snacks', icon: 'bi-apple', colorClass: 'bg-orange-soft' },
+];
+
+const food = (id: number) => FOODS.find((f) => f.id === id)!;
+
+/** Kcal que se quitan o suman a la meta según el objetivo. */
+const GOAL_ADJUST = { perder: -500, mantener: 0, ganar: 300 } as const;
+
+/**
+ * Estado de la app guardado en memoria con signals.
+ * No hay backend: al recargar la página vuelven los datos de prueba.
+ */
+@Injectable({ providedIn: 'root' })
+export class NutritionService {
+  // ---------- Datos fijos ----------
+  readonly foods = FOODS;
+  readonly meals = MEALS;
+  readonly waterGoalMl = 2500;
+  readonly stepsGoal = 10000;
+
+  // ---------- Estado (signals) ----------
+  readonly profile = signal<UserProfile>({
+    name: 'Miguel',
+    sex: 'hombre',
+    age: 24,
+    heightCm: 175,
+    weightKg: 72.4,
+    activity: 'moderado',
+    goal: 'perder',
+  });
+
+  readonly entries = signal<LoggedFood[]>([
+    { id: 1, food: food(1), meal: 'desayuno', servings: 1 },
+    { id: 2, food: food(2), meal: 'desayuno', servings: 1 },
+    { id: 3, food: food(3), meal: 'almuerzo', servings: 1 },
+    { id: 4, food: food(4), meal: 'almuerzo', servings: 1 },
+    { id: 5, food: food(5), meal: 'almuerzo', servings: 1 },
+  ]);
+
+  readonly waterMl = signal(1250);
+  readonly steps = signal(6540);
+
+  readonly weightHistory = signal<WeightEntry[]>([
+    { date: '2026-10-14', kg: 74.1 },
+    { date: '2026-10-21', kg: 73.6 },
+    { date: '2026-10-28', kg: 73.4 },
+    { date: '2026-11-04', kg: 73.0 },
+    { date: '2026-11-11', kg: 72.4 },
+  ]);
+
+  readonly weekHistory = signal<DayHistory[]>([
+    { date: '2026-11-05', kcal: 2050 },
+    { date: '2026-11-06', kcal: 1890 },
+    { date: '2026-11-07', kcal: 2240 },
+    { date: '2026-11-08', kcal: 1980 },
+    { date: '2026-11-09', kcal: 2310 },
+    { date: '2026-11-10', kcal: 2010 },
+  ]);
+
+  private nextId = 100;
+
+  // ---------- Metas calculadas ----------
+
+  /** Meta diaria: Mifflin-St Jeor × actividad ± objetivo, redondeada a 10. */
+  readonly calorieGoal = computed(() => {
+    const p = this.profile();
+    const base = 10 * p.weightKg + 6.25 * p.heightCm - 5 * p.age + (p.sex === 'hombre' ? 5 : -161);
+    const total = base * ACTIVITY_LEVELS[p.activity] + GOAL_ADJUST[p.goal];
+    return Math.round(total / 10) * 10;
+  });
+
+  /** Reparto 50% carbohidratos, 25% proteínas, 25% grasas (en gramos). */
+  readonly macroGoals = computed<Macros>(() => {
+    const kcal = this.calorieGoal();
+    return {
+      carbs: Math.round((kcal * 0.5) / 4),
+      protein: Math.round((kcal * 0.25) / 4),
+      fat: Math.round((kcal * 0.25) / 9),
+    };
+  });
+
+  // ---------- Totales del día ----------
+
+  readonly consumedKcal = computed(() =>
+    this.entries().reduce((sum, e) => sum + e.food.kcal * e.servings, 0),
+  );
+
+  readonly consumedMacros = computed<Macros>(() =>
+    this.entries().reduce(
+      (sum, e) => ({
+        protein: sum.protein + e.food.macros.protein * e.servings,
+        carbs: sum.carbs + e.food.macros.carbs * e.servings,
+        fat: sum.fat + e.food.macros.fat * e.servings,
+      }),
+      { protein: 0, carbs: 0, fat: 0 },
+    ),
+  );
+
+  /** Estimación simple: 0,04 kcal por paso. */
+  readonly burnedKcal = computed(() => Math.round(this.steps() * 0.04));
+
+  /** Lo que queda: meta − consumidas + quemadas (nunca negativo). */
+  readonly remainingKcal = computed(() =>
+    Math.max(this.calorieGoal() - this.consumedKcal() + this.burnedKcal(), 0),
+  );
+
+  readonly currentWeight = computed(() => this.weightHistory().at(-1)?.kg ?? this.profile().weightKg);
+
+  /** Diferencia con el registro de peso anterior (negativo = bajó). */
+  readonly weightChange = computed(() => {
+    const h = this.weightHistory();
+    if (h.length < 2) return 0;
+    return Math.round((h[h.length - 1].kg - h[h.length - 2].kg) * 10) / 10;
+  });
+
+  // ---------- Consultas ----------
+
+  entriesFor(meal: MealType): LoggedFood[] {
+    return this.entries().filter((e) => e.meal === meal);
+  }
+
+  kcalFor(meal: MealType): number {
+    return this.entriesFor(meal).reduce((sum, e) => sum + e.food.kcal * e.servings, 0);
+  }
+
+  // ---------- Acciones ----------
+
+  addFood(foodId: number, meal: MealType, servings = 1): void {
+    const f = FOODS.find((x) => x.id === foodId);
+    if (!f || servings <= 0) return;
+    this.entries.update((list) => [...list, { id: this.nextId++, food: f, meal, servings }]);
+  }
+
+  removeEntry(id: number): void {
+    this.entries.update((list) => list.filter((e) => e.id !== id));
+  }
+
+  addWater(ml: number): void {
+    this.waterMl.update((w) => Math.max(w + ml, 0));
+  }
+
+  setSteps(steps: number): void {
+    this.steps.set(Math.max(Math.round(steps), 0));
+  }
+
+  updateProfile(changes: Partial<UserProfile>): void {
+    this.profile.update((p) => ({ ...p, ...changes }));
+  }
+}
