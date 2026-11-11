@@ -1,0 +1,131 @@
+.shell {
+  min-height: 100dvh;
+}
+
+.content {
+  padding: 1.25rem 1rem 6.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* ---------- Sidebar ---------- */
+.sidebar {
+  display: none;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-weight: 800;
+  font-size: 1.15rem;
+  color: var(--sano-ink);
+  text-decoration: none;
+}
+
+.brand-logo {
+  display: grid;
+  place-items: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 12px;
+  background: var(--sano-lime);
+}
+
+.side-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
+}
+
+.side-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.7rem 1rem;
+  border-radius: 14px;
+  color: var(--sano-muted);
+  font-weight: 600;
+  text-decoration: none;
+
+  &:hover {
+    background: var(--sano-bg);
+    color: var(--sano-ink);
+  }
+
+  &.active {
+    background: var(--sano-lime);
+    color: var(--sano-ink);
+  }
+}
+
+/* ---------- Barra inferior ---------- */
+.bottom-nav {
+  position: fixed;
+  inset: auto 0.75rem 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0.5rem;
+  background: #fff;
+  border-radius: var(--sano-radius);
+  box-shadow: 0 -4px 24px rgba(28, 31, 26, 0.08);
+  z-index: 10;
+}
+
+.bottom-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.1rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--sano-muted);
+  text-decoration: none;
+
+  i {
+    font-size: 1.25rem;
+  }
+
+  &.active {
+    color: var(--sano-ink);
+  }
+}
+
+.fab {
+  display: grid;
+  place-items: center;
+  width: 3.4rem;
+  height: 3.4rem;
+  margin-top: -2rem;
+  border-radius: 50%;
+  background: var(--sano-gradient-orange);
+  color: #fff;
+  font-size: 1.5rem;
+  box-shadow: 0 8px 20px rgba(255, 122, 47, 0.4);
+}
+
+/* ---------- Escritorio ---------- */
+@media (min-width: 992px) {
+  .sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    width: 250px;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    padding: 1.75rem 1.25rem;
+    background: #fff;
+    border-right: 1px solid var(--sano-border);
+  }
+
+  .content {
+    margin-left: 250px;
+    padding: 2rem 2.5rem;
+  }
+
+  .bottom-nav {
+    display: none;
+  }
+}
