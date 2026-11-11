@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -10,6 +10,7 @@ import { RouterLink } from '@angular/router';
 })
 export class Login {
   private readonly fb = inject(NonNullableFormBuilder);
+  private readonly router = inject(Router);
 
   readonly form = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
@@ -21,6 +22,6 @@ export class Login {
       this.form.markAllAsTouched();
       return;
     }
-    // Paso 6: aquí navegaremos a /inicio
+    this.router.navigate(['/inicio']);
   }
 }

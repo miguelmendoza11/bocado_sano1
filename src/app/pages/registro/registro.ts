@@ -7,7 +7,8 @@ import {
   ValidatorFn,
   Validators,
 } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
+import { NutritionService } from '../../core/services/nutrition.service';
 
 /** Valida que los campos password y confirmPassword del grupo sean iguales. */
 export const passwordsMatch: ValidatorFn = (group: AbstractControl): ValidationErrors | null => {
@@ -24,6 +25,8 @@ export const passwordsMatch: ValidatorFn = (group: AbstractControl): ValidationE
 })
 export class Registro {
   private readonly fb = inject(NonNullableFormBuilder);
+  private readonly router = inject(Router);
+  private readonly nutrition = inject(NutritionService);
 
   readonly form = this.fb.group(
     {
@@ -40,6 +43,7 @@ export class Registro {
       this.form.markAllAsTouched();
       return;
     }
-    // Paso 6: guardar el nombre y navegar a /inicio
+    this.nutrition.updateProfile({ name: this.form.controls.name.value.trim() });
+    this.router.navigate(['/inicio']);
   }
 }
