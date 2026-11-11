@@ -6,18 +6,48 @@
       <p class="text-secondary-sano mb-0">Qué bueno verte de nuevo.</p>
     </header>
 
-    <form>
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+      @let email = form.controls.email;
       <div class="mb-3">
         <label for="login-email" class="form-label">Correo electrónico</label>
-        <input id="login-email" type="email" class="form-control" placeholder="tu@correo.com" autocomplete="email" />
+        <input
+          id="login-email"
+          type="email"
+          class="form-control"
+          placeholder="tu@correo.com"
+          autocomplete="email"
+          formControlName="email"
+          [class.is-invalid]="email.invalid && email.touched"
+        />
+        @if (email.touched && email.hasError('required')) {
+          <div class="invalid-feedback">Escribe tu correo.</div>
+        } @else if (email.touched && email.hasError('email')) {
+          <div class="invalid-feedback">Escribe un correo válido.</div>
+        }
       </div>
 
+      @let password = form.controls.password;
       <div class="mb-4">
         <label for="login-password" class="form-label">Contraseña</label>
-        <input id="login-password" type="password" class="form-control" placeholder="••••••••" autocomplete="current-password" />
+        <input
+          id="login-password"
+          type="password"
+          class="form-control"
+          placeholder="••••••••"
+          autocomplete="current-password"
+          formControlName="password"
+          [class.is-invalid]="password.invalid && password.touched"
+        />
+        @if (password.touched && password.hasError('required')) {
+          <div class="invalid-feedback">Escribe tu contraseña.</div>
+        } @else if (password.touched && password.hasError('minlength')) {
+          <div class="invalid-feedback">Debe tener al menos 6 caracteres.</div>
+        }
       </div>
 
-      <button type="submit" class="btn btn-solid theme-warning sano-btn-orange w-100">Iniciar sesión</button>
+      <button type="submit" class="btn btn-solid theme-warning sano-btn-orange w-100" [disabled]="form.invalid">
+        Iniciar sesión
+      </button>
     </form>
 
     <p class="text-center text-secondary-sano mt-4 mb-0">
