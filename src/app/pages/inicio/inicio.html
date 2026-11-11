@@ -1,36 +1,145 @@
-<header class="mb-4">
-  <h1 class="fs-2xl mb-1">Inicio</h1>
-  <p class="text-secondary-sano mb-0">Tu resumen del día.</p>
+<header class="inicio-header mb-4">
+  <div>
+    <p class="text-secondary-sano mb-1">Martes, 11 de noviembre</p>
+    <h1 class="fs-2xl mb-0">¡Hola! 👋</h1>
+  </div>
+  <button type="button" class="icon-btn" aria-label="Notificaciones">
+    <i class="bi bi-bell"></i>
+  </button>
 </header>
 
 <div class="row g-3">
-  <!-- Calorías del día (anillo) -->
+  <!-- Calorías del día -->
   <div class="col-12 lg:col-7">
-    <section class="sano-card sano-card-lime card-calorias"></section>
+    <section class="sano-card sano-card-lime card-calorias">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <h2 class="fs-lg mb-0">Calorías de hoy</h2>
+        <span class="chip"><i class="bi bi-fire"></i> Meta 2.200</span>
+      </div>
+
+      <p class="fs-4xl fw-bold mb-0">1.250</p>
+      <p class="mb-4">kcal restantes</p>
+
+      <div class="calorias-resumen">
+        <div>
+          <p class="fs-sm mb-0">Consumidas</p>
+          <p class="fs-lg fw-bold mb-0">950</p>
+        </div>
+        <div>
+          <p class="fs-sm mb-0">Quemadas</p>
+          <p class="fs-lg fw-bold mb-0">180</p>
+        </div>
+      </div>
+    </section>
   </div>
 
-  <!-- Macros: proteínas, carbohidratos, grasas -->
+  <!-- Macros -->
   <div class="col-12 lg:col-5">
-    <section class="sano-card card-macros"></section>
+    <section class="sano-card card-macros">
+      <h2 class="fs-lg mb-3">Macronutrientes</h2>
+
+      <div class="macro">
+        <div class="d-flex justify-content-between fs-sm mb-1">
+          <span class="fw-semibold">Proteínas</span>
+          <span class="text-secondary-sano">60 / 138 g</span>
+        </div>
+        <div class="sano-progress"><span style="width: 43%"></span></div>
+      </div>
+
+      <div class="macro">
+        <div class="d-flex justify-content-between fs-sm mb-1">
+          <span class="fw-semibold">Carbohidratos</span>
+          <span class="text-secondary-sano">120 / 275 g</span>
+        </div>
+        <div class="sano-progress"><span style="width: 44%"></span></div>
+      </div>
+
+      <div class="macro">
+        <div class="d-flex justify-content-between fs-sm mb-1">
+          <span class="fw-semibold">Grasas</span>
+          <span class="text-secondary-sano">30 / 61 g</span>
+        </div>
+        <div class="sano-progress"><span style="width: 49%"></span></div>
+      </div>
+    </section>
   </div>
 
   <!-- Agua -->
   <div class="col-6 lg:col-4">
-    <section class="sano-card bg-blue-soft card-mini"></section>
+    <section class="sano-card bg-blue-soft card-mini">
+      <i class="bi bi-droplet-fill mini-icon"></i>
+      <p class="fs-sm text-secondary-sano mb-0">Agua</p>
+      <p class="fs-xl fw-bold mb-0">1,2 L</p>
+      <p class="fs-sm text-secondary-sano mb-0">de 2,5 L</p>
+    </section>
   </div>
 
   <!-- Pasos -->
   <div class="col-6 lg:col-4">
-    <section class="sano-card bg-orange-soft card-mini"></section>
+    <section class="sano-card bg-orange-soft card-mini">
+      <i class="bi bi-person-walking mini-icon"></i>
+      <p class="fs-sm text-secondary-sano mb-0">Pasos</p>
+      <p class="fs-xl fw-bold mb-0">6.540</p>
+      <p class="fs-sm text-secondary-sano mb-0">de 10.000</p>
+    </section>
   </div>
 
   <!-- Peso -->
   <div class="col-12 lg:col-4">
-    <section class="sano-card sano-card-dark card-mini"></section>
+    <section class="sano-card sano-card-dark card-mini">
+      <i class="bi bi-speedometer2 mini-icon"></i>
+      <p class="fs-sm mb-0 opacity-75">Peso actual</p>
+      <p class="fs-xl fw-bold mb-0">72,4 kg</p>
+      <p class="fs-sm mb-0 peso-cambio"><i class="bi bi-arrow-down-right"></i> 0,6 kg esta semana</p>
+    </section>
   </div>
 
   <!-- Comidas del día -->
   <div class="col-12">
-    <section class="sano-card card-comidas"></section>
+    <section class="sano-card">
+      <div class="d-flex align-items-center justify-content-between mb-2">
+        <h2 class="fs-lg mb-0">Comidas de hoy</h2>
+        <a href="#" class="link-sano fs-sm">Ver diario <i class="bi bi-chevron-right"></i></a>
+      </div>
+
+      <ul class="list-unstyled mb-0">
+        <li class="comida">
+          <span class="comida-icon bg-orange-soft"><i class="bi bi-cup-hot"></i></span>
+          <div class="flex-grow-1">
+            <p class="fw-semibold mb-0">Desayuno</p>
+            <p class="fs-sm text-secondary-sano mb-0">Avena con frutas, café</p>
+          </div>
+          <span class="kcal-pill">420 kcal</span>
+          <button type="button" class="icon-btn" aria-label="Agregar a desayuno"><i class="bi bi-plus-lg"></i></button>
+        </li>
+        <li class="comida">
+          <span class="comida-icon bg-lime-soft"><i class="bi bi-sun"></i></span>
+          <div class="flex-grow-1">
+            <p class="fw-semibold mb-0">Almuerzo</p>
+            <p class="fs-sm text-secondary-sano mb-0">Pollo, arroz integral, ensalada</p>
+          </div>
+          <span class="kcal-pill">530 kcal</span>
+          <button type="button" class="icon-btn" aria-label="Agregar a almuerzo"><i class="bi bi-plus-lg"></i></button>
+        </li>
+        <li class="comida">
+          <span class="comida-icon bg-blue-soft"><i class="bi bi-moon-stars"></i></span>
+          <div class="flex-grow-1">
+            <p class="fw-semibold mb-0">Cena</p>
+            <p class="fs-sm text-secondary-sano mb-0">Sin registrar</p>
+          </div>
+          <span class="kcal-pill">0 kcal</span>
+          <button type="button" class="icon-btn" aria-label="Agregar a cena"><i class="bi bi-plus-lg"></i></button>
+        </li>
+        <li class="comida">
+          <span class="comida-icon bg-orange-soft"><i class="bi bi-apple"></i></span>
+          <div class="flex-grow-1">
+            <p class="fw-semibold mb-0">Snacks</p>
+            <p class="fs-sm text-secondary-sano mb-0">Sin registrar</p>
+          </div>
+          <span class="kcal-pill">0 kcal</span>
+          <button type="button" class="icon-btn" aria-label="Agregar a snacks"><i class="bi bi-plus-lg"></i></button>
+        </li>
+      </ul>
+    </section>
   </div>
 </div>
