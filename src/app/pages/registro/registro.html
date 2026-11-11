@@ -1,0 +1,96 @@
+<main class="auth-page">
+  <section class="sano-card">
+    <header class="text-center mb-4">
+      <span class="logo"><i class="bi bi-egg-fried"></i></span>
+      <h1 class="fs-2xl mt-3 mb-1">Crear cuenta</h1>
+      <p class="text-secondary-sano mb-0">Empieza a comer rico y contar fácil.</p>
+    </header>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+      @let name = form.controls.name;
+      <div class="mb-3">
+        <label for="registro-nombre" class="form-label">Nombre</label>
+        <input
+          id="registro-nombre"
+          type="text"
+          class="form-control"
+          placeholder="Tu nombre"
+          autocomplete="name"
+          formControlName="name"
+          [class.is-invalid]="name.invalid && name.touched"
+        />
+        @if (name.touched && name.hasError('required')) {
+          <div class="invalid-feedback">Escribe tu nombre.</div>
+        } @else if (name.touched && name.hasError('minlength')) {
+          <div class="invalid-feedback">Debe tener al menos 2 caracteres.</div>
+        }
+      </div>
+
+      @let email = form.controls.email;
+      <div class="mb-3">
+        <label for="registro-email" class="form-label">Correo electrónico</label>
+        <input
+          id="registro-email"
+          type="email"
+          class="form-control"
+          placeholder="tu@correo.com"
+          autocomplete="email"
+          formControlName="email"
+          [class.is-invalid]="email.invalid && email.touched"
+        />
+        @if (email.touched && email.hasError('required')) {
+          <div class="invalid-feedback">Escribe tu correo.</div>
+        } @else if (email.touched && email.hasError('email')) {
+          <div class="invalid-feedback">Escribe un correo válido.</div>
+        }
+      </div>
+
+      @let password = form.controls.password;
+      <div class="mb-3">
+        <label for="registro-password" class="form-label">Contraseña</label>
+        <input
+          id="registro-password"
+          type="password"
+          class="form-control"
+          placeholder="Mínimo 6 caracteres"
+          autocomplete="new-password"
+          formControlName="password"
+          [class.is-invalid]="password.invalid && password.touched"
+        />
+        @if (password.touched && password.hasError('required')) {
+          <div class="invalid-feedback">Escribe una contraseña.</div>
+        } @else if (password.touched && password.hasError('minlength')) {
+          <div class="invalid-feedback">Debe tener al menos 6 caracteres.</div>
+        }
+      </div>
+
+      @let confirm = form.controls.confirmPassword;
+      @let mismatch = form.hasError('passwordsMismatch');
+      <div class="mb-4">
+        <label for="registro-confirmar" class="form-label">Confirmar contraseña</label>
+        <input
+          id="registro-confirmar"
+          type="password"
+          class="form-control"
+          placeholder="Repite tu contraseña"
+          autocomplete="new-password"
+          formControlName="confirmPassword"
+          [class.is-invalid]="confirm.touched && (confirm.invalid || mismatch)"
+        />
+        @if (confirm.touched && confirm.hasError('required')) {
+          <div class="invalid-feedback">Confirma tu contraseña.</div>
+        } @else if (confirm.touched && mismatch) {
+          <div class="invalid-feedback">Las contraseñas no coinciden.</div>
+        }
+      </div>
+
+      <button type="submit" class="btn btn-solid theme-warning sano-btn-orange w-100" [disabled]="form.invalid">
+        Crear cuenta
+      </button>
+    </form>
+
+    <p class="text-center text-secondary-sano mt-4 mb-0">
+      ¿Ya tienes cuenta? <a routerLink="/login" class="link-sano">Inicia sesión</a>
+    </p>
+  </section>
+</main>

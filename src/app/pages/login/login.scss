@@ -1,0 +1,22 @@
+.auth-page {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+
+  .sano-card {
+    width: 100%;
+    max-width: 420px;
+    padding: 2.5rem 2rem;
+  }
+}
+
+.logo {
+  display: inline-grid;
+  place-items: center;
+  width: 4rem;
+  height: 4rem;
+  border-radius: 20px;
+  background: var(--sano-lime);
+  font-size: 2rem;
+}
