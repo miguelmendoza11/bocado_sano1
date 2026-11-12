@@ -121,3 +121,18 @@
     justify-content: center;
   }
 }
+
+/* ---------- Datos de ejemplo ---------- */
+.aviso-reset {
+  color: var(--sano-orange-ink);
+  font-weight: 600;
+}
+
+.reset-ok {
+  color: var(--sano-ink);
+  font-weight: 600;
+
+  i {
+    color: var(--sano-lime-strong);
+  }
+}

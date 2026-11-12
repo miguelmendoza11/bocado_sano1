@@ -264,8 +264,25 @@ export class NutritionService {
     const data =
       saved?.version === 1
         ? rollOver(saved, this.today) // si es de otro día, empieza un día nuevo
-        : sampleData(this.auth.user()?.name ?? this.profile().name, this.today);
+        : sampleData(this.currentName(), this.today);
+    this.apply(data);
+    this.loadedKey = key;
+  }
 
+  /**
+   * Vuelve a los datos de ejemplo (comidas, agua, pasos, perfil e historial),
+   * conservando el nombre del usuario. Se guarda solo gracias al effect.
+   */
+  resetToSample(): void {
+    this.apply(sampleData(this.currentName(), this.today));
+  }
+
+  private currentName(): string {
+    return this.auth.user()?.name ?? this.profile().name;
+  }
+
+  /** Pone en los signals unos datos completos (cargados o de ejemplo). */
+  private apply(data: SavedNutrition): void {
     this.profile.set(data.profile);
     this.entries.set(this.toEntries(data.entries));
     this.waterMl.set(data.waterMl);
@@ -273,7 +290,6 @@ export class NutritionService {
     this.weightHistory.set(data.weightHistory);
     this.weekHistory.set(data.weekHistory);
     this.nextId = data.nextId;
-    this.loadedKey = key;
   }
 
   /** Convierte lo guardado (ids) en registros con el alimento completo; ignora ids que ya no existen. */
