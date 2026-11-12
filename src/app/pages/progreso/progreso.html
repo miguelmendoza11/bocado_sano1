@@ -88,26 +88,42 @@
     </section>
   </div>
 
-  <!-- Gráfica de peso (línea fija hasta el paso 5) -->
+  <!-- Gráfica de peso: SVG calculado con weightPoints() -->
   <div class="col-12 xl:col-5">
     <section class="sano-card card-grafica">
+      @let cambioTotal = totalWeightChange();
       <div class="d-flex align-items-center justify-content-between">
-        <h2 class="fs-lg mb-0">Peso</h2>
-        <span class="chip">Últimas 5 semanas</span>
+        <div>
+          <h2 class="fs-lg mb-0">Peso</h2>
+          <p class="fs-sm text-secondary-sano mb-0">{{ weightPoints().length }} registros</p>
+        </div>
+        <span class="chip" [class.chip-baja]="cambioTotal < 0" [class.chip-sube]="cambioTotal > 0">
+          <i class="bi" [class.bi-arrow-down-right]="cambioTotal <= 0" [class.bi-arrow-up-right]="cambioTotal > 0"></i>
+          {{ cambioTotal > 0 ? '+' : '' }}{{ cambioTotal | number: '1.1-1' }} kg
+        </span>
       </div>
 
-      <svg class="grafica-peso" viewBox="0 0 300 160" role="img" aria-label="Evolución del peso">
-        <polyline class="linea" points="20,38 85,60 150,68 215,86 280,112" />
-        <circle class="punto" cx="20" cy="38" r="5" />
-        <circle class="punto" cx="85" cy="60" r="5" />
-        <circle class="punto" cx="150" cy="68" r="5" />
-        <circle class="punto" cx="215" cy="86" r="5" />
-        <circle class="punto" cx="280" cy="112" r="5" />
-        <text x="20" y="152">14 oct</text>
-        <text x="85" y="152">21 oct</text>
-        <text x="150" y="152">28 oct</text>
-        <text x="215" y="152">4 nov</text>
-        <text x="280" y="152">11 nov</text>
+      <svg
+        class="grafica-peso"
+        [attr.viewBox]="'0 0 ' + chart.width + ' ' + chart.height"
+        role="img"
+        [attr.aria-label]="'Evolución del peso: de ' + (firstWeight()?.kg | number: '1.1-1') + ' a ' + (nutrition.currentWeight() | number: '1.1-1') + ' kg'"
+      >
+        <defs>
+          <linearGradient id="peso-relleno" x1="0" y1="0" x2="0" y2="1">
+            <stop class="relleno-arriba" offset="0%" />
+            <stop class="relleno-abajo" offset="100%" />
+          </linearGradient>
+        </defs>
+
+        <polygon class="area" [attr.points]="weightArea()" fill="url(#peso-relleno)" />
+        <polyline class="linea" [attr.points]="weightLine()" />
+
+        @for (p of weightPoints(); track p.date; let last = $last) {
+          <circle class="punto" [class.ultimo]="last" [attr.cx]="p.x" [attr.cy]="p.y" r="5" />
+          <text class="valor" [class.ultimo]="last" [attr.x]="p.x" [attr.y]="p.y - 11">{{ p.kg | number: '1.1-1' }}</text>
+          <text class="fecha" [attr.x]="p.x" [attr.y]="chart.height - 10">{{ p.date | date: 'd MMM' }}</text>
+        }
       </svg>
     </section>
   </div>

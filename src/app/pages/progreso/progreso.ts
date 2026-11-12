@@ -71,6 +71,44 @@ export class Progreso {
 
   // ---------- Peso ----------
 
+  /** Medidas del SVG de peso (viewBox 0 0 300 170) y márgenes para los textos. */
+  readonly chart = { width: 300, height: 170, padX: 24, top: 26, bottom: 34 } as const;
+
+  /**
+   * Cada registro de peso convertido en un punto (x, y) del SVG.
+   * x: repartidos a lo ancho. y: el peso más alto arriba y el más bajo abajo,
+   * con 0,3 kg de aire para que los puntos no toquen los bordes.
+   */
+  readonly weightPoints = computed(() => {
+    const history = this.nutrition.weightHistory();
+    const { width, height, padX, top, bottom } = this.chart;
+    const kgs = history.map((w) => w.kg);
+    const min = Math.min(...kgs) - 0.3;
+    const max = Math.max(...kgs) + 0.3;
+    const stepX = history.length > 1 ? (width - 2 * padX) / (history.length - 1) : 0;
+    const plotHeight = height - top - bottom;
+    return history.map((w, i) => ({
+      ...w,
+      x: history.length > 1 ? padX + i * stepX : width / 2,
+      y: top + ((max - w.kg) / (max - min)) * plotHeight,
+    }));
+  });
+
+  /** Texto para el atributo points del <polyline>: "24,40 87,62 ...". */
+  readonly weightLine = computed(() =>
+    this.weightPoints()
+      .map((p) => `${p.x.toFixed(1)},${p.y.toFixed(1)}`)
+      .join(' '),
+  );
+
+  /** Área sombreada bajo la línea: la misma línea + las dos esquinas de abajo. */
+  readonly weightArea = computed(() => {
+    const points = this.weightPoints();
+    if (points.length < 2) return '';
+    const base = this.chart.height - this.chart.bottom;
+    return `${points[0].x.toFixed(1)},${base} ${this.weightLine()} ${points.at(-1)!.x.toFixed(1)},${base}`;
+  });
+
   /** Primer registro de peso (punto de partida). */
   readonly firstWeight = computed(() => this.nutrition.weightHistory().at(0));
 

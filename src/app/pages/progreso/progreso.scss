@@ -150,9 +150,22 @@
 }
 
 /* ---------- Línea de peso ---------- */
+.chip-baja {
+  background: var(--sano-lime-soft);
+  border-color: var(--sano-lime-soft);
+  color: #3f5503;
+}
+
+.chip-sube {
+  background: #ffeedd;
+  border-color: #ffeedd;
+  color: #c25412;
+}
+
 .grafica-peso {
   width: 100%;
   height: auto;
+  overflow: visible;
 
   .linea {
     fill: none;
@@ -162,16 +175,42 @@
     stroke-linejoin: round;
   }
 
+  /* Degradado naranja bajo la línea (los colores van aquí porque var() no sirve en atributos SVG) */
+  .relleno-arriba {
+    stop-color: var(--sano-orange);
+    stop-opacity: 0.25;
+  }
+
+  .relleno-abajo {
+    stop-color: var(--sano-orange);
+    stop-opacity: 0;
+  }
+
   .punto {
     fill: #fff;
     stroke: var(--sano-orange);
     stroke-width: 3;
+
+    &.ultimo {
+      fill: var(--sano-orange);
+    }
   }
 
   text {
-    fill: var(--sano-muted);
     font-size: 11px;
     font-weight: 600;
     text-anchor: middle;
+  }
+
+  .valor {
+    fill: var(--sano-ink);
+
+    &.ultimo {
+      font-weight: 800;
+    }
+  }
+
+  .fecha {
+    fill: var(--sano-muted);
   }
 }
