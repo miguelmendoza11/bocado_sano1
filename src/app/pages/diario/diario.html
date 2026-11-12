@@ -5,26 +5,185 @@
 
 <div class="row g-3">
   <!-- Columna izquierda: las 4 comidas del día -->
-  <div class="col-12 lg:col-8">
+  <div class="col-12 xl:col-8">
     <div class="comidas">
       <!-- Desayuno -->
-      <section class="sano-card card-comida"></section>
+      <section class="sano-card">
+        <div class="comida-header">
+          <span class="comida-icon bg-orange-soft"><i class="bi bi-cup-hot"></i></span>
+          <h2 class="fs-lg mb-0 flex-grow-1">Desayuno</h2>
+          <span class="kcal-pill">420 kcal</span>
+          <button type="button" class="icon-btn" aria-label="Agregar a desayuno"><i class="bi bi-plus-lg"></i></button>
+        </div>
+        <ul class="list-unstyled mb-0 alimentos">
+          <li class="alimento">
+            <div class="flex-grow-1 min-w-0">
+              <p class="fw-semibold mb-0 text-truncate">Avena con frutas</p>
+              <p class="fs-sm text-secondary-sano mb-0">1 tazón</p>
+            </div>
+            <span class="fs-sm fw-semibold">320 kcal</span>
+            <button type="button" class="btn-quitar" aria-label="Quitar avena con frutas"><i class="bi bi-trash3"></i></button>
+          </li>
+          <li class="alimento">
+            <div class="flex-grow-1 min-w-0">
+              <p class="fw-semibold mb-0 text-truncate">Café con leche</p>
+              <p class="fs-sm text-secondary-sano mb-0">1 taza</p>
+            </div>
+            <span class="fs-sm fw-semibold">100 kcal</span>
+            <button type="button" class="btn-quitar" aria-label="Quitar café con leche"><i class="bi bi-trash3"></i></button>
+          </li>
+        </ul>
+      </section>
+
       <!-- Almuerzo -->
-      <section class="sano-card card-comida"></section>
+      <section class="sano-card">
+        <div class="comida-header">
+          <span class="comida-icon bg-lime-soft"><i class="bi bi-sun"></i></span>
+          <h2 class="fs-lg mb-0 flex-grow-1">Almuerzo</h2>
+          <span class="kcal-pill">530 kcal</span>
+          <button type="button" class="icon-btn" aria-label="Agregar a almuerzo"><i class="bi bi-plus-lg"></i></button>
+        </div>
+        <ul class="list-unstyled mb-0 alimentos">
+          <li class="alimento">
+            <div class="flex-grow-1 min-w-0">
+              <p class="fw-semibold mb-0 text-truncate">Pechuga de pollo</p>
+              <p class="fs-sm text-secondary-sano mb-0">150 g</p>
+            </div>
+            <span class="fs-sm fw-semibold">250 kcal</span>
+            <button type="button" class="btn-quitar" aria-label="Quitar pechuga de pollo"><i class="bi bi-trash3"></i></button>
+          </li>
+          <li class="alimento">
+            <div class="flex-grow-1 min-w-0">
+              <p class="fw-semibold mb-0 text-truncate">Arroz integral</p>
+              <p class="fs-sm text-secondary-sano mb-0">1 taza</p>
+            </div>
+            <span class="fs-sm fw-semibold">215 kcal</span>
+            <button type="button" class="btn-quitar" aria-label="Quitar arroz integral"><i class="bi bi-trash3"></i></button>
+          </li>
+          <li class="alimento">
+            <div class="flex-grow-1 min-w-0">
+              <p class="fw-semibold mb-0 text-truncate">Ensalada verde</p>
+              <p class="fs-sm text-secondary-sano mb-0">1 plato</p>
+            </div>
+            <span class="fs-sm fw-semibold">65 kcal</span>
+            <button type="button" class="btn-quitar" aria-label="Quitar ensalada verde"><i class="bi bi-trash3"></i></button>
+          </li>
+        </ul>
+      </section>
+
       <!-- Cena -->
-      <section class="sano-card card-comida"></section>
+      <section class="sano-card">
+        <div class="comida-header">
+          <span class="comida-icon bg-blue-soft"><i class="bi bi-moon-stars"></i></span>
+          <h2 class="fs-lg mb-0 flex-grow-1">Cena</h2>
+          <span class="kcal-pill">0 kcal</span>
+          <button type="button" class="icon-btn" aria-label="Agregar a cena"><i class="bi bi-plus-lg"></i></button>
+        </div>
+        <p class="vacio fs-sm text-secondary-sano mb-0">Todavía no registras nada. Toca + para agregar.</p>
+      </section>
+
       <!-- Snacks -->
-      <section class="sano-card card-comida"></section>
+      <section class="sano-card">
+        <div class="comida-header">
+          <span class="comida-icon bg-orange-soft"><i class="bi bi-apple"></i></span>
+          <h2 class="fs-lg mb-0 flex-grow-1">Snacks</h2>
+          <span class="kcal-pill">0 kcal</span>
+          <button type="button" class="icon-btn" aria-label="Agregar a snacks"><i class="bi bi-plus-lg"></i></button>
+        </div>
+        <p class="vacio fs-sm text-secondary-sano mb-0">Todavía no registras nada. Toca + para agregar.</p>
+      </section>
     </div>
   </div>
 
   <!-- Columna derecha: resumen del día y buscador de alimentos -->
-  <div class="col-12 lg:col-4 col-lateral">
+  <div class="col-12 xl:col-4 col-lateral">
     <div class="lateral">
       <!-- Resumen de calorías -->
-      <section class="sano-card sano-card-lime card-resumen"></section>
+      <section class="sano-card sano-card-lime">
+        <h2 class="fs-lg mb-3">Resumen de hoy</h2>
+        <div class="resumen">
+          <div>
+            <p class="fs-sm mb-0">Consumidas</p>
+            <p class="fs-lg fw-bold mb-0">950</p>
+          </div>
+          <div>
+            <p class="fs-sm mb-0">Meta</p>
+            <p class="fs-lg fw-bold mb-0">2.140</p>
+          </div>
+          <div>
+            <p class="fs-sm mb-0">Restantes</p>
+            <p class="fs-lg fw-bold mb-0">1.452</p>
+          </div>
+        </div>
+        <div class="sano-progress progress-resumen"><span style="width: 44%"></span></div>
+        <div class="d-flex justify-content-between fs-sm mt-3">
+          <span>P 69 g</span>
+          <span>C 119 g</span>
+          <span>G 21 g</span>
+        </div>
+      </section>
+
       <!-- Buscar y agregar alimentos -->
-      <section class="sano-card card-buscador"></section>
+      <section class="sano-card">
+        <h2 class="fs-lg mb-3">Agregar alimento</h2>
+
+        <label class="buscador mb-3">
+          <i class="bi bi-search"></i>
+          <input type="search" placeholder="Buscar alimento..." aria-label="Buscar alimento" />
+        </label>
+
+        <div class="tabs-pill mb-3 w-100">
+          <button type="button" class="tab active">Desayuno</button>
+          <button type="button" class="tab">Almuerzo</button>
+          <button type="button" class="tab">Cena</button>
+          <button type="button" class="tab">Snacks</button>
+        </div>
+
+        <ul class="list-unstyled mb-0">
+          <li class="resultado">
+            <div class="flex-grow-1 min-w-0">
+              <p class="fw-semibold mb-0 text-truncate">Avena con frutas</p>
+              <p class="fs-sm text-secondary-sano mb-0">1 tazón · 320 kcal</p>
+            </div>
+            <button type="button" class="icon-btn" aria-label="Agregar avena con frutas"><i class="bi bi-plus-lg"></i></button>
+          </li>
+          <li class="resultado">
+            <div class="flex-grow-1 min-w-0">
+              <p class="fw-semibold mb-0 text-truncate">Pechuga de pollo</p>
+              <p class="fs-sm text-secondary-sano mb-0">150 g · 250 kcal</p>
+            </div>
+            <button type="button" class="icon-btn" aria-label="Agregar pechuga de pollo"><i class="bi bi-plus-lg"></i></button>
+          </li>
+          <li class="resultado">
+            <div class="flex-grow-1 min-w-0">
+              <p class="fw-semibold mb-0 text-truncate">Huevo cocido</p>
+              <p class="fs-sm text-secondary-sano mb-0">1 unidad · 78 kcal</p>
+            </div>
+            <button type="button" class="icon-btn" aria-label="Agregar huevo cocido"><i class="bi bi-plus-lg"></i></button>
+          </li>
+          <li class="resultado">
+            <div class="flex-grow-1 min-w-0">
+              <p class="fw-semibold mb-0 text-truncate">Manzana</p>
+              <p class="fs-sm text-secondary-sano mb-0">1 mediana · 95 kcal</p>
+            </div>
+            <button type="button" class="icon-btn" aria-label="Agregar manzana"><i class="bi bi-plus-lg"></i></button>
+          </li>
+          <li class="resultado">
+            <div class="flex-grow-1 min-w-0">
+              <p class="fw-semibold mb-0 text-truncate">Yogur griego</p>
+              <p class="fs-sm text-secondary-sano mb-0">170 g · 150 kcal</p>
+            </div>
+            <button type="button" class="icon-btn" aria-label="Agregar yogur griego"><i class="bi bi-plus-lg"></i></button>
+          </li>
+          <li class="resultado">
+            <div class="flex-grow-1 min-w-0">
+              <p class="fw-semibold mb-0 text-truncate">Salmón a la plancha</p>
+              <p class="fs-sm text-secondary-sano mb-0">150 g · 310 kcal</p>
+            </div>
+            <button type="button" class="icon-btn" aria-label="Agregar salmón a la plancha"><i class="bi bi-plus-lg"></i></button>
+          </li>
+        </ul>
+      </section>
     </div>
   </div>
 </div>
