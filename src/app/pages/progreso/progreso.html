@@ -4,43 +4,83 @@
 </header>
 
 <div class="row g-3">
-  <!-- Resumen: promedio semanal -->
+  <!-- Resumen: promedio semanal (texto fijo, en el paso 3 viene del servicio) -->
   <div class="col-6 md:col-4">
-    <section class="sano-card card-resumen">
-      <div class="placeholder-icon"></div>
-      <div class="placeholder-line"></div>
+    <section class="sano-card sano-card-lime card-resumen">
+      <i class="bi bi-fire resumen-icon"></i>
+      <div>
+        <p class="fs-sm mb-0">Promedio diario</p>
+        <p class="fs-xl fw-bold mb-0">1.919 kcal</p>
+        <p class="fs-sm mb-0 opacity-75">últimos 7 días</p>
+      </div>
     </section>
   </div>
 
   <!-- Resumen: días dentro de la meta -->
   <div class="col-6 md:col-4">
-    <section class="sano-card card-resumen">
-      <div class="placeholder-icon"></div>
-      <div class="placeholder-line"></div>
+    <section class="sano-card bg-orange-soft card-resumen">
+      <i class="bi bi-bullseye resumen-icon"></i>
+      <div>
+        <p class="fs-sm text-secondary-sano mb-0">Días en la meta</p>
+        <p class="fs-xl fw-bold mb-0">5 / 7</p>
+        <p class="fs-sm text-secondary-sano mb-0">meta: 2.140 kcal</p>
+      </div>
     </section>
   </div>
 
   <!-- Resumen: peso actual -->
   <div class="col-12 md:col-4">
-    <section class="sano-card card-resumen">
-      <div class="placeholder-icon"></div>
-      <div class="placeholder-line"></div>
+    <section class="sano-card sano-card-dark card-resumen">
+      <i class="bi bi-speedometer2 resumen-icon"></i>
+      <div>
+        <p class="fs-sm mb-0 opacity-75">Peso actual</p>
+        <p class="fs-xl fw-bold mb-0">72,4 kg</p>
+        <p class="fs-sm mb-0 peso-cambio"><i class="bi bi-arrow-down-right"></i> 1,7 kg desde el 14 oct</p>
+      </div>
     </section>
   </div>
 
-  <!-- Gráfica de calorías de la semana -->
+  <!-- Gráfica de calorías de la semana (barras dibujadas a mano) -->
   <div class="col-12 xl:col-7">
     <section class="sano-card card-grafica">
-      <div class="placeholder-title"></div>
-      <div class="placeholder-chart"></div>
+      <div class="d-flex align-items-center justify-content-between">
+        <h2 class="fs-lg mb-0">Calorías de la semana</h2>
+        <span class="kcal-pill">Meta 2.140</span>
+      </div>
+
+      <div class="barras">
+        <div class="barra-col"><span class="barra" style="height: 82%"></span><span class="barra-dia">jue</span></div>
+        <div class="barra-col"><span class="barra" style="height: 76%"></span><span class="barra-dia">vie</span></div>
+        <div class="barra-col"><span class="barra" style="height: 90%"></span><span class="barra-dia">sáb</span></div>
+        <div class="barra-col"><span class="barra" style="height: 79%"></span><span class="barra-dia">dom</span></div>
+        <div class="barra-col"><span class="barra" style="height: 92%"></span><span class="barra-dia">lun</span></div>
+        <div class="barra-col"><span class="barra" style="height: 80%"></span><span class="barra-dia">mar</span></div>
+        <div class="barra-col hoy"><span class="barra" style="height: 38%"></span><span class="barra-dia">hoy</span></div>
+      </div>
     </section>
   </div>
 
-  <!-- Gráfica de peso -->
+  <!-- Gráfica de peso (línea SVG dibujada a mano) -->
   <div class="col-12 xl:col-5">
     <section class="sano-card card-grafica">
-      <div class="placeholder-title"></div>
-      <div class="placeholder-chart"></div>
+      <div class="d-flex align-items-center justify-content-between">
+        <h2 class="fs-lg mb-0">Peso</h2>
+        <span class="chip">Últimas 5 semanas</span>
+      </div>
+
+      <svg class="grafica-peso" viewBox="0 0 300 160" role="img" aria-label="Evolución del peso">
+        <polyline class="linea" points="20,38 85,60 150,68 215,86 280,112" />
+        <circle class="punto" cx="20" cy="38" r="5" />
+        <circle class="punto" cx="85" cy="60" r="5" />
+        <circle class="punto" cx="150" cy="68" r="5" />
+        <circle class="punto" cx="215" cy="86" r="5" />
+        <circle class="punto" cx="280" cy="112" r="5" />
+        <text x="20" y="152">14 oct</text>
+        <text x="85" y="152">21 oct</text>
+        <text x="150" y="152">28 oct</text>
+        <text x="215" y="152">4 nov</text>
+        <text x="280" y="152">11 nov</text>
+      </svg>
     </section>
   </div>
 </div>

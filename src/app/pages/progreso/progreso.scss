@@ -6,30 +6,80 @@
   gap: 0.85rem;
 }
 
-/* Espacios grises que en los siguientes pasos se llenan con contenido */
-.placeholder-icon,
-.placeholder-line,
-.placeholder-title,
-.placeholder-chart {
-  border-radius: 12px;
-  background: var(--sano-bg);
+/* ---------- Tarjetas de resumen ---------- */
+.resumen-icon {
+  font-size: 1.4rem;
 }
 
-.placeholder-icon {
-  width: 2.75rem;
-  height: 2.75rem;
-  border-radius: 14px;
+.peso-cambio {
+  color: var(--sano-lime);
 }
 
-.placeholder-line {
-  height: 3.25rem;
-}
-
-.placeholder-title {
-  width: 45%;
-  height: 1.5rem;
-}
-
-.placeholder-chart {
+/* ---------- Barras de calorías ---------- */
+.barras {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.5rem;
   height: 14rem;
+}
+
+/* Cada columna: la barra crece desde abajo y el día va debajo */
+.barra-col {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+.barra {
+  width: 100%;
+  max-width: 2.5rem;
+  border-radius: 10px 10px 6px 6px;
+  background: var(--sano-lime-soft);
+}
+
+.barra-dia {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--sano-muted);
+}
+
+/* El día de hoy resaltado */
+.hoy {
+  .barra {
+    background: var(--sano-lime-strong);
+  }
+
+  .barra-dia {
+    color: var(--sano-ink);
+  }
+}
+
+/* ---------- Línea de peso ---------- */
+.grafica-peso {
+  width: 100%;
+  height: auto;
+
+  .linea {
+    fill: none;
+    stroke: var(--sano-orange);
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .punto {
+    fill: #fff;
+    stroke: var(--sano-orange);
+    stroke-width: 3;
+  }
+
+  text {
+    fill: var(--sano-muted);
+    font-size: 11px;
+    font-weight: 600;
+    text-anchor: middle;
+  }
 }
