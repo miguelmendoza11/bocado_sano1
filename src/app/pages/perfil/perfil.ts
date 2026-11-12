@@ -1,4 +1,6 @@
-import { Component, computed, inject } from '@angular/core';
+import { DecimalPipe } from '@angular/common';
+import { Component, computed, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivityLevel, Goal, Sex } from '../../core/models/nutrition.models';
 import { AuthService } from '../../core/services/auth.service';
@@ -6,7 +8,7 @@ import { NutritionService } from '../../core/services/nutrition.service';
 
 @Component({
   selector: 'app-perfil',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, DecimalPipe],
   templateUrl: './perfil.html',
   styleUrl: './perfil.scss',
 })
@@ -35,6 +37,18 @@ export class Perfil {
   /** Formulario precargado con el perfil actual y el nombre de la sesión. */
   readonly form = this.buildForm();
 
+  /** true justo después de guardar; se apaga al volver a editar. */
+  protected readonly saved = signal(false);
+
+  /** Texto del objetivo actual para el chip de la meta. */
+  protected readonly goalLabel = computed(
+    () => this.goalOptions.find((o) => o.value === this.nutrition.profile().goal)?.label ?? '',
+  );
+
+  constructor() {
+    this.form.valueChanges.pipe(takeUntilDestroyed()).subscribe(() => this.saved.set(false));
+  }
+
   /** Iniciales para el avatar: "Juan Montezuma" → "JM", "ana" → "A". */
   protected readonly initials = computed(() => {
     const name = this.auth.user()?.name ?? '';
@@ -51,7 +65,13 @@ export class Perfil {
       this.form.markAllAsTouched();
       return;
     }
-    // Guardar: siguiente commit
+    const { name, ...data } = this.form.getRawValue();
+    // El perfil cambia → calorieGoal() y macroGoals() se recalculan solos (Inicio y Diario también)
+    this.nutrition.updateProfile({ ...data, name: name.trim() });
+    // El nombre también va a la sesión (avatar, saludo y login futuro)
+    this.auth.updateName(name);
+    this.form.markAsPristine();
+    this.saved.set(true);
   }
 
   private buildForm() {

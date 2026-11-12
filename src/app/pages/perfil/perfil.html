@@ -21,24 +21,25 @@
     <section class="sano-card sano-card-lime card-meta">
       <div class="d-flex align-items-center justify-content-between mb-3">
         <h2 class="fs-lg mb-0">Tu meta diaria</h2>
-        <span class="chip"><i class="bi bi-bullseye"></i> Perder peso</span>
+        <span class="chip"><i class="bi bi-bullseye"></i> {{ goalLabel() }}</span>
       </div>
       <p class="mb-3">
-        <span class="fs-4xl fw-bold lh-1">2.140</span>
+        <span class="fs-4xl fw-bold lh-1">{{ nutrition.calorieGoal() | number }}</span>
         <span class="fs-md">kcal</span>
       </p>
+      @let macros = nutrition.macroGoals();
       <div class="macros">
         <div>
           <p class="fs-sm mb-0">Carbohidratos</p>
-          <p class="fw-bold mb-0">268 g</p>
+          <p class="fw-bold mb-0">{{ macros.carbs }} g</p>
         </div>
         <div>
           <p class="fs-sm mb-0">Proteína</p>
-          <p class="fw-bold mb-0">134 g</p>
+          <p class="fw-bold mb-0">{{ macros.protein }} g</p>
         </div>
         <div>
           <p class="fs-sm mb-0">Grasa</p>
-          <p class="fw-bold mb-0">59 g</p>
+          <p class="fw-bold mb-0">{{ macros.fat }} g</p>
         </div>
       </div>
     </section>
@@ -148,6 +149,12 @@
         <button type="submit" class="btn btn-solid theme-warning sano-btn-orange w-100 mt-4">
           Guardar cambios
         </button>
+
+        @if (saved()) {
+          <p class="guardado mt-3 mb-0" role="status">
+            <i class="bi bi-check-circle-fill"></i> Guardado. Tu meta se actualizó.
+          </p>
+        }
       </form>
     </section>
   </div>
