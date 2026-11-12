@@ -62,6 +62,65 @@
   --bs-link-color: var(--sano-ink);
 }
 
+/* ---------- Modo oscuro ----------
+   Se activa con <html data-bs-theme="dark">. Bootstrap usa el mismo atributo,
+   así que sus componentes (inputs, selects...) también pasan a oscuro.
+   Solo se redefinen colores: el resto del diseño no cambia. */
+:root[data-bs-theme='dark'] {
+  /* Fondo gris verdoso muy oscuro (no negro puro) y tarjetas un poco más claras */
+  --sano-bg: #10130e;
+  --sano-surface: #1a1e17;
+  --sano-surface-dark: #262c21;
+  --sano-border: #2c3328;
+
+  /* Textos */
+  --sano-ink: #eef1e8;
+  --sano-muted: #9ba293;
+  --sano-on-dark: #f3f5ee;
+  --sano-on-lime: #151912;
+
+  /* Lima un poco más suave para que no encandile en la oscuridad */
+  --sano-lime: #b8e53a;
+  --sano-lime-strong: #a5d424;
+  --sano-lime-soft: #273216;
+  --sano-lime-ink: #cdee6e;
+
+  /* Acentos ajustados para fondo oscuro */
+  --sano-orange: #ff9a52;
+  --sano-gradient-orange: linear-gradient(135deg, #ffb45c 0%, #ff8240 100%);
+  --sano-orange-soft: #372415;
+  --sano-orange-ink: #ffb27a;
+  --sano-blue: #5ea3f2;
+  --sano-blue-soft: #16222f;
+  --sano-danger: #ff6369;
+  --sano-danger-ink: #ff8a8f;
+  --sano-success-ink: #b9e04c;
+  --sano-chart-ok: #46551f;
+  --sano-chart-over: #6a4027;
+  --sano-track-soft: rgba(255, 255, 255, 0.12);
+
+  /* Sombras más profundas: en oscuro una sombra suave no se ve */
+  --sano-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  --sano-shadow-nav: 0 -4px 24px rgba(0, 0, 0, 0.45);
+  --sano-shadow-hover: 0 14px 32px rgba(0, 0, 0, 0.5);
+
+  /* Bootstrap: primary (lima) y warning (naranja) en versión oscura */
+  --bs-primary-fg: #c6f432;
+  --bs-primary-fg-emphasis: #def78f;
+  --bs-primary-bg-subtle: var(--sano-lime-soft);
+  --bs-primary-bg-muted: #3a4a15;
+  --bs-warning-fg: #ffb27a;
+  --bs-warning-bg-subtle: var(--sano-orange-soft);
+  --bs-warning-border: #8a4a1f;
+}
+
+/* En oscuro las tarjetas llevan un borde de luz muy sutil para separarse del fondo */
+:root[data-bs-theme='dark'] .sano-card {
+  box-shadow:
+    var(--sano-shadow),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+}
+
 /* ---------- Base ---------- */
 body {
   background: var(--sano-bg);
