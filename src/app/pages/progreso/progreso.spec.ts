@@ -64,6 +64,21 @@ describe('Progreso', () => {
     expect(el.textContent).toContain('5 / 7');
   });
 
+  it('does not count days without records in the average or the goal', async () => {
+    // Martes 10 sin abrir la app (0 kcal); el resto igual
+    nutrition.weekHistory.update((week) =>
+      week.map((d) => (d.date === '2026-11-10' ? { ...d, kcal: 0 } : d)),
+    );
+    await fixture.whenStable();
+
+    // (2050 + 1890 + 2240 + 1980 + 2310 + 950) / 6 = 1903,3 → 1903
+    expect(component.loggedDays().length).toBe(6);
+    expect(component.average()).toBe(1903);
+    expect(component.daysOnGoal()).toBe(4);
+    expect(el.textContent).toContain('4 / 6');
+    expect(el.textContent).toContain('6 de 7 días con registro');
+  });
+
   it('shows the current weight and the total change', () => {
     expect(component.totalWeightChange()).toBe(-1.7);
     expect(text('.sano-card-dark')).toContain('72,4 kg');
