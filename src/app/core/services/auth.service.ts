@@ -1,4 +1,5 @@
 import { Injectable, computed, signal } from '@angular/core';
+import { STORAGE_PREFIX, readStorage, writeStorage } from '../utils/storage';
 
 /** Usuario con sesión iniciada. */
 export interface AuthUser {
@@ -6,31 +7,8 @@ export interface AuthUser {
   email: string;
 }
 
-const SESSION_KEY = 'bocado-sano.session';
-const USERS_KEY = 'bocado-sano.users';
-
-/** Lee un JSON de localStorage. Si falla (modo privado, dato roto...) devuelve null. */
-function readStorage<T>(key: string): T | null {
-  try {
-    const raw = localStorage.getItem(key);
-    return raw ? (JSON.parse(raw) as T) : null;
-  } catch {
-    return null;
-  }
-}
-
-/** Guarda (o borra, si value es null) un JSON en localStorage sin romper la app si falla. */
-function writeStorage(key: string, value: unknown): void {
-  try {
-    if (value === null) {
-      localStorage.removeItem(key);
-    } else {
-      localStorage.setItem(key, JSON.stringify(value));
-    }
-  } catch {
-    // Sin localStorage la sesión solo dura hasta recargar la página.
-  }
-}
+const SESSION_KEY = `${STORAGE_PREFIX}session`;
+const USERS_KEY = `${STORAGE_PREFIX}users`;
 
 /**
  * Sesión del usuario, solo en el frontend (no hay backend).

@@ -51,6 +51,12 @@ export class Perfil {
   /** true justo después de guardar; se apaga al volver a editar. */
   protected readonly saved = signal(false);
 
+  /** Restablecer datos: false → botón normal, true → pide confirmación. */
+  protected readonly confirmingReset = signal(false);
+
+  /** true justo después de restablecer, para mostrar el aviso. */
+  protected readonly resetDone = signal(false);
+
   /** Texto del objetivo actual para el chip de la meta. */
   protected readonly goalLabel = computed(
     () => this.goalOptions.find((o) => o.value === this.nutrition.profile().goal)?.label ?? '',
@@ -85,22 +91,45 @@ export class Perfil {
     this.saved.set(true);
   }
 
+  /** Segundo clic de "Restablecer": vuelve a los datos de ejemplo y recarga el formulario. */
+  resetData(): void {
+    this.nutrition.resetToSample();
+    this.form.reset(this.formValues());
+    this.confirmingReset.set(false);
+    this.saved.set(false);
+    this.resetDone.set(true);
+  }
+
   /** Borra la sesión y vuelve a la bienvenida. */
   logout(): void {
     this.auth.logout();
     this.router.navigate(['/bienvenida']);
   }
 
-  private buildForm() {
+  /** Valores del formulario a partir del perfil actual y el nombre de la sesión. */
+  private formValues() {
     const p = this.nutrition.profile();
+    return {
+      name: this.auth.user()?.name ?? p.name,
+      sex: p.sex,
+      age: p.age,
+      heightCm: p.heightCm,
+      weightKg: p.weightKg,
+      activity: p.activity,
+      goal: p.goal,
+    };
+  }
+
+  private buildForm() {
+    const v = this.formValues();
     return this.fb.group({
-      name: [this.auth.user()?.name ?? p.name, [Validators.required, Validators.minLength(2)]],
-      sex: [p.sex, Validators.required],
-      age: [p.age, [Validators.required, Validators.min(13), Validators.max(100)]],
-      heightCm: [p.heightCm, [Validators.required, Validators.min(120), Validators.max(230)]],
-      weightKg: [p.weightKg, [Validators.required, Validators.min(30), Validators.max(250)]],
-      activity: [p.activity, Validators.required],
-      goal: [p.goal, Validators.required],
+      name: [v.name, [Validators.required, Validators.minLength(2)]],
+      sex: [v.sex, Validators.required],
+      age: [v.age, [Validators.required, Validators.min(13), Validators.max(100)]],
+      heightCm: [v.heightCm, [Validators.required, Validators.min(120), Validators.max(230)]],
+      weightKg: [v.weightKg, [Validators.required, Validators.min(30), Validators.max(250)]],
+      activity: [v.activity, Validators.required],
+      goal: [v.goal, Validators.required],
     });
   }
 }

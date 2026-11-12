@@ -1,5 +1,6 @@
 import { DOCUMENT } from '@angular/common';
 import { DestroyRef, Injectable, computed, effect, inject, signal } from '@angular/core';
+import { STORAGE_PREFIX } from '../utils/storage';
 
 /** Lo que elige el usuario. "system" sigue el modo del celular o del computador. */
 export type ThemePreference = 'light' | 'dark' | 'system';
@@ -7,8 +8,11 @@ export type ThemePreference = 'light' | 'dark' | 'system';
 /** El tema que realmente se ve. */
 export type Theme = 'light' | 'dark';
 
-/** Misma clave que lee el script de src/index.html (evita el destello blanco al recargar). */
-export const THEME_KEY = 'bocado-sano.theme';
+/**
+ * Misma clave ('bocado-sano.theme') que lee el script de src/index.html, que evita el destello
+ * blanco al recargar. Se guarda como texto plano (no JSON) para que ese script la lea fácil.
+ */
+export const THEME_KEY = `${STORAGE_PREFIX}theme`;
 
 const PREFERENCES: ThemePreference[] = ['light', 'dark', 'system'];
 

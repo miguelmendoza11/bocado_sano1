@@ -1,4 +1,4 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, computed, effect, inject, signal, untracked } from '@angular/core';
 import {
   ACTIVITY_LEVELS,
   DayHistory,
@@ -10,6 +10,8 @@ import {
   UserProfile,
   WeightEntry,
 } from '../models/nutrition.models';
+import { STORAGE_PREFIX, readStorage, writeStorage } from '../utils/storage';
+import { AuthService } from './auth.service';
 
 /** Catálogo de alimentos de prueba (valores por porción). */
 const FOODS: Food[] = [
@@ -32,8 +34,6 @@ const MEALS: MealInfo[] = [
   { type: 'snacks', label: 'Snacks', icon: 'bi-apple', colorClass: 'bg-orange-soft' },
 ];
 
-const food = (id: number) => FOODS.find((f) => f.id === id)!;
-
 /** Fecha ISO local ("2026-11-12") de hoy menos `days` días. Usa la hora local, no UTC. */
 export function daysAgo(days: number, from: Date = new Date()): string {
   const d = new Date(from.getFullYear(), from.getMonth(), from.getDate() - days);
@@ -41,12 +41,98 @@ export function daysAgo(days: number, from: Date = new Date()): string {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 }
 
+/** Lo que se guarda en localStorage por cada usuario. */
+export interface SavedNutrition {
+  version: 1;
+  /** Día al que pertenecen las comidas, el agua y los pasos. */
+  date: string;
+  profile: UserProfile;
+  /** Solo el id del alimento: el resto se toma del catálogo al cargar. */
+  entries: { id: number; foodId: number; meal: MealType; servings: number }[];
+  waterMl: number;
+  steps: number;
+  weightHistory: WeightEntry[];
+  weekHistory: DayHistory[];
+  nextId: number;
+}
+
+/** Clave de localStorage de cada usuario: bocado-sano.data.ana@correo.com */
+export const dataKey = (email: string) => `${STORAGE_PREFIX}data.${email}`;
+
+/** Datos de ejemplo para alguien que entra por primera vez (con su nombre). */
+function sampleData(name: string, today: string): SavedNutrition {
+  return {
+    version: 1,
+    date: today,
+    profile: {
+      name,
+      sex: 'hombre',
+      age: 24,
+      heightCm: 175,
+      weightKg: 72.4,
+      activity: 'moderado',
+      goal: 'perder',
+    },
+    entries: [
+      { id: 1, foodId: 1, meal: 'desayuno', servings: 1 },
+      { id: 2, foodId: 2, meal: 'desayuno', servings: 1 },
+      { id: 3, foodId: 3, meal: 'almuerzo', servings: 1 },
+      { id: 4, foodId: 4, meal: 'almuerzo', servings: 1 },
+      { id: 5, foodId: 5, meal: 'almuerzo', servings: 1 },
+    ],
+    waterMl: 1250,
+    steps: 6540,
+    // Un peso por semana durante 4 semanas; el último es de hoy
+    weightHistory: [74.1, 73.6, 73.4, 73.0, 72.4].map((kg, i) => ({ date: daysAgo(28 - i * 7), kg })),
+    // Los 6 días anteriores a hoy (hoy sale de las comidas del Diario)
+    weekHistory: [2050, 1890, 2240, 1980, 2310, 2010].map((kcal, i) => ({ date: daysAgo(6 - i), kcal })),
+    nextId: 100,
+  };
+}
+
+/** Suma (o resta) días a una fecha ISO: shiftDate("2026-11-30", 1) → "2026-12-01". */
+export function shiftDate(isoDate: string, days: number): string {
+  const [y, m, d] = isoDate.split('-').map(Number);
+  return daysAgo(-days, new Date(y, m - 1, d));
+}
+
+/**
+ * Cambio de día: si lo guardado es de un día anterior a hoy,
+ * - las kcal de ese día pasan al historial de la semana,
+ * - los días en que no se abrió la app quedan con 0 kcal,
+ * - el historial se queda solo con los 6 días anteriores a hoy,
+ * - las comidas, el agua y los pasos empiezan en cero.
+ * Si lo guardado ya es de hoy, se devuelve igual.
+ */
+export function rollOver(saved: SavedNutrition, today: string): SavedNutrition {
+  if (saved.date >= today) return saved;
+
+  const kcalOfSavedDay = saved.entries.reduce((sum, e) => {
+    const f = FOODS.find((x) => x.id === e.foodId);
+    return sum + (f ? f.kcal * e.servings : 0);
+  }, 0);
+
+  // El día guardado con sus kcal, y en 0 los días siguientes hasta ayer
+  const newDays: DayHistory[] = [{ date: saved.date, kcal: kcalOfSavedDay }];
+  for (let day = shiftDate(saved.date, 1); day < today; day = shiftDate(day, 1)) {
+    newDays.push({ date: day, kcal: 0 });
+  }
+
+  const firstDay = shiftDate(today, -6);
+  const week = [...saved.weekHistory.filter((d) => d.date < saved.date), ...newDays]
+    .filter((d) => d.date >= firstDay && d.date < today)
+    .sort((a, b) => a.date.localeCompare(b.date));
+
+  return { ...saved, date: today, weekHistory: week, entries: [], waterMl: 0, steps: 0 };
+}
+
 /** Kcal que se quitan o suman a la meta según el objetivo. */
 const GOAL_ADJUST = { perder: -500, mantener: 0, ganar: 300 } as const;
 
 /**
- * Estado de la app guardado en memoria con signals.
- * No hay backend: al recargar la página vuelven los datos de prueba.
+ * Estado de la app con signals.
+ * Se guarda en localStorage por usuario (no hay backend), así que sobrevive a un F5
+ * y cada persona que inicia sesión en el mismo computador ve sus propios datos.
  */
 @Injectable({ providedIn: 'root' })
 export class NutritionService {
@@ -60,38 +146,43 @@ export class NutritionService {
   readonly today = daysAgo(0);
 
   // ---------- Estado (signals) ----------
-  readonly profile = signal<UserProfile>({
-    name: 'Miguel',
-    sex: 'hombre',
-    age: 24,
-    heightCm: 175,
-    weightKg: 72.4,
-    activity: 'moderado',
-    goal: 'perder',
+  // Empiezan con los datos de ejemplo; al haber sesión se cargan los del usuario.
+  private readonly auth = inject(AuthService);
+  private readonly sample = sampleData('Miguel', this.today);
+
+  readonly profile = signal<UserProfile>(this.sample.profile);
+  readonly entries = signal<LoggedFood[]>(this.toEntries(this.sample.entries));
+  readonly waterMl = signal(this.sample.waterMl);
+  readonly steps = signal(this.sample.steps);
+  readonly weightHistory = signal<WeightEntry[]>(this.sample.weightHistory);
+  readonly weekHistory = signal<DayHistory[]>(this.sample.weekHistory);
+
+  private nextId = this.sample.nextId;
+
+  /** Clave del usuario con sesión (null sin sesión). */
+  private readonly storageKey = computed(() => {
+    const email = this.auth.user()?.email;
+    return email ? dataKey(email) : null;
   });
 
-  readonly entries = signal<LoggedFood[]>([
-    { id: 1, food: food(1), meal: 'desayuno', servings: 1 },
-    { id: 2, food: food(2), meal: 'desayuno', servings: 1 },
-    { id: 3, food: food(3), meal: 'almuerzo', servings: 1 },
-    { id: 4, food: food(4), meal: 'almuerzo', servings: 1 },
-    { id: 5, food: food(5), meal: 'almuerzo', servings: 1 },
-  ]);
+  /** Clave cuyos datos ya están cargados: evita guardar encima antes de cargar. */
+  private loadedKey: string | null = null;
 
-  readonly waterMl = signal(1250);
-  readonly steps = signal(6540);
+  constructor() {
+    // 1) Cuando alguien inicia sesión (o cambia de usuario), se cargan sus datos
+    effect(() => {
+      const key = this.storageKey();
+      if (!key) return;
+      untracked(() => this.load(key));
+    });
 
-  /** Un peso por semana durante 4 semanas; el último es de hoy. */
-  readonly weightHistory = signal<WeightEntry[]>(
-    [74.1, 73.6, 73.4, 73.0, 72.4].map((kg, i) => ({ date: daysAgo(28 - i * 7), kg })),
-  );
-
-  /** Los 6 días anteriores a hoy (hoy sale de las comidas del Diario). */
-  readonly weekHistory = signal<DayHistory[]>(
-    [2050, 1890, 2240, 1980, 2310, 2010].map((kcal, i) => ({ date: daysAgo(6 - i), kcal })),
-  );
-
-  private nextId = 100;
+    // 2) Cada vez que cambia algo, se guarda para ese usuario
+    effect(() => {
+      const key = this.storageKey();
+      const data = this.toSaved();
+      if (key && key === this.loadedKey) writeStorage(key, data);
+    });
+  }
 
   // ---------- Metas calculadas ----------
 
@@ -146,6 +237,68 @@ export class NutritionService {
     if (h.length < 2) return 0;
     return Math.round((h[h.length - 1].kg - h[h.length - 2].kg) * 10) / 10;
   });
+
+  // ---------- Guardar / cargar ----------
+
+  /** Todo el estado en el formato que se guarda (lee los signals: lo usa el effect). */
+  private toSaved(): SavedNutrition {
+    return {
+      version: 1,
+      date: this.today,
+      profile: this.profile(),
+      entries: this.entries().map((e) => ({ id: e.id, foodId: e.food.id, meal: e.meal, servings: e.servings })),
+      waterMl: this.waterMl(),
+      steps: this.steps(),
+      weightHistory: this.weightHistory(),
+      weekHistory: this.weekHistory(),
+      nextId: this.nextId,
+    };
+  }
+
+  /**
+   * Carga lo guardado del usuario (pasando al día de hoy si era de otro día);
+   * si es nuevo, le pone los datos de ejemplo con su nombre.
+   */
+  private load(key: string): void {
+    const saved = readStorage<SavedNutrition>(key);
+    const data =
+      saved?.version === 1
+        ? rollOver(saved, this.today) // si es de otro día, empieza un día nuevo
+        : sampleData(this.currentName(), this.today);
+    this.apply(data);
+    this.loadedKey = key;
+  }
+
+  /**
+   * Vuelve a los datos de ejemplo (comidas, agua, pasos, perfil e historial),
+   * conservando el nombre del usuario. Se guarda solo gracias al effect.
+   */
+  resetToSample(): void {
+    this.apply(sampleData(this.currentName(), this.today));
+  }
+
+  private currentName(): string {
+    return this.auth.user()?.name ?? this.profile().name;
+  }
+
+  /** Pone en los signals unos datos completos (cargados o de ejemplo). */
+  private apply(data: SavedNutrition): void {
+    this.profile.set(data.profile);
+    this.entries.set(this.toEntries(data.entries));
+    this.waterMl.set(data.waterMl);
+    this.steps.set(data.steps);
+    this.weightHistory.set(data.weightHistory);
+    this.weekHistory.set(data.weekHistory);
+    this.nextId = data.nextId;
+  }
+
+  /** Convierte lo guardado (ids) en registros con el alimento completo; ignora ids que ya no existen. */
+  private toEntries(saved: SavedNutrition['entries']): LoggedFood[] {
+    return saved.flatMap((e) => {
+      const f = FOODS.find((x) => x.id === e.foodId);
+      return f ? [{ id: e.id, food: f, meal: e.meal, servings: e.servings }] : [];
+    });
+  }
 
   // ---------- Consultas ----------
 

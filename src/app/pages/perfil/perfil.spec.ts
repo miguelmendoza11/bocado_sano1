@@ -127,4 +127,43 @@ describe('Perfil', () => {
     expect(theme.preference()).toBe('system');
     expect(el.querySelector('.card-apariencia')?.textContent).toContain('Sigue el modo de tu dispositivo');
   });
+
+  // ---------- Datos de ejemplo ----------
+
+  const buttonWith = (el: HTMLElement, text: string) =>
+    [...el.querySelectorAll('button')].find((b) => b.textContent?.includes(text));
+
+  it('asks for confirmation before resetting the data', async () => {
+    const { fixture, el } = setup();
+    const nutrition = TestBed.inject(NutritionService);
+    nutrition.removeEntry(1);
+
+    buttonWith(el, 'Restablecer')!.click();
+    await fixture.whenStable();
+    expect(el.querySelector('.aviso-reset')?.textContent).toContain('Se borrarán');
+    expect(nutrition.consumedKcal()).toBe(630); // todavía no se borró nada
+
+    buttonWith(el, 'Cancelar')!.click();
+    await fixture.whenStable();
+    expect(el.querySelector('.aviso-reset')).toBeNull();
+    expect(nutrition.consumedKcal()).toBe(630);
+  });
+
+  it('resets the data and reloads the form after confirming', async () => {
+    const { fixture, el, component } = setup();
+    const nutrition = TestBed.inject(NutritionService);
+    nutrition.removeEntry(1);
+    nutrition.updateProfile({ age: 40 });
+    component.form.controls.age.setValue(40);
+
+    buttonWith(el, 'Restablecer')!.click();
+    await fixture.whenStable();
+    buttonWith(el, 'Sí, restablecer')!.click();
+    await fixture.whenStable();
+
+    expect(nutrition.consumedKcal()).toBe(950);
+    expect(component.form.controls.age.value).toBe(24);
+    expect(component.form.controls.name.value).toBe('Juan Montezuma');
+    expect(el.querySelector('.reset-ok')?.textContent).toContain('se restauraron');
+  });
 });
