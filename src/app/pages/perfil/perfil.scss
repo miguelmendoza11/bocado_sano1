@@ -69,3 +69,55 @@
     align-items: stretch;
   }
 }
+
+/* ---------- Apariencia ---------- */
+.card-apariencia {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.opcion-tema {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 0;
+  border-radius: 999px;
+  padding: 0.45rem 0.95rem;
+  background: none;
+  color: var(--sano-muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+
+  &:hover {
+    color: var(--sano-ink);
+  }
+
+  &.active {
+    background: var(--sano-lime);
+    color: var(--sano-on-lime);
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--sano-lime-strong);
+    outline-offset: 2px;
+  }
+}
+
+// En el celular las 3 opciones ocupan todo el ancho
+@media (max-width: 575.98px) {
+  .opciones-tema {
+    width: 100%;
+  }
+
+  .opcion-tema {
+    flex: 1;
+    justify-content: center;
+  }
+}

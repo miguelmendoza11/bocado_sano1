@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 import { ActivityLevel, Goal, Sex } from '../../core/models/nutrition.models';
 import { AuthService } from '../../core/services/auth.service';
 import { NutritionService } from '../../core/services/nutrition.service';
+import { ThemePreference, ThemeService } from '../../core/services/theme.service';
 
 @Component({
   selector: 'app-perfil',
@@ -18,6 +19,14 @@ export class Perfil {
   private readonly router = inject(Router);
   protected readonly auth = inject(AuthService);
   protected readonly nutrition = inject(NutritionService);
+  protected readonly theme = inject(ThemeService);
+
+  /** Opciones de la tarjeta Apariencia. */
+  protected readonly themeOptions: { value: ThemePreference; label: string }[] = [
+    { value: 'light', label: 'Claro' },
+    { value: 'dark', label: 'Oscuro' },
+    { value: 'system', label: 'Sistema' },
+  ];
 
   /** Opciones de los select (valor que se guarda + texto que se ve). */
   protected readonly sexOptions: { value: Sex; label: string }[] = [

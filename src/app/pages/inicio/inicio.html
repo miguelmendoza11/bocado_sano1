@@ -3,9 +3,13 @@
     <p class="text-secondary-sano mb-1 capitalize">{{ today | date: "EEEE, d 'de' MMMM" }}</p>
     <h1 class="fs-2xl mb-0">¡Hola, {{ nutrition.profile().name }}! 👋</h1>
   </div>
-  <button type="button" class="icon-btn" aria-label="Notificaciones">
-    <i class="bi bi-bell"></i>
-  </button>
+  <div class="inicio-acciones">
+    <!-- En escritorio el botón de tema está en la barra lateral; aquí solo en celular -->
+    <app-theme-toggle class="solo-movil" />
+    <button type="button" class="icon-btn" aria-label="Notificaciones">
+      <i class="bi bi-bell"></i>
+    </button>
+  </div>
 </header>
 
 <div class="row g-3">

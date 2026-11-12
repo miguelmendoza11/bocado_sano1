@@ -4,6 +4,18 @@
   justify-content: space-between;
 }
 
+.inicio-acciones {
+  display: flex;
+  gap: 0.5rem;
+}
+
+// Mismo corte que la barra lateral del Shell (992px)
+@media (min-width: 992px) {
+  .solo-movil {
+    display: none;
+  }
+}
+
 .card-calorias,
 .card-macros {
   height: 100%;

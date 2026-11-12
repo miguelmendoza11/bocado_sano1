@@ -21,6 +21,7 @@ const PREFERENCES: ThemePreference[] = ['light', 'dark', 'system'];
 export class ThemeService {
   private readonly document = inject(DOCUMENT);
   private readonly media = this.document.defaultView?.matchMedia?.('(prefers-color-scheme: dark)');
+  private transitionTimer?: ReturnType<typeof setTimeout>;
 
   /** Preferencia guardada (por defecto, seguir al sistema). */
   readonly preference = signal<ThemePreference>(this.readPreference());
@@ -41,11 +42,22 @@ export class ThemeService {
     // Si el usuario cambia el modo del sistema con la app abierta, se actualiza solo
     const onChange = (event: MediaQueryListEvent) => this.systemDark.set(event.matches);
     this.media?.addEventListener('change', onChange);
-    inject(DestroyRef).onDestroy(() => this.media?.removeEventListener('change', onChange));
+    inject(DestroyRef).onDestroy(() => {
+      this.media?.removeEventListener('change', onChange);
+      clearTimeout(this.transitionTimer);
+    });
 
     // Aplica el tema en <html> y guarda la preferencia cada vez que cambian
+    let firstRun = true;
     effect(() => {
-      this.document.documentElement.setAttribute('data-bs-theme', this.theme());
+      const html = this.document.documentElement;
+      const theme = this.theme();
+      // Al cambiar (no al arrancar) los colores se funden suavemente
+      if (!firstRun && html.getAttribute('data-bs-theme') !== theme) {
+        this.animateChange(html);
+      }
+      firstRun = false;
+      html.setAttribute('data-bs-theme', theme);
       this.writePreference(this.preference());
     });
   }
@@ -57,6 +69,13 @@ export class ThemeService {
   /** Botón rápido: pasa al tema contrario del que se ve ahora. */
   toggle(): void {
     this.preference.set(this.isDark() ? 'light' : 'dark');
+  }
+
+  /** Activa por un momento la clase que anima los colores (ver src/styles.scss). */
+  private animateChange(html: HTMLElement): void {
+    html.classList.add('theme-transition');
+    clearTimeout(this.transitionTimer);
+    this.transitionTimer = setTimeout(() => html.classList.remove('theme-transition'), 450);
   }
 
   private readPreference(): ThemePreference {

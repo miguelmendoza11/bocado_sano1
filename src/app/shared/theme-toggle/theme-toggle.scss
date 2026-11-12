@@ -1,0 +1,58 @@
+:host {
+  display: inline-flex;
+}
+
+svg {
+  overflow: visible;
+}
+
+// Todas las piezas giran/escalan desde su propio centro
+.centro,
+.mordida,
+.rayos {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition:
+    transform 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.35s ease;
+}
+
+/* ---------- Modo claro: se muestra la LUNA ---------- */
+.mordida {
+  transform: translate(5px, -4px);
+}
+
+.rayos {
+  opacity: 0;
+  transform: rotate(-90deg) scale(0.5);
+}
+
+/* ---------- Modo oscuro: se muestra el SOL ---------- */
+.is-dark {
+  .centro {
+    transform: scale(0.6);
+  }
+
+  // La mordida se va fuera del círculo: queda redondo
+  .mordida {
+    transform: translate(14px, -12px);
+  }
+
+  .rayos {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+  }
+}
+
+.theme-toggle:hover svg {
+  transform: rotate(-12deg);
+  transition: transform 0.3s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .centro,
+  .mordida,
+  .rayos {
+    transition: none;
+  }
+}
