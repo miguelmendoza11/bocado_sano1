@@ -1,0 +1,40 @@
+<header class="detalle-header mb-4">
+  <a routerLink="/recetas" class="icon-btn" aria-label="Volver a recetas">
+    <i class="bi bi-arrow-left"></i>
+  </a>
+  <div>
+    <p class="text-secondary-sano fs-sm mb-0">Recetas</p>
+    <h1 class="fs-2xl mb-0">Receta #{{ id() }}</h1>
+  </div>
+</header>
+
+<div class="row g-3">
+  <!-- Imagen, nombre y datos principales -->
+  <div class="col-12 lg:col-5">
+    <section class="sano-card detalle-card">
+      <div class="placeholder-media"></div>
+      <div class="placeholder-line"></div>
+    </section>
+  </div>
+
+  <!-- Macros -->
+  <div class="col-12 lg:col-7">
+    <section class="sano-card detalle-card">
+      <div class="placeholder-block"></div>
+    </section>
+  </div>
+
+  <!-- Ingredientes -->
+  <div class="col-12 lg:col-5">
+    <section class="sano-card detalle-card">
+      <div class="placeholder-block"></div>
+    </section>
+  </div>
+
+  <!-- Pasos -->
+  <div class="col-12 lg:col-7">
+    <section class="sano-card detalle-card">
+      <div class="placeholder-block"></div>
+    </section>
+  </div>
+</div>
