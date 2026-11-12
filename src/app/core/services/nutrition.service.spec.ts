@@ -1,12 +1,33 @@
 import { TestBed } from '@angular/core/testing';
-import { NutritionService } from './nutrition.service';
+import { NutritionService, daysAgo } from './nutrition.service';
 
 describe('NutritionService', () => {
   let service: NutritionService;
 
   beforeEach(() => {
+    // Reloj fijo en el 11 de noviembre de 2026 (solo Date) para fechas predecibles
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date(2026, 10, 11, 12, 0));
     TestBed.configureTestingModule({});
     service = TestBed.inject(NutritionService);
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('generates the sample history counting back from today', () => {
+    expect(service.today).toBe('2026-11-11');
+    expect(service.weekHistory().map((d) => d.date)).toEqual([
+      '2026-11-05',
+      '2026-11-06',
+      '2026-11-07',
+      '2026-11-08',
+      '2026-11-09',
+      '2026-11-10',
+    ]);
+    expect(service.weightHistory().at(0)?.date).toBe('2026-10-14');
+    expect(service.weightHistory().at(-1)?.date).toBe('2026-11-11');
   });
 
   it('calculates the calorie goal with Mifflin-St Jeor', () => {
@@ -60,6 +81,11 @@ describe('NutritionService', () => {
     service.addWeight(71.8, '2026-11-11');
     expect(service.weightHistory().length).toBe(5);
     expect(service.currentWeight()).toBe(71.8);
+  });
+
+  it('daysAgo uses the local date and crosses months and years', () => {
+    expect(daysAgo(1, new Date(2026, 10, 1, 23, 30))).toBe('2026-10-31');
+    expect(daysAgo(-1, new Date(2026, 11, 31, 8, 0))).toBe('2027-01-01');
   });
 
   it('keeps the weight history sorted by date', () => {

@@ -3,13 +3,6 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { DayHistory } from '../../core/models/nutrition.models';
 import { NutritionService } from '../../core/services/nutrition.service';
 
-/** Suma días a una fecha ISO ("2026-11-10" + 1 → "2026-11-11") sin líos de zona horaria. */
-export function addDays(isoDate: string, days: number): string {
-  const [y, m, d] = isoDate.split('-').map(Number);
-  const date = new Date(Date.UTC(y, m - 1, d + days));
-  return date.toISOString().slice(0, 10);
-}
-
 @Component({
   selector: 'app-progreso',
   imports: [DecimalPipe, DatePipe],
@@ -20,16 +13,14 @@ export class Progreso {
   protected readonly nutrition = inject(NutritionService);
 
   /**
-   * Los 7 días de la semana: el historial + HOY.
-   * Hoy es el día siguiente al último del historial, y sus kcal son las del Diario,
-   * así que esta lista cambia en vivo cuando agregas o quitas comida.
+   * Los 7 días de la semana: el historial + HOY (la fecha real del computador).
+   * Las kcal de hoy son las del Diario, así que esta lista cambia en vivo
+   * cuando agregas o quitas comida.
    */
-  readonly week = computed<DayHistory[]>(() => {
-    const history = this.nutrition.weekHistory();
-    const last = history.at(-1)?.date;
-    const today = last ? addDays(last, 1) : new Date().toISOString().slice(0, 10);
-    return [...history, { date: today, kcal: this.nutrition.consumedKcal() }];
-  });
+  readonly week = computed<DayHistory[]>(() => [
+    ...this.nutrition.weekHistory(),
+    { date: this.nutrition.today, kcal: this.nutrition.consumedKcal() },
+  ]);
 
   /** Promedio diario de kcal de la semana (redondeado). */
   readonly average = computed(() => {
