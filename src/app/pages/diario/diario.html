@@ -2,3 +2,139 @@
   <h1 class="fs-2xl mb-1">Diario</h1>
   <p class="text-secondary-sano mb-0">Lo que comiste hoy.</p>
 </header>
+
+<div class="row g-3">
+  <!-- Columna izquierda: las 4 comidas del día -->
+  <div class="col-12 xl:col-8">
+    <div class="comidas">
+      @for (meal of nutrition.meals; track meal.type) {
+        @let items = nutrition.entriesFor(meal.type);
+        <section class="sano-card">
+          <div class="comida-header">
+            <span class="comida-icon {{ meal.colorClass }}"><i class="bi {{ meal.icon }}"></i></span>
+            <h2 class="fs-lg mb-0 flex-grow-1">{{ meal.label }}</h2>
+            <span class="kcal-pill">{{ nutrition.kcalFor(meal.type) | number }} kcal</span>
+            <button
+              type="button"
+              class="icon-btn"
+              [attr.aria-label]="'Agregar a ' + meal.label"
+              (click)="startAdding(meal.type)"
+            >
+              <i class="bi bi-plus-lg"></i>
+            </button>
+          </div>
+
+          @if (items.length) {
+            <ul class="list-unstyled mb-0 alimentos">
+              @for (item of items; track item.id) {
+                <li class="alimento">
+                  <div class="flex-grow-1 min-w-0">
+                    <p class="fw-semibold mb-0 text-truncate">{{ item.food.name }}</p>
+                    <p class="fs-sm text-secondary-sano mb-0">
+                      @if (item.servings !== 1) {
+                        {{ item.servings }} ×
+                      }
+                      {{ item.food.portion }}
+                    </p>
+                  </div>
+                  <span class="fs-sm fw-semibold">{{ item.food.kcal * item.servings | number }} kcal</span>
+                  <button
+                    type="button"
+                    class="btn-quitar"
+                    [attr.aria-label]="'Quitar ' + item.food.name"
+                    (click)="nutrition.removeEntry(item.id)"
+                  >
+                    <i class="bi bi-trash3"></i>
+                  </button>
+                </li>
+              }
+            </ul>
+          } @else {
+            <p class="vacio fs-sm text-secondary-sano mb-0">Todavía no registras nada. Toca + para agregar.</p>
+          }
+        </section>
+      }
+    </div>
+  </div>
+
+  <!-- Columna derecha: resumen del día y buscador de alimentos -->
+  <div class="col-12 xl:col-4 col-lateral">
+    <div class="lateral">
+      <!-- Resumen de calorías -->
+      <section class="sano-card sano-card-lime">
+        <h2 class="fs-lg mb-3">Resumen de hoy</h2>
+        <div class="resumen">
+          <div>
+            <p class="fs-sm mb-0">Consumidas</p>
+            <p class="fs-lg fw-bold mb-0">{{ nutrition.consumedKcal() | number }}</p>
+          </div>
+          <div>
+            <p class="fs-sm mb-0">Meta</p>
+            <p class="fs-lg fw-bold mb-0">{{ nutrition.calorieGoal() | number }}</p>
+          </div>
+          <div>
+            <p class="fs-sm mb-0">Restantes</p>
+            <p class="fs-lg fw-bold mb-0">{{ nutrition.remainingKcal() | number }}</p>
+          </div>
+        </div>
+        <div class="sano-progress progress-resumen"><span [style.width.%]="percent()"></span></div>
+        <div class="d-flex justify-content-between fs-sm mt-3">
+          <span>P {{ nutrition.consumedMacros().protein }} g</span>
+          <span>C {{ nutrition.consumedMacros().carbs }} g</span>
+          <span>G {{ nutrition.consumedMacros().fat }} g</span>
+        </div>
+      </section>
+
+      <!-- Buscar y agregar alimentos -->
+      <section class="sano-card">
+        <h2 class="fs-lg mb-3">Agregar alimento</h2>
+
+        <label class="buscador mb-3">
+          <i class="bi bi-search"></i>
+          <input
+            #searchInput
+            type="search"
+            placeholder="Buscar alimento..."
+            aria-label="Buscar alimento"
+            [value]="query()"
+            (input)="onSearch($event)"
+          />
+        </label>
+
+        <div class="tabs-pill mb-3 w-100">
+          @for (meal of nutrition.meals; track meal.type) {
+            <button
+              type="button"
+              class="tab"
+              [class.active]="selectedMeal() === meal.type"
+              [attr.aria-pressed]="selectedMeal() === meal.type"
+              (click)="selectedMeal.set(meal.type)"
+            >
+              {{ meal.label }}
+            </button>
+          }
+        </div>
+
+        @if (feedback()) {
+          <p class="feedback fs-sm mb-3" role="status"><i class="bi bi-check-circle-fill"></i> {{ feedback() }}</p>
+        }
+
+        <ul class="list-unstyled mb-0">
+          @for (food of results(); track food.id) {
+            <li class="resultado">
+              <div class="flex-grow-1 min-w-0">
+                <p class="fw-semibold mb-0 text-truncate">{{ food.name }}</p>
+                <p class="fs-sm text-secondary-sano mb-0">{{ food.portion }} · {{ food.kcal }} kcal</p>
+              </div>
+              <button type="button" class="icon-btn" [attr.aria-label]="'Agregar ' + food.name" (click)="add(food)">
+                <i class="bi bi-plus-lg"></i>
+              </button>
+            </li>
+          } @empty {
+            <li class="vacio fs-sm text-secondary-sano">No encontramos "{{ query() }}" en el catálogo.</li>
+          }
+        </ul>
+      </section>
+    </div>
+  </div>
+</div>

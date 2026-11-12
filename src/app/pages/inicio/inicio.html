@@ -131,7 +131,12 @@
               <p class="fs-sm text-secondary-sano mb-0 text-truncate">{{ summary(meal.type) }}</p>
             </div>
             <span class="kcal-pill">{{ nutrition.kcalFor(meal.type) | number }} kcal</span>
-            <a routerLink="/diario" class="icon-btn" [attr.aria-label]="'Agregar a ' + meal.label">
+            <a
+              routerLink="/diario"
+              [queryParams]="{ comida: meal.type }"
+              class="icon-btn"
+              [attr.aria-label]="'Agregar a ' + meal.label"
+            >
               <i class="bi bi-plus-lg"></i>
             </a>
           </li>
