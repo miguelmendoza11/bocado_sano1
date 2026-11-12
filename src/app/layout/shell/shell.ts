@@ -1,5 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, effect, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { AuthService } from '../../core/services/auth.service';
+import { NutritionService } from '../../core/services/nutrition.service';
 
 export interface NavItem {
   path: string;
@@ -14,6 +16,17 @@ export interface NavItem {
   styleUrl: './shell.scss',
 })
 export class Shell {
+  private readonly auth = inject(AuthService);
+  private readonly nutrition = inject(NutritionService);
+
+  constructor() {
+    // Al recargar (F5) el perfil vuelve a los datos de prueba: le ponemos el nombre de la sesión
+    effect(() => {
+      const user = this.auth.user();
+      if (user) this.nutrition.updateProfile({ name: user.name });
+    });
+  }
+
   /** Enlaces del menú. Para agregar una página nueva, súmala aquí. */
   protected readonly nav: NavItem[] = [
     { path: '/inicio', label: 'Inicio', icon: 'bi-house-door' },
