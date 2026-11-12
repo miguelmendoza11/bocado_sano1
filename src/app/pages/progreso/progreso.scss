@@ -1,0 +1,35 @@
+.card-resumen,
+.card-grafica {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+/* Espacios grises que en los siguientes pasos se llenan con contenido */
+.placeholder-icon,
+.placeholder-line,
+.placeholder-title,
+.placeholder-chart {
+  border-radius: 12px;
+  background: var(--sano-bg);
+}
+
+.placeholder-icon {
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 14px;
+}
+
+.placeholder-line {
+  height: 3.25rem;
+}
+
+.placeholder-title {
+  width: 45%;
+  height: 1.5rem;
+}
+
+.placeholder-chart {
+  height: 14rem;
+}
