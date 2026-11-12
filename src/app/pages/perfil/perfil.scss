@@ -1,0 +1,16 @@
+// Las dos tarjetas de la izquierda, una debajo de otra
+.perfil-col {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+// Mientras están vacías, que se vean con algo de alto
+.card-usuario {
+  min-height: 140px;
+}
+
+.card-datos {
+  height: 100%;
+  min-height: 240px;
+}
