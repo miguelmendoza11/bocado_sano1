@@ -35,6 +35,17 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/diario/diario').then((m) => m.Diario),
       },
       {
+        path: 'recetas',
+        title: 'Recetas · Bocado Sano',
+        loadComponent: () => import('./pages/recetas/recetas').then((m) => m.Recetas),
+      },
+      {
+        path: 'recetas/:id',
+        title: 'Receta · Bocado Sano',
+        loadComponent: () =>
+          import('./pages/receta-detalle/receta-detalle').then((m) => m.RecetaDetalle),
+      },
+      {
         path: 'progreso',
         title: 'Progreso · Bocado Sano',
         loadComponent: () => import('./pages/progreso/progreso').then((m) => m.Progreso),
