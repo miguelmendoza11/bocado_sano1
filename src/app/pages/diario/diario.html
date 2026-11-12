@@ -14,7 +14,12 @@
             <span class="comida-icon {{ meal.colorClass }}"><i class="bi {{ meal.icon }}"></i></span>
             <h2 class="fs-lg mb-0 flex-grow-1">{{ meal.label }}</h2>
             <span class="kcal-pill">{{ nutrition.kcalFor(meal.type) | number }} kcal</span>
-            <button type="button" class="icon-btn" [attr.aria-label]="'Agregar a ' + meal.label">
+            <button
+              type="button"
+              class="icon-btn"
+              [attr.aria-label]="'Agregar a ' + meal.label"
+              (click)="startAdding(meal.type)"
+            >
               <i class="bi bi-plus-lg"></i>
             </button>
           </div>
@@ -86,28 +91,47 @@
 
         <label class="buscador mb-3">
           <i class="bi bi-search"></i>
-          <input type="search" placeholder="Buscar alimento..." aria-label="Buscar alimento" />
+          <input
+            #searchInput
+            type="search"
+            placeholder="Buscar alimento..."
+            aria-label="Buscar alimento"
+            [value]="query()"
+            (input)="onSearch($event)"
+          />
         </label>
 
         <div class="tabs-pill mb-3 w-100">
           @for (meal of nutrition.meals; track meal.type) {
-            <button type="button" class="tab" [class.active]="selectedMeal() === meal.type">
+            <button
+              type="button"
+              class="tab"
+              [class.active]="selectedMeal() === meal.type"
+              [attr.aria-pressed]="selectedMeal() === meal.type"
+              (click)="selectedMeal.set(meal.type)"
+            >
               {{ meal.label }}
             </button>
           }
         </div>
 
+        @if (feedback()) {
+          <p class="feedback fs-sm mb-3" role="status"><i class="bi bi-check-circle-fill"></i> {{ feedback() }}</p>
+        }
+
         <ul class="list-unstyled mb-0">
-          @for (food of nutrition.foods; track food.id) {
+          @for (food of results(); track food.id) {
             <li class="resultado">
               <div class="flex-grow-1 min-w-0">
                 <p class="fw-semibold mb-0 text-truncate">{{ food.name }}</p>
                 <p class="fs-sm text-secondary-sano mb-0">{{ food.portion }} · {{ food.kcal }} kcal</p>
               </div>
-              <button type="button" class="icon-btn" [attr.aria-label]="'Agregar ' + food.name">
+              <button type="button" class="icon-btn" [attr.aria-label]="'Agregar ' + food.name" (click)="add(food)">
                 <i class="bi bi-plus-lg"></i>
               </button>
             </li>
+          } @empty {
+            <li class="vacio fs-sm text-secondary-sano">No encontramos "{{ query() }}" en el catálogo.</li>
           }
         </ul>
       </section>
