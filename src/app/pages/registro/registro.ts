@@ -8,6 +8,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { AuthService } from '../../core/services/auth.service';
 import { NutritionService } from '../../core/services/nutrition.service';
 
 /** Valida que los campos password y confirmPassword del grupo sean iguales. */
@@ -27,6 +28,7 @@ export class Registro {
   private readonly fb = inject(NonNullableFormBuilder);
   private readonly router = inject(Router);
   private readonly nutrition = inject(NutritionService);
+  private readonly auth = inject(AuthService);
 
   readonly form = this.fb.group(
     {
@@ -43,7 +45,10 @@ export class Registro {
       this.form.markAllAsTouched();
       return;
     }
-    this.nutrition.updateProfile({ name: this.form.controls.name.value.trim() });
+    const { name, email } = this.form.getRawValue();
+    // Crea la cuenta y deja la sesión iniciada
+    this.auth.register(name, email);
+    this.nutrition.updateProfile({ name: name.trim() });
     this.router.navigate(['/inicio']);
   }
 }

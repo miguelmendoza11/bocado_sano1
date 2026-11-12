@@ -1,19 +1,23 @@
 import { Routes } from '@angular/router';
+import { authGuard, guestGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
   // Páginas fuera del layout (sin barra lateral ni inferior)
   {
     path: 'bienvenida',
+    canActivate: [guestGuard],
     title: 'Bienvenida · Bocado Sano',
     loadComponent: () => import('./pages/bienvenida/bienvenida').then((m) => m.Bienvenida),
   },
   {
     path: 'login',
+    canActivate: [guestGuard],
     title: 'Iniciar sesión · Bocado Sano',
     loadComponent: () => import('./pages/login/login').then((m) => m.Login),
   },
   {
     path: 'registro',
+    canActivate: [guestGuard],
     title: 'Registro · Bocado Sano',
     loadComponent: () => import('./pages/registro/registro').then((m) => m.Registro),
   },
@@ -21,6 +25,8 @@ export const routes: Routes = [
   // Páginas dentro del layout (Shell)
   {
     path: '',
+    // Sin sesión no se entra: el guard manda a /bienvenida
+    canActivate: [authGuard],
     loadComponent: () => import('./layout/shell/shell').then((m) => m.Shell),
     children: [
       { path: '', pathMatch: 'full', redirectTo: 'inicio' },
@@ -58,6 +64,6 @@ export const routes: Routes = [
     ],
   },
 
-  // Cualquier ruta desconocida vuelve a inicio
-  { path: '**', redirectTo: 'inicio' },
+  // Cualquier ruta desconocida va a la raíz y el guard decide (bienvenida o inicio)
+  { path: '**', redirectTo: '' },
 ];

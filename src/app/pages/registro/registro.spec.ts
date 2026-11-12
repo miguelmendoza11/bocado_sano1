@@ -1,10 +1,12 @@
 import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
+import { AuthService } from '../../core/services/auth.service';
 import { NutritionService } from '../../core/services/nutrition.service';
 import { Registro } from './registro';
 
 describe('Registro', () => {
   beforeEach(async () => {
+    localStorage.clear();
     await TestBed.configureTestingModule({
       imports: [Registro],
       providers: [provideRouter([])],
@@ -52,6 +54,14 @@ describe('Registro', () => {
     component.onSubmit();
     expect(nutrition.profile().name).toBe('Ana');
     expect(navigate).toHaveBeenCalledWith(['/inicio']);
+  });
+
+  it('should save the session with name and email', () => {
+    const { component } = setup();
+    vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
+    component.form.setValue(valid);
+    component.onSubmit();
+    expect(TestBed.inject(AuthService).user()).toEqual({ name: 'Ana', email: 'ana@correo.com' });
   });
 
   it('should not navigate when the form is invalid', () => {
