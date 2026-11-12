@@ -49,48 +49,106 @@
     <section class="sano-card card-datos">
       <h2 class="fs-lg mb-3">Tus datos</h2>
 
-      <div class="row g-3">
-        <div class="col-12 md:col-6">
-          <label for="perfil-sexo" class="form-label">Sexo</label>
-          <select id="perfil-sexo" class="form-control">
-            <option>Hombre</option>
-            <option>Mujer</option>
-          </select>
-        </div>
-        <div class="col-12 md:col-6">
-          <label for="perfil-edad" class="form-label">Edad</label>
-          <input id="perfil-edad" type="number" class="form-control" value="24" />
-        </div>
-        <div class="col-12 md:col-6">
-          <label for="perfil-altura" class="form-label">Altura (cm)</label>
-          <input id="perfil-altura" type="number" class="form-control" value="175" />
-        </div>
-        <div class="col-12 md:col-6">
-          <label for="perfil-peso" class="form-label">Peso (kg)</label>
-          <input id="perfil-peso" type="number" class="form-control" value="72.4" />
-        </div>
-        <div class="col-12 md:col-6">
-          <label for="perfil-actividad" class="form-label">Actividad</label>
-          <select id="perfil-actividad" class="form-control">
-            <option>Sedentario</option>
-            <option>Ligero</option>
-            <option selected>Moderado</option>
-            <option>Activo</option>
-          </select>
-        </div>
-        <div class="col-12 md:col-6">
-          <label for="perfil-objetivo" class="form-label">Objetivo</label>
-          <select id="perfil-objetivo" class="form-control">
-            <option selected>Perder peso</option>
-            <option>Mantener peso</option>
-            <option>Ganar peso</option>
-          </select>
-        </div>
-      </div>
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+        <div class="row g-3">
+          @let name = form.controls.name;
+          <div class="col-12">
+            <label for="perfil-nombre" class="form-label">Nombre</label>
+            <input
+              id="perfil-nombre"
+              type="text"
+              class="form-control"
+              autocomplete="name"
+              formControlName="name"
+              [class.is-invalid]="name.invalid && name.touched"
+            />
+            @if (name.touched && name.hasError('required')) {
+              <div class="invalid-feedback">Escribe tu nombre.</div>
+            } @else if (name.touched && name.hasError('minlength')) {
+              <div class="invalid-feedback">Debe tener al menos 2 caracteres.</div>
+            }
+          </div>
 
-      <button type="button" class="btn btn-solid theme-warning sano-btn-orange w-100 mt-4">
-        Guardar cambios
-      </button>
+          <div class="col-12 md:col-6">
+            <label for="perfil-sexo" class="form-label">Sexo</label>
+            <select id="perfil-sexo" class="form-control" formControlName="sex">
+              @for (option of sexOptions; track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </div>
+
+          @let age = form.controls.age;
+          <div class="col-12 md:col-6">
+            <label for="perfil-edad" class="form-label">Edad</label>
+            <input
+              id="perfil-edad"
+              type="number"
+              class="form-control"
+              step="1"
+              formControlName="age"
+              [class.is-invalid]="age.invalid && age.touched"
+            />
+            @if (age.touched && age.invalid) {
+              <div class="invalid-feedback">Escribe una edad entre 13 y 100 años.</div>
+            }
+          </div>
+
+          @let heightCm = form.controls.heightCm;
+          <div class="col-12 md:col-6">
+            <label for="perfil-altura" class="form-label">Altura (cm)</label>
+            <input
+              id="perfil-altura"
+              type="number"
+              class="form-control"
+              step="1"
+              formControlName="heightCm"
+              [class.is-invalid]="heightCm.invalid && heightCm.touched"
+            />
+            @if (heightCm.touched && heightCm.invalid) {
+              <div class="invalid-feedback">Escribe una altura entre 120 y 230 cm.</div>
+            }
+          </div>
+
+          @let weightKg = form.controls.weightKg;
+          <div class="col-12 md:col-6">
+            <label for="perfil-peso" class="form-label">Peso (kg)</label>
+            <input
+              id="perfil-peso"
+              type="number"
+              class="form-control"
+              step="0.1"
+              formControlName="weightKg"
+              [class.is-invalid]="weightKg.invalid && weightKg.touched"
+            />
+            @if (weightKg.touched && weightKg.invalid) {
+              <div class="invalid-feedback">Escribe un peso entre 30 y 250 kg.</div>
+            }
+          </div>
+
+          <div class="col-12 md:col-6">
+            <label for="perfil-actividad" class="form-label">Actividad</label>
+            <select id="perfil-actividad" class="form-control" formControlName="activity">
+              @for (option of activityOptions; track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="col-12 md:col-6">
+            <label for="perfil-objetivo" class="form-label">Objetivo</label>
+            <select id="perfil-objetivo" class="form-control" formControlName="goal">
+              @for (option of goalOptions; track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-solid theme-warning sano-btn-orange w-100 mt-4">
+          Guardar cambios
+        </button>
+      </form>
     </section>
   </div>
 
