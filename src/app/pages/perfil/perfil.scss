@@ -5,12 +5,55 @@
   gap: 1rem;
 }
 
-// Mientras están vacías, que se vean con algo de alto
+// Avatar redondo con iniciales + nombre y correo
 .card-usuario {
-  min-height: 140px;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.avatar {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--sano-gradient-orange);
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+// Sin min-width: 0 el texto largo (correo) no se corta con "..."
+.usuario-texto {
+  min-width: 0;
+}
+
+// Los 3 macros en fila
+.macros {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(28, 31, 26, 0.15);
 }
 
 .card-datos {
   height: 100%;
-  min-height: 240px;
+}
+
+// Texto a la izquierda y botón a la derecha; en celular, uno debajo del otro
+.card-sesion {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+@media (max-width: 575.98px) {
+  .card-sesion {
+    flex-direction: column;
+    align-items: stretch;
+  }
 }
