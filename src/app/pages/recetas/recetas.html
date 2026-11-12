@@ -4,12 +4,63 @@
 </header>
 
 <div class="row g-3">
-  @for (n of placeholders; track n) {
-    <div class="col-12 md:col-6 lg:col-4">
-      <article class="sano-card receta-card">
-        <div class="receta-media"></div>
-        <div class="receta-body"></div>
-      </article>
-    </div>
-  }
+  <!-- Receta 1 (texto fijo, en el paso 4 vendrá del servicio) -->
+  <div class="col-12 md:col-6 lg:col-4">
+    <article class="sano-card receta-card">
+      <div class="receta-media bg-lime-soft">
+        <span class="receta-emoji" aria-hidden="true">🥗</span>
+      </div>
+      <div class="receta-body">
+        <h2 class="fs-md fw-bold mb-0 receta-nombre">Ensalada de quinoa y aguacate</h2>
+        <div class="receta-meta">
+          <span class="kcal-pill"><i class="bi bi-fire"></i> 420 kcal</span>
+          <span class="fs-sm text-secondary-sano"><i class="bi bi-clock"></i> 15 min</span>
+        </div>
+        <div class="receta-tags">
+          <span class="chip">Almuerzo</span>
+          <span class="chip">Vegana</span>
+        </div>
+      </div>
+    </article>
+  </div>
+
+  <!-- Receta 2 -->
+  <div class="col-12 md:col-6 lg:col-4">
+    <article class="sano-card receta-card">
+      <div class="receta-media bg-orange-soft">
+        <span class="receta-emoji" aria-hidden="true">🥞</span>
+      </div>
+      <div class="receta-body">
+        <h2 class="fs-md fw-bold mb-0 receta-nombre">Pancakes de avena y banano</h2>
+        <div class="receta-meta">
+          <span class="kcal-pill"><i class="bi bi-fire"></i> 350 kcal</span>
+          <span class="fs-sm text-secondary-sano"><i class="bi bi-clock"></i> 20 min</span>
+        </div>
+        <div class="receta-tags">
+          <span class="chip">Desayuno</span>
+          <span class="chip">Alta en fibra</span>
+        </div>
+      </div>
+    </article>
+  </div>
+
+  <!-- Receta 3 -->
+  <div class="col-12 md:col-6 lg:col-4">
+    <article class="sano-card receta-card">
+      <div class="receta-media bg-blue-soft">
+        <span class="receta-emoji" aria-hidden="true">🐟</span>
+      </div>
+      <div class="receta-body">
+        <h2 class="fs-md fw-bold mb-0 receta-nombre">Salmón al horno con verduras</h2>
+        <div class="receta-meta">
+          <span class="kcal-pill"><i class="bi bi-fire"></i> 510 kcal</span>
+          <span class="fs-sm text-secondary-sano"><i class="bi bi-clock"></i> 30 min</span>
+        </div>
+        <div class="receta-tags">
+          <span class="chip">Cena</span>
+          <span class="chip">Alta en proteína</span>
+        </div>
+      </div>
+    </article>
+  </div>
 </div>

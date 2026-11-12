@@ -5,16 +5,48 @@
   gap: 1rem;
 }
 
-/* Espacio para la imagen / ícono de la receta */
+/* Imagen de la receta: fondo suave de color + emoji grande */
 .receta-media {
-  aspect-ratio: 16 / 10;
+  display: grid;
+  place-items: center;
+  height: 9rem;
   border-radius: calc(var(--sano-radius) - 8px);
-  background: var(--sano-bg);
 }
 
-/* Espacio para nombre, kcal y etiquetas */
+.receta-emoji {
+  font-size: 4rem;
+  line-height: 1;
+}
+
+/* Nombre en máximo 2 líneas, para que no se corte en escritorio */
+.receta-nombre {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+}
+
+/* Nombre, kcal / minutos y etiquetas */
 .receta-body {
-  min-height: 4.5rem;
-  border-radius: 12px;
-  background: var(--sano-bg);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.receta-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.receta-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+
+  .chip {
+    padding: 0.2rem 0.7rem;
+    font-size: 0.75rem;
+  }
 }
