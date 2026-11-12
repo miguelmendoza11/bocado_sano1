@@ -8,11 +8,13 @@
   <div class="col-12 xl:col-5 perfil-col">
     <!-- Cabecera del usuario -->
     <section class="sano-card card-usuario">
-      <div class="avatar" aria-hidden="true">JM</div>
-      <div class="usuario-texto">
-        <h2 class="fs-xl mb-0 text-truncate">Juan Montezuma</h2>
-        <p class="text-secondary-sano mb-0 text-truncate">juan&#64;correo.com</p>
-      </div>
+      <div class="avatar" aria-hidden="true">{{ initials() }}</div>
+      @if (auth.user(); as user) {
+        <div class="usuario-texto">
+          <h2 class="fs-xl mb-0 text-truncate">{{ user.name }}</h2>
+          <p class="text-secondary-sano mb-0 text-truncate">{{ user.email }}</p>
+        </div>
+      }
     </section>
 
     <!-- Meta calculada -->
