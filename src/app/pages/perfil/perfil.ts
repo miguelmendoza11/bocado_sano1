@@ -2,6 +2,7 @@ import { DecimalPipe } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { ActivityLevel, Goal, Sex } from '../../core/models/nutrition.models';
 import { AuthService } from '../../core/services/auth.service';
 import { NutritionService } from '../../core/services/nutrition.service';
@@ -14,6 +15,7 @@ import { NutritionService } from '../../core/services/nutrition.service';
 })
 export class Perfil {
   private readonly fb = inject(NonNullableFormBuilder);
+  private readonly router = inject(Router);
   protected readonly auth = inject(AuthService);
   protected readonly nutrition = inject(NutritionService);
 
@@ -72,6 +74,12 @@ export class Perfil {
     this.auth.updateName(name);
     this.form.markAsPristine();
     this.saved.set(true);
+  }
+
+  /** Borra la sesión y vuelve a la bienvenida. */
+  logout(): void {
+    this.auth.logout();
+    this.router.navigate(['/bienvenida']);
   }
 
   private buildForm() {
