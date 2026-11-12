@@ -1,5 +1,18 @@
 import { DecimalPipe } from '@angular/common';
-import { Component, ElementRef, OnDestroy, computed, inject, signal, viewChild } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  Injector,
+  OnDestroy,
+  afterNextRender,
+  computed,
+  effect,
+  inject,
+  input,
+  signal,
+  untracked,
+  viewChild,
+} from '@angular/core';
 import { Food, MealType } from '../../core/models/nutrition.models';
 import { NutritionService } from '../../core/services/nutrition.service';
 
@@ -15,6 +28,13 @@ const normalize = (text: string) =>
 })
 export class Diario implements OnDestroy {
   protected readonly nutrition = inject(NutritionService);
+  private readonly injector = inject(Injector);
+
+  /**
+   * Comida que llega por la URL: /diario?comida=cena
+   * (withComponentInputBinding pasa los query params como input).
+   */
+  readonly comida = input<string>();
 
   private readonly searchInput = viewChild<ElementRef<HTMLInputElement>>('searchInput');
   private feedbackTimer?: ReturnType<typeof setTimeout>;
@@ -40,6 +60,16 @@ export class Diario implements OnDestroy {
     Math.min((this.nutrition.consumedKcal() / this.nutrition.calorieGoal()) * 100, 100),
   );
 
+  constructor() {
+    // Si la URL trae una comida válida, se elige esa pestaña y se enfoca el buscador
+    effect(() => {
+      const meal = this.nutrition.meals.find((m) => m.type === this.comida())?.type;
+      if (!meal) return;
+      untracked(() => this.selectedMeal.set(meal));
+      afterNextRender(() => this.focusSearch(), { injector: this.injector });
+    });
+  }
+
   protected onSearch(event: Event): void {
     this.query.set((event.target as HTMLInputElement).value);
   }
@@ -47,9 +77,13 @@ export class Diario implements OnDestroy {
   /** El "+" de cada comida: elige esa comida y lleva al buscador. */
   protected startAdding(meal: MealType): void {
     this.selectedMeal.set(meal);
-    const input = this.searchInput()?.nativeElement;
-    input?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    input?.focus({ preventScroll: true });
+    this.focusSearch();
+  }
+
+  private focusSearch(): void {
+    const field = this.searchInput()?.nativeElement;
+    field?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    field?.focus({ preventScroll: true });
   }
 
   protected add(food: Food): void {
