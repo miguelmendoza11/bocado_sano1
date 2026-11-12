@@ -2,3 +2,173 @@
   <h1 class="fs-2xl mb-1">Perfil</h1>
   <p class="text-secondary-sano mb-0">Tus datos y tu meta.</p>
 </header>
+
+<div class="row g-3">
+  <!-- Columna izquierda: quién eres y tu meta -->
+  <div class="col-12 xl:col-5 perfil-col">
+    <!-- Cabecera del usuario -->
+    <section class="sano-card card-usuario">
+      <div class="avatar" aria-hidden="true">{{ initials() }}</div>
+      @if (auth.user(); as user) {
+        <div class="usuario-texto">
+          <h2 class="fs-xl mb-0 text-truncate">{{ user.name }}</h2>
+          <p class="text-secondary-sano mb-0 text-truncate">{{ user.email }}</p>
+        </div>
+      }
+    </section>
+
+    <!-- Meta calculada -->
+    <section class="sano-card sano-card-lime card-meta">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <h2 class="fs-lg mb-0">Tu meta diaria</h2>
+        <span class="chip"><i class="bi bi-bullseye"></i> {{ goalLabel() }}</span>
+      </div>
+      <p class="mb-3">
+        <span class="fs-4xl fw-bold lh-1">{{ nutrition.calorieGoal() | number }}</span>
+        <span class="fs-md">kcal</span>
+      </p>
+      @let macros = nutrition.macroGoals();
+      <div class="macros">
+        <div>
+          <p class="fs-sm mb-0">Carbohidratos</p>
+          <p class="fw-bold mb-0">{{ macros.carbs }} g</p>
+        </div>
+        <div>
+          <p class="fs-sm mb-0">Proteína</p>
+          <p class="fw-bold mb-0">{{ macros.protein }} g</p>
+        </div>
+        <div>
+          <p class="fs-sm mb-0">Grasa</p>
+          <p class="fw-bold mb-0">{{ macros.fat }} g</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Columna derecha: formulario de datos -->
+  <div class="col-12 xl:col-7">
+    <section class="sano-card card-datos">
+      <h2 class="fs-lg mb-3">Tus datos</h2>
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+        <div class="row g-3">
+          @let name = form.controls.name;
+          <div class="col-12">
+            <label for="perfil-nombre" class="form-label">Nombre</label>
+            <input
+              id="perfil-nombre"
+              type="text"
+              class="form-control"
+              autocomplete="name"
+              formControlName="name"
+              [class.is-invalid]="name.invalid && name.touched"
+            />
+            @if (name.touched && name.hasError('required')) {
+              <div class="invalid-feedback">Escribe tu nombre.</div>
+            } @else if (name.touched && name.hasError('minlength')) {
+              <div class="invalid-feedback">Debe tener al menos 2 caracteres.</div>
+            }
+          </div>
+
+          <div class="col-12 md:col-6">
+            <label for="perfil-sexo" class="form-label">Sexo</label>
+            <select id="perfil-sexo" class="form-control" formControlName="sex">
+              @for (option of sexOptions; track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </div>
+
+          @let age = form.controls.age;
+          <div class="col-12 md:col-6">
+            <label for="perfil-edad" class="form-label">Edad</label>
+            <input
+              id="perfil-edad"
+              type="number"
+              class="form-control"
+              step="1"
+              formControlName="age"
+              [class.is-invalid]="age.invalid && age.touched"
+            />
+            @if (age.touched && age.invalid) {
+              <div class="invalid-feedback">Escribe una edad entre 13 y 100 años.</div>
+            }
+          </div>
+
+          @let heightCm = form.controls.heightCm;
+          <div class="col-12 md:col-6">
+            <label for="perfil-altura" class="form-label">Altura (cm)</label>
+            <input
+              id="perfil-altura"
+              type="number"
+              class="form-control"
+              step="1"
+              formControlName="heightCm"
+              [class.is-invalid]="heightCm.invalid && heightCm.touched"
+            />
+            @if (heightCm.touched && heightCm.invalid) {
+              <div class="invalid-feedback">Escribe una altura entre 120 y 230 cm.</div>
+            }
+          </div>
+
+          @let weightKg = form.controls.weightKg;
+          <div class="col-12 md:col-6">
+            <label for="perfil-peso" class="form-label">Peso (kg)</label>
+            <input
+              id="perfil-peso"
+              type="number"
+              class="form-control"
+              step="0.1"
+              formControlName="weightKg"
+              [class.is-invalid]="weightKg.invalid && weightKg.touched"
+            />
+            @if (weightKg.touched && weightKg.invalid) {
+              <div class="invalid-feedback">Escribe un peso entre 30 y 250 kg.</div>
+            }
+          </div>
+
+          <div class="col-12 md:col-6">
+            <label for="perfil-actividad" class="form-label">Actividad</label>
+            <select id="perfil-actividad" class="form-control" formControlName="activity">
+              @for (option of activityOptions; track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="col-12 md:col-6">
+            <label for="perfil-objetivo" class="form-label">Objetivo</label>
+            <select id="perfil-objetivo" class="form-control" formControlName="goal">
+              @for (option of goalOptions; track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-solid theme-warning sano-btn-orange w-100 mt-4">
+          Guardar cambios
+        </button>
+
+        @if (saved()) {
+          <p class="guardado mt-3 mb-0" role="status">
+            <i class="bi bi-check-circle-fill"></i> Guardado. Tu meta se actualizó.
+          </p>
+        }
+      </form>
+    </section>
+  </div>
+
+  <!-- Cerrar sesión -->
+  <div class="col-12">
+    <section class="sano-card card-sesion">
+      <div>
+        <h2 class="fs-lg mb-0">Sesión</h2>
+        <p class="text-secondary-sano fs-sm mb-0">Sal de tu cuenta en este dispositivo.</p>
+      </div>
+      <button type="button" class="btn btn-outline" (click)="logout()">
+        <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+      </button>
+    </section>
+  </div>
+</div>
