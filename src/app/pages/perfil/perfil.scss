@@ -20,7 +20,7 @@
   height: 72px;
   border-radius: 50%;
   background: var(--sano-gradient-orange);
-  color: #fff;
+  color: var(--sano-on-orange);
   font-size: 1.5rem;
   font-weight: 700;
 }
@@ -36,7 +36,7 @@
   justify-content: space-between;
   gap: 1rem;
   padding-top: 1rem;
-  border-top: 1px solid rgba(28, 31, 26, 0.15);
+  border-top: 1px solid color-mix(in srgb, currentColor 15%, transparent);
 }
 
 .card-datos {

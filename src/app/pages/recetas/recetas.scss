@@ -11,7 +11,7 @@
   gap: 0.6rem;
   padding: 0.7rem 1.1rem;
   border-radius: 999px;
-  background: #fff;
+  background: var(--sano-surface);
   border: 1px solid var(--sano-border);
   color: var(--sano-muted);
   cursor: text;
@@ -58,7 +58,7 @@
 
   &.active {
     background: var(--sano-lime);
-    color: var(--sano-ink);
+    color: var(--sano-on-lime);
   }
 }
 
@@ -94,7 +94,7 @@
 
   &:hover {
     transform: translateY(-3px);
-    box-shadow: 0 14px 32px rgba(28, 31, 26, 0.1);
+    box-shadow: var(--sano-shadow-hover);
   }
 
   &:focus-visible {

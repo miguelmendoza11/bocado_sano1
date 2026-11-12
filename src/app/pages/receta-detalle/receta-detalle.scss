@@ -69,7 +69,7 @@
 }
 
 .bar-fat > span {
-  background: #4a90e2;
+  background: var(--sano-blue);
 }
 
 /* ---------- Ingredientes ---------- */
@@ -110,7 +110,7 @@
   height: 1.9rem;
   border-radius: 50%;
   background: var(--sano-gradient-orange);
-  color: #fff;
+  color: var(--sano-on-orange);
   font-size: 0.85rem;
   font-weight: 700;
 }

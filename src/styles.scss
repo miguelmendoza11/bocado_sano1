@@ -17,6 +17,26 @@
   --sano-border: #e6e8df;
   --sano-radius: 24px;
   --sano-shadow: 0 8px 24px rgba(28, 31, 26, 0.06);
+  --sano-shadow-nav: 0 -4px 24px rgba(28, 31, 26, 0.08);
+  --sano-shadow-hover: 0 14px 32px rgba(28, 31, 26, 0.1);
+
+  /* Superficies y textos (el modo oscuro solo redefine estos valores) */
+  --sano-surface: #fff; /* tarjetas, botones, inputs, barras de navegación */
+  --sano-surface-dark: #1c1f1a; /* fondo de .sano-card-dark */
+  --sano-on-dark: #fff; /* texto sobre .sano-card-dark */
+  --sano-on-lime: #1c1f1a; /* texto sobre lima: siempre oscuro para que se lea */
+  --sano-on-orange: #fff; /* texto sobre naranja */
+  --sano-lime-ink: #3f5503; /* texto verde sobre lima suave */
+  --sano-orange-soft: #ffeedd;
+  --sano-orange-ink: #c25412;
+  --sano-blue: #4a90e2;
+  --sano-blue-soft: #e3f0ff;
+  --sano-danger: #e5484d;
+  --sano-danger-ink: #c4292f;
+  --sano-success-ink: #4d6b04;
+  --sano-chart-ok: #def78f; /* barras de días dentro de la meta */
+  --sano-chart-over: #ffc8a1; /* barras de días por encima de la meta */
+  --sano-track-soft: rgba(255, 255, 255, 0.7); /* fondo de barras sobre tarjetas de color */
 
   /* ---------- Bootstrap: primary = lima, warning = naranja ---------- */
   --bs-primary-base: var(--sano-lime);
@@ -27,7 +47,7 @@
   --bs-primary-bg-muted: #def78f;
   --bs-primary-border: var(--sano-lime-strong);
   --bs-primary-focus-ring: color-mix(in oklch, var(--sano-lime) 60%, transparent);
-  --bs-primary-contrast: var(--sano-ink);
+  --bs-primary-contrast: var(--sano-on-lime);
 
   --bs-warning-base: var(--sano-orange);
   --bs-warning-bg: var(--sano-orange);
@@ -62,7 +82,7 @@ h6 {
 
 /* ---------- Tarjetas ---------- */
 .sano-card {
-  background: #fff;
+  background: var(--sano-surface);
   border-radius: var(--sano-radius);
   box-shadow: var(--sano-shadow);
   padding: 1.25rem;
@@ -70,12 +90,12 @@ h6 {
 
 .sano-card-lime {
   background: var(--sano-lime);
-  color: var(--sano-ink);
+  color: var(--sano-on-lime);
 }
 
 .sano-card-dark {
-  background: var(--sano-ink);
-  color: #fff;
+  background: var(--sano-surface-dark);
+  color: var(--sano-on-dark);
 }
 
 /* ---------- Botones ---------- */
@@ -83,7 +103,7 @@ h6 {
 .sano-btn-orange {
   background: var(--sano-gradient-orange);
   border: 0;
-  color: #fff;
+  color: var(--sano-on-orange);
   border-radius: 999px;
   font-weight: 600;
 }
@@ -95,7 +115,7 @@ h6 {
   height: 2.5rem;
   border-radius: 50%;
   border: 1px solid var(--sano-border);
-  background: #fff;
+  background: var(--sano-surface);
   color: var(--sano-ink);
   font-size: 1.1rem;
   cursor: pointer;
@@ -108,7 +128,8 @@ h6 {
   gap: 0.35rem;
   padding: 0.35rem 0.85rem;
   border-radius: 999px;
-  background: #fff;
+  background: var(--sano-surface);
+  color: var(--sano-ink);
   border: 1px solid var(--sano-border);
   font-size: 0.85rem;
   font-weight: 600;
@@ -121,7 +142,7 @@ h6 {
   padding: 0.2rem 0.65rem;
   border-radius: 999px;
   background: var(--sano-lime-soft);
-  color: #3f5503;
+  color: var(--sano-lime-ink);
   font-size: 0.8rem;
   font-weight: 700;
 }
@@ -131,7 +152,7 @@ h6 {
   gap: 0.25rem;
   padding: 0.25rem;
   border-radius: 999px;
-  background: #fff;
+  background: var(--sano-surface);
   border: 1px solid var(--sano-border);
 }
 
@@ -170,9 +191,9 @@ h6 {
 }
 
 .bg-orange-soft {
-  background: #ffeedd;
+  background: var(--sano-orange-soft);
 }
 
 .bg-blue-soft {
-  background: #e3f0ff;
+  background: var(--sano-blue-soft);
 }

@@ -20,7 +20,7 @@
   flex-direction: column;
   gap: 0.75rem;
   padding-left: 1.5rem;
-  border-left: 1px solid rgba(28, 31, 26, 0.15);
+  border-left: 1px solid color-mix(in srgb, currentColor 15%, transparent);
 }
 
 .macro + .macro {
@@ -57,7 +57,7 @@
   height: 1.9rem;
   border: 0;
   border-radius: 50%;
-  background: #fff;
+  background: var(--sano-surface);
   color: var(--sano-ink);
   font-size: 0.85rem;
   cursor: pointer;
@@ -69,11 +69,11 @@
 
 .card-mini .sano-progress {
   margin-top: auto;
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--sano-track-soft);
 }
 
 .progress-agua > span {
-  background: #4a90e2;
+  background: var(--sano-blue);
 }
 
 .progress-pasos > span {
