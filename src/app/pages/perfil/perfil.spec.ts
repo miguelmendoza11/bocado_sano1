@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { NutritionService } from '../../core/services/nutrition.service';
+import { ThemeService } from '../../core/services/theme.service';
 import { Perfil } from './perfil';
 
 describe('Perfil', () => {
@@ -98,5 +99,32 @@ describe('Perfil', () => {
     button.click();
     expect(TestBed.inject(AuthService).isLoggedIn()).toBe(false);
     expect(navigate).toHaveBeenCalledWith(['/bienvenida']);
+  });
+
+  // ---------- Apariencia ----------
+
+  const themeOptions = (el: HTMLElement) => [...el.querySelectorAll<HTMLButtonElement>('.opcion-tema')];
+
+  it('shows the three theme options with the current one checked', () => {
+    TestBed.inject(ThemeService).setPreference('dark');
+    const { el } = setup();
+    const options = themeOptions(el);
+    expect(options.map((b) => b.textContent?.trim())).toEqual(['Claro', 'Oscuro', 'Sistema']);
+    expect(options.map((b) => b.getAttribute('aria-checked'))).toEqual(['false', 'true', 'false']);
+  });
+
+  it('changes the theme when an option is chosen', async () => {
+    const { fixture, el } = setup();
+    const theme = TestBed.inject(ThemeService);
+
+    themeOptions(el)[1].click(); // Oscuro
+    await fixture.whenStable();
+    expect(theme.preference()).toBe('dark');
+    expect(document.documentElement.getAttribute('data-bs-theme')).toBe('dark');
+
+    themeOptions(el)[2].click(); // Sistema
+    await fixture.whenStable();
+    expect(theme.preference()).toBe('system');
+    expect(el.querySelector('.card-apariencia')?.textContent).toContain('Sigue el modo de tu dispositivo');
   });
 });
