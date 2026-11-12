@@ -18,6 +18,7 @@ export class Shell {
   protected readonly nav: NavItem[] = [
     { path: '/inicio', label: 'Inicio', icon: 'bi-house-door' },
     { path: '/diario', label: 'Diario', icon: 'bi-journal-text' },
+    { path: '/recetas', label: 'Recetas', icon: 'bi-book' },
     { path: '/progreso', label: 'Progreso', icon: 'bi-graph-up' },
     { path: '/perfil', label: 'Perfil', icon: 'bi-person' },
   ];

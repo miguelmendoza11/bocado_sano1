@@ -75,11 +75,14 @@
 }
 
 .bottom-link {
+  /* Todos los enlaces con el mismo ancho (son 5 + el botón "+") */
+  flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0.1rem;
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   font-weight: 600;
   color: var(--sano-muted);
   text-decoration: none;
@@ -94,6 +97,7 @@
 }
 
 .fab {
+  flex-shrink: 0;
   display: grid;
   place-items: center;
   width: 3.4rem;

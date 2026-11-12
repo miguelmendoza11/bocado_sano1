@@ -1,0 +1,15 @@
+<header class="mb-4">
+  <h1 class="fs-2xl mb-1">Recetas</h1>
+  <p class="text-secondary-sano mb-0">Ideas saludables para cada comida.</p>
+</header>
+
+<div class="row g-3">
+  @for (n of placeholders; track n) {
+    <div class="col-12 md:col-6 lg:col-4">
+      <article class="sano-card receta-card">
+        <div class="receta-media"></div>
+        <div class="receta-body"></div>
+      </article>
+    </div>
+  }
+</div>
