@@ -16,45 +16,137 @@
 }
 
 /* ---------- Barras de calorías ---------- */
+/* Colores de las barras de días anteriores (hoy usa la versión fuerte) */
+:host {
+  --bar-meta: #def78f;
+  --bar-pasado: #ffc8a1;
+}
+
+/*
+ * Área de la gráfica: las barras, sus números y la línea de la meta se miden
+ * desde abajo (bottom / height en %) dentro de este mismo cuadro, así quedan alineados.
+ * El margin-top deja espacio para el número de la barra más alta.
+ */
 .barras {
+  position: relative;
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 0.5rem;
-  height: 14rem;
+  height: 13rem;
+  margin-top: 1.25rem;
+  border-bottom: 1px solid var(--sano-border);
 }
 
-/* Cada columna: la barra crece desde abajo y el día va debajo */
 .barra-col {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 0.4rem;
+  position: relative;
   min-width: 0;
 }
 
 .barra {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
   width: 100%;
   max-width: 2.5rem;
-  border-radius: 10px 10px 6px 6px;
-  background: var(--sano-lime-soft);
+  border-radius: 10px 10px 4px 4px;
+  background: var(--bar-meta);
+  transition: height 0.4s ease;
 }
 
-.barra-dia {
-  font-size: 0.75rem;
-  font-weight: 600;
+/* Número encima de cada barra (fondo blanco para que la línea de la meta no lo tape) */
+.barra-valor {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--alto, 0%) + 0.25rem);
+  transform: translateX(-50%);
+  z-index: 2;
+  padding: 0 0.15rem;
+  border-radius: 4px;
+  background: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
   color: var(--sano-muted);
+  white-space: nowrap;
 }
 
-/* El día de hoy resaltado */
-.hoy {
-  .barra {
-    background: var(--sano-lime-strong);
+/* Colores: hoy resaltado; naranja si el día pasó la meta */
+.over .barra {
+  background: var(--bar-pasado);
+}
+
+.hoy .barra {
+  background: var(--sano-lime-strong);
+}
+
+.hoy.over .barra {
+  background: var(--sano-orange);
+}
+
+.hoy .barra-valor {
+  color: var(--sano-ink);
+}
+
+/* Línea punteada de la meta */
+.linea-meta {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-top: 2px dashed var(--sano-ink);
+  opacity: 0.35;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.barras-dias {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.5rem;
+  margin-top: -0.35rem;
+
+  span {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--sano-muted);
+    text-align: center;
   }
 
-  .barra-dia {
+  .hoy {
     color: var(--sano-ink);
   }
+}
+
+.leyenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1rem;
+  margin-top: auto;
+
+  span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+}
+
+.punto-leyenda {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 50%;
+
+  &.en-meta {
+    background: var(--bar-meta);
+  }
+
+  &.pasado {
+    background: var(--bar-pasado);
+  }
+}
+
+.raya-leyenda {
+  width: 1.1rem;
+  border-top: 2px dashed var(--sano-ink);
+  opacity: 0.35;
 }
 
 /* ---------- Línea de peso ---------- */

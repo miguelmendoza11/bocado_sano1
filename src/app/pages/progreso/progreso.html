@@ -44,7 +44,7 @@
     </section>
   </div>
 
-  <!-- Gráfica de calorías de la semana (barras fijas hasta el paso 4) -->
+  <!-- Gráfica de calorías de la semana -->
   <div class="col-12 xl:col-7">
     <section class="sano-card card-grafica">
       <div class="d-flex align-items-center justify-content-between">
@@ -55,14 +55,35 @@
         <span class="kcal-pill">Meta {{ nutrition.calorieGoal() | number }}</span>
       </div>
 
-      <div class="barras">
-        <div class="barra-col"><span class="barra" style="height: 82%"></span><span class="barra-dia">jue</span></div>
-        <div class="barra-col"><span class="barra" style="height: 76%"></span><span class="barra-dia">vie</span></div>
-        <div class="barra-col"><span class="barra" style="height: 90%"></span><span class="barra-dia">sáb</span></div>
-        <div class="barra-col"><span class="barra" style="height: 79%"></span><span class="barra-dia">dom</span></div>
-        <div class="barra-col"><span class="barra" style="height: 92%"></span><span class="barra-dia">lun</span></div>
-        <div class="barra-col"><span class="barra" style="height: 80%"></span><span class="barra-dia">mar</span></div>
-        <div class="barra-col hoy"><span class="barra" style="height: 38%"></span><span class="barra-dia">hoy</span></div>
+      <!-- Barras: la altura sale de bars() y la línea punteada es la meta -->
+      <div class="barras" role="list" aria-label="Calorías por día">
+        <div class="linea-meta" [style.bottom.%]="goalPct()" aria-hidden="true"></div>
+
+        @for (bar of bars(); track bar.date) {
+          <div
+            class="barra-col"
+            role="listitem"
+            [class.hoy]="bar.isToday"
+            [class.over]="bar.over"
+            [attr.aria-label]="(bar.isToday ? 'Hoy' : (bar.date | date: 'EEEE')) + ': ' + (bar.kcal | number) + ' kcal'"
+          >
+            <span class="barra-valor" [style.--alto]="bar.pct + '%'">{{ bar.kcal | number }}</span>
+            <span class="barra" [style.height.%]="bar.pct"></span>
+          </div>
+        }
+      </div>
+
+      <!-- Días debajo de cada barra -->
+      <div class="barras-dias" aria-hidden="true">
+        @for (bar of bars(); track bar.date) {
+          <span [class.hoy]="bar.isToday">{{ bar.isToday ? 'hoy' : (bar.date | date: 'EEE') }}</span>
+        }
+      </div>
+
+      <div class="leyenda fs-sm text-secondary-sano">
+        <span><i class="punto-leyenda en-meta"></i> En la meta</span>
+        <span><i class="punto-leyenda pasado"></i> Por encima de la meta</span>
+        <span><i class="raya-leyenda"></i> Meta</span>
       </div>
     </section>
   </div>

@@ -42,6 +42,35 @@ export class Progreso {
     () => this.week().filter((d) => d.kcal <= this.nutrition.calorieGoal()).length,
   );
 
+  // ---------- Gráfica de barras ----------
+
+  /**
+   * Tope del eje: el día más alto o la meta (lo que sea mayor) + 15% de aire,
+   * redondeado hacia arriba a 500 kcal. Así ninguna barra toca el techo.
+   */
+  readonly chartMax = computed(() => {
+    const top = Math.max(...this.week().map((d) => d.kcal), this.nutrition.calorieGoal());
+    return Math.ceil((top * 1.15) / 500) * 500;
+  });
+
+  /** Altura de la línea de la meta (0–100 %). */
+  readonly goalPct = computed(() => (this.nutrition.calorieGoal() / this.chartMax()) * 100);
+
+  /** Cada barra con su altura en %, si se pasó de la meta y si es hoy. */
+  readonly bars = computed(() => {
+    const max = this.chartMax();
+    const goal = this.nutrition.calorieGoal();
+    const days = this.week();
+    return days.map((d, i) => ({
+      ...d,
+      pct: (d.kcal / max) * 100,
+      over: d.kcal > goal,
+      isToday: i === days.length - 1,
+    }));
+  });
+
+  // ---------- Peso ----------
+
   /** Primer registro de peso (punto de partida). */
   readonly firstWeight = computed(() => this.nutrition.weightHistory().at(0));
 
