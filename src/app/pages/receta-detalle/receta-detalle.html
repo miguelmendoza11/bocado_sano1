@@ -1,40 +1,106 @@
-<header class="detalle-header mb-4">
-  <a routerLink="/recetas" class="icon-btn" aria-label="Volver a recetas">
-    <i class="bi bi-arrow-left"></i>
-  </a>
-  <div>
-    <p class="text-secondary-sano fs-sm mb-0">Recetas</p>
-    <h1 class="fs-2xl mb-0">Receta #{{ id() }}</h1>
-  </div>
-</header>
+@if (recipe(); as r) {
+  <header class="detalle-header mb-4">
+    <a routerLink="/recetas" class="icon-btn" aria-label="Volver a recetas">
+      <i class="bi bi-arrow-left"></i>
+    </a>
+    <div class="min-w-0">
+      <p class="text-secondary-sano fs-sm mb-0">Recetas · {{ r.category | titlecase }}</p>
+      <h1 class="fs-2xl mb-0">{{ r.name }}</h1>
+    </div>
+  </header>
 
-<div class="row g-3">
-  <!-- Imagen, nombre y datos principales -->
-  <div class="col-12 lg:col-5">
-    <section class="sano-card detalle-card">
-      <div class="placeholder-media"></div>
-      <div class="placeholder-line"></div>
-    </section>
-  </div>
+  <div class="row g-3">
+    <!-- Imagen, descripción y datos principales -->
+    <div class="col-12 lg:col-5">
+      <section class="sano-card detalle-card">
+        <div class="detalle-media {{ r.colorClass }}">
+          <span class="detalle-emoji" aria-hidden="true">{{ r.emoji }}</span>
+        </div>
+        <p class="mb-0">{{ r.description }}</p>
+        <div class="detalle-datos">
+          <span class="kcal-pill"><i class="bi bi-fire"></i> {{ r.kcal }} kcal</span>
+          <span class="fs-sm text-secondary-sano"><i class="bi bi-clock"></i> {{ r.minutes }} min</span>
+          <span class="fs-sm text-secondary-sano">
+            <i class="bi bi-people"></i> {{ r.servings }} {{ r.servings === 1 ? 'porción' : 'porciones' }}
+          </span>
+        </div>
+        <div class="detalle-tags">
+          @for (tag of r.tags; track tag) {
+            <span class="chip">{{ tag }}</span>
+          }
+        </div>
+      </section>
+    </div>
 
-  <!-- Macros -->
-  <div class="col-12 lg:col-7">
-    <section class="sano-card detalle-card">
-      <div class="placeholder-block"></div>
-    </section>
-  </div>
+    <!-- Macros por porción -->
+    <div class="col-12 lg:col-7">
+      <section class="sano-card detalle-card">
+        <h2 class="fs-lg mb-0">Nutrición por porción</h2>
+        <div class="macros-body">
+          <app-calorie-ring [value]="r.kcal" [max]="nutrition.calorieGoal()" [size]="130" [stroke]="12">
+            <span class="fs-2xl fw-bold lh-1">{{ r.kcal }}</span>
+            <span class="fs-sm text-secondary-sano">kcal</span>
+          </app-calorie-ring>
 
-  <!-- Ingredientes -->
-  <div class="col-12 lg:col-5">
-    <section class="sano-card detalle-card">
-      <div class="placeholder-block"></div>
-    </section>
-  </div>
+          <div class="macros-lista">
+            @for (m of macros(); track m.label) {
+              <div>
+                <div class="d-flex justify-content-between fs-sm mb-1">
+                  <span class="fw-semibold">{{ m.label }}</span>
+                  <span class="text-secondary-sano">{{ m.grams }} g</span>
+                </div>
+                <div class="sano-progress {{ m.colorClass }}"><span [style.width.%]="m.pct"></span></div>
+              </div>
+            }
+          </div>
+        </div>
+        <p class="fs-sm text-secondary-sano mb-0">
+          Una porción es el {{ goalPct() }}% de tu meta diaria de calorías. Las barras comparan
+          cada macro con tu meta del día.
+        </p>
+      </section>
+    </div>
 
-  <!-- Pasos -->
-  <div class="col-12 lg:col-7">
-    <section class="sano-card detalle-card">
-      <div class="placeholder-block"></div>
-    </section>
+    <!-- Ingredientes -->
+    <div class="col-12 lg:col-5">
+      <section class="sano-card detalle-card">
+        <h2 class="fs-lg mb-0">Ingredientes</h2>
+        <ul class="list-unstyled mb-0 ingredientes">
+          @for (item of r.ingredients; track $index) {
+            <li><i class="bi bi-check-circle-fill"></i> {{ item }}</li>
+          }
+        </ul>
+      </section>
+    </div>
+
+    <!-- Pasos -->
+    <div class="col-12 lg:col-7">
+      <section class="sano-card detalle-card">
+        <h2 class="fs-lg mb-0">Preparación</h2>
+        <ol class="list-unstyled mb-0 pasos">
+          @for (step of r.steps; track $index) {
+            <li>
+              <span class="paso-num">{{ $index + 1 }}</span>
+              <span>{{ step }}</span>
+            </li>
+          }
+        </ol>
+      </section>
+    </div>
   </div>
-</div>
+} @else {
+  <!-- El id de la URL no existe -->
+  <header class="detalle-header mb-4">
+    <a routerLink="/recetas" class="icon-btn" aria-label="Volver a recetas">
+      <i class="bi bi-arrow-left"></i>
+    </a>
+    <h1 class="fs-2xl mb-0">Recetas</h1>
+  </header>
+
+  <section class="sano-card text-center no-encontrada">
+    <span class="detalle-emoji" aria-hidden="true">🍽️</span>
+    <h2 class="fs-lg mt-3 mb-1">Receta no encontrada</h2>
+    <p class="fs-sm text-secondary-sano mb-3">La receta que buscas no existe o fue eliminada.</p>
+    <a routerLink="/recetas" class="btn btn-solid theme-warning sano-btn-orange">Ver todas las recetas</a>
+  </section>
+}
