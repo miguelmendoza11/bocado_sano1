@@ -13,11 +13,12 @@ circle {
 }
 
 .track {
-  stroke: rgba(28, 31, 26, 0.12);
+  stroke: currentColor;
+  stroke-opacity: 0.12;
 }
 
 .bar {
-  stroke: var(--sano-ink);
+  stroke: currentColor;
   stroke-linecap: round;
   transition: stroke-dashoffset 0.6s ease;
 }

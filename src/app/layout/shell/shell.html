@@ -1,10 +1,13 @@
 <div class="shell">
   <!-- Barra lateral (escritorio, ≥ 992px) -->
   <aside class="sidebar">
-    <a routerLink="/inicio" class="brand">
-      <span class="brand-logo"><i class="bi bi-egg-fried"></i></span>
-      Bocado Sano
-    </a>
+    <div class="sidebar-top">
+      <a routerLink="/inicio" class="brand">
+        <span class="brand-logo"><i class="bi bi-egg-fried"></i></span>
+        Bocado Sano
+      </a>
+      <app-theme-toggle />
+    </div>
 
     <nav class="side-nav">
       @for (item of nav; track item.path) {

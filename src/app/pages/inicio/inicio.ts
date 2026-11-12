@@ -4,10 +4,11 @@ import { RouterLink } from '@angular/router';
 import { MealType } from '../../core/models/nutrition.models';
 import { NutritionService } from '../../core/services/nutrition.service';
 import { CalorieRing } from '../../shared/calorie-ring/calorie-ring';
+import { ThemeToggle } from '../../shared/theme-toggle/theme-toggle';
 
 @Component({
   selector: 'app-inicio',
-  imports: [CalorieRing, DecimalPipe, DatePipe, RouterLink],
+  imports: [CalorieRing, DecimalPipe, DatePipe, RouterLink, ThemeToggle],
   templateUrl: './inicio.html',
   styleUrl: './inicio.scss',
 })

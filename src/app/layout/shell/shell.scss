@@ -13,6 +13,13 @@
   display: none;
 }
 
+.sidebar-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
 .brand {
   display: flex;
   align-items: center;
@@ -21,6 +28,7 @@
   font-size: 1.15rem;
   color: var(--sano-ink);
   text-decoration: none;
+  white-space: nowrap;
 }
 
 .brand-logo {
@@ -30,6 +38,7 @@
   height: 2.4rem;
   border-radius: 12px;
   background: var(--sano-lime);
+  color: var(--sano-on-lime);
 }
 
 .side-nav {
@@ -56,7 +65,7 @@
 
   &.active {
     background: var(--sano-lime);
-    color: var(--sano-ink);
+    color: var(--sano-on-lime);
   }
 }
 
@@ -68,9 +77,9 @@
   align-items: center;
   justify-content: space-around;
   padding: 0.5rem;
-  background: #fff;
+  background: var(--sano-surface);
   border-radius: var(--sano-radius);
-  box-shadow: 0 -4px 24px rgba(28, 31, 26, 0.08);
+  box-shadow: var(--sano-shadow-nav);
   z-index: 10;
 }
 
@@ -105,7 +114,7 @@
   margin-top: -2rem;
   border-radius: 50%;
   background: var(--sano-gradient-orange);
-  color: #fff;
+  color: var(--sano-on-orange);
   font-size: 1.5rem;
   box-shadow: 0 8px 20px rgba(255, 122, 47, 0.4);
 }
@@ -120,7 +129,7 @@
     flex-direction: column;
     gap: 2rem;
     padding: 1.75rem 1.25rem;
-    background: #fff;
+    background: var(--sano-surface);
     border-right: 1px solid var(--sano-border);
   }
 

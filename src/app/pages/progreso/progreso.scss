@@ -18,8 +18,8 @@
 /* ---------- Barras de calorías ---------- */
 /* Colores de las barras de días anteriores (hoy usa la versión fuerte) */
 :host {
-  --bar-meta: #def78f;
-  --bar-pasado: #ffc8a1;
+  --bar-meta: var(--sano-chart-ok);
+  --bar-pasado: var(--sano-chart-over);
 }
 
 /*
@@ -63,7 +63,7 @@
   z-index: 2;
   padding: 0 0.15rem;
   border-radius: 4px;
-  background: #fff;
+  background: var(--sano-surface);
   font-size: 0.65rem;
   font-weight: 700;
   color: var(--sano-muted);
@@ -153,13 +153,13 @@
 .chip-baja {
   background: var(--sano-lime-soft);
   border-color: var(--sano-lime-soft);
-  color: #3f5503;
+  color: var(--sano-lime-ink);
 }
 
 .chip-sube {
-  background: #ffeedd;
-  border-color: #ffeedd;
-  color: #c25412;
+  background: var(--sano-orange-soft);
+  border-color: var(--sano-orange-soft);
+  color: var(--sano-orange-ink);
 }
 
 .grafica-peso {
@@ -187,7 +187,7 @@
   }
 
   .punto {
-    fill: #fff;
+    fill: var(--sano-surface);
     stroke: var(--sano-orange);
     stroke-width: 3;
 
@@ -243,7 +243,7 @@
   padding: 0.55rem 1rem;
   border-radius: 999px;
   border: 1px solid var(--sano-border);
-  background: #fff;
+  background: var(--sano-surface);
 
   &:focus-within {
     border-color: var(--sano-lime-strong);
@@ -251,7 +251,7 @@
   }
 
   &.invalido {
-    border-color: #e5484d;
+    border-color: var(--sano-danger);
   }
 
   input {
@@ -272,9 +272,9 @@
 }
 
 .peso-error {
-  color: #c4292f;
+  color: var(--sano-danger-ink);
 }
 
 .peso-ok {
-  color: #4d6b04;
+  color: var(--sano-success-ink);
 }

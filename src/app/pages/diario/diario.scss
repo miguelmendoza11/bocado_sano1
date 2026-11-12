@@ -62,7 +62,7 @@
   cursor: pointer;
 
   &:hover {
-    color: #d9534f;
+    color: var(--sano-danger);
   }
 }
 
@@ -82,11 +82,12 @@
   margin-bottom: 1rem;
 }
 
+// Barra sobre la tarjeta lima: usa el color del texto de la tarjeta
 .progress-resumen {
-  background: rgba(28, 31, 26, 0.12);
+  background: color-mix(in srgb, currentColor 12%, transparent);
 
   > span {
-    background: var(--sano-ink);
+    background: currentColor;
   }
 }
 
@@ -129,7 +130,7 @@
 
   &.active {
     background: var(--sano-lime);
-    color: var(--sano-ink);
+    color: var(--sano-on-lime);
   }
 }
 
@@ -141,6 +142,6 @@
   padding: 0.55rem 0.85rem;
   border-radius: 14px;
   background: var(--sano-lime-soft);
-  color: #3f5503;
+  color: var(--sano-lime-ink);
   font-weight: 600;
 }
