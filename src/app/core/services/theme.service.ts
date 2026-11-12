@@ -58,6 +58,10 @@ export class ThemeService {
       }
       firstRun = false;
       html.setAttribute('data-bs-theme', theme);
+      // Barra del navegador en el celular del mismo color que el fondo de la app
+      this.document
+        .querySelector('meta[name="theme-color"]')
+        ?.setAttribute('content', theme === 'dark' ? '#10130e' : '#f4f5f0');
       this.writePreference(this.preference());
     });
   }

@@ -10,6 +10,7 @@ import {
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { NutritionService } from '../../core/services/nutrition.service';
+import { ThemeToggle } from '../../shared/theme-toggle/theme-toggle';
 
 /** Valida que los campos password y confirmPassword del grupo sean iguales. */
 export const passwordsMatch: ValidatorFn = (group: AbstractControl): ValidationErrors | null => {
@@ -20,7 +21,7 @@ export const passwordsMatch: ValidatorFn = (group: AbstractControl): ValidationE
 
 @Component({
   selector: 'app-registro',
-  imports: [RouterLink, ReactiveFormsModule],
+  imports: [RouterLink, ReactiveFormsModule, ThemeToggle],
   templateUrl: './registro.html',
   styleUrl: './registro.scss',
 })

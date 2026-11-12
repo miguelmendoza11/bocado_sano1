@@ -179,6 +179,23 @@ h6 {
   color: var(--sano-on-dark);
 }
 
+/* ---------- Pantallas de acceso (bienvenida, login, registro) ---------- */
+/* Dos brillos suaves, lima y naranja, detrás de la tarjeta. Usan tokens,
+   así que en modo oscuro se ven como un resplandor sobre el fondo oscuro. */
+.sano-fondo-acceso {
+  position: relative;
+  background:
+    radial-gradient(circle at 15% 20%, var(--sano-lime-soft) 0, transparent 45%),
+    radial-gradient(circle at 85% 85%, var(--sano-orange-soft) 0, transparent 40%),
+    var(--sano-bg);
+
+  .tema-esquina {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+  }
+}
+
 /* ---------- Botones ---------- */
 /* Usar junto con: class="btn btn-solid theme-warning sano-btn-orange" */
 .sano-btn-orange {
