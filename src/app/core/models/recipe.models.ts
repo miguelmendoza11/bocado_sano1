@@ -19,3 +19,6 @@ export interface Recipe {
   ingredients: string[];
   steps: string[];
 }
+
+/** Categoría elegida en el filtro de recetas: una comida o todas. */
+export type RecipeCategoryFilter = MealType | 'todas';

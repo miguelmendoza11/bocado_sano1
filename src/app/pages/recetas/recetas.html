@@ -3,8 +3,36 @@
   <p class="text-secondary-sano mb-0">Ideas saludables para cada comida.</p>
 </header>
 
+<!-- Buscador y filtro por categoría -->
+<div class="recetas-filtros mb-4">
+  <label class="buscador">
+    <i class="bi bi-search" aria-hidden="true"></i>
+    <input
+      type="search"
+      placeholder="Buscar receta o etiqueta…"
+      aria-label="Buscar receta"
+      [value]="search()"
+      (input)="search.set($any($event.target).value)"
+    />
+  </label>
+
+  <div class="tabs-pill categorias" role="group" aria-label="Filtrar por categoría">
+    @for (c of categories; track c.value) {
+      <button
+        type="button"
+        class="tab"
+        [class.active]="category() === c.value"
+        [attr.aria-pressed]="category() === c.value"
+        (click)="category.set(c.value)"
+      >
+        {{ c.label }}
+      </button>
+    }
+  </div>
+</div>
+
 <div class="row g-3">
-  @for (recipe of recipeService.recipes(); track recipe.id) {
+  @for (recipe of filtered(); track recipe.id) {
     <div class="col-12 md:col-6 lg:col-4">
       <a [routerLink]="['/recetas', recipe.id]" class="sano-card receta-card">
         <div class="receta-media {{ recipe.colorClass }}">
@@ -24,6 +52,15 @@
           </div>
         </div>
       </a>
+    </div>
+  } @empty {
+    <div class="col-12">
+      <div class="sano-card text-center sin-resultados">
+        <i class="bi bi-search fs-3xl text-secondary-sano"></i>
+        <p class="fw-semibold mb-1 mt-2">No encontramos recetas</p>
+        <p class="fs-sm text-secondary-sano mb-3">Prueba con otra palabra u otra categoría.</p>
+        <button type="button" class="btn btn-solid theme-warning sano-btn-orange" (click)="clearFilters()">Ver todas</button>
+      </div>
     </div>
   }
 </div>

@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import { Recipe } from '../models/recipe.models';
+import { Recipe, RecipeCategoryFilter } from '../models/recipe.models';
 
 /** Recetas de prueba (kcal y macros por porción). */
 const RECIPES: Recipe[] = [
@@ -170,4 +170,24 @@ export class RecipeService {
   getById(id: number): Recipe | undefined {
     return this.recipes().find((r) => r.id === id);
   }
+
+  /**
+   * Filtra por categoría ('todas' = sin filtro) y por texto en el nombre o las etiquetas.
+   * No distingue mayúsculas ni tildes: "salmon" encuentra "Salmón".
+   */
+  filter(query: string, category: RecipeCategoryFilter): Recipe[] {
+    const text = normalize(query.trim());
+    return this.recipes().filter(
+      (r) =>
+        (category === 'todas' || r.category === category) &&
+        (!text || [r.name, ...r.tags].some((value) => normalize(value).includes(text))),
+    );
+  }
 }
+
+/** Pasa a minúsculas y quita tildes: "Salmón" → "salmon". */
+const normalize = (value: string) =>
+  value
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '');

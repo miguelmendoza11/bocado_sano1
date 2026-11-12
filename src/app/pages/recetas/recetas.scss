@@ -1,3 +1,85 @@
+/* ---------- Buscador y pestañas ---------- */
+.recetas-filtros {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.buscador {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.7rem 1.1rem;
+  border-radius: 999px;
+  background: #fff;
+  border: 1px solid var(--sano-border);
+  color: var(--sano-muted);
+  cursor: text;
+
+  &:focus-within {
+    border-color: var(--sano-lime-strong);
+    box-shadow: 0 0 0 3px var(--sano-lime-soft);
+  }
+
+  input {
+    flex: 1;
+    min-width: 0;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: var(--sano-ink);
+    font: inherit;
+  }
+}
+
+/* Las pestañas se desplazan de lado en celulares angostos */
+.categorias {
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+  align-self: flex-start;
+}
+
+.tab {
+  flex-shrink: 0;
+  padding: 0.45rem 1rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--sano-muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--sano-ink);
+  }
+
+  &.active {
+    background: var(--sano-lime);
+    color: var(--sano-ink);
+  }
+}
+
+@media (min-width: 768px) {
+  .recetas-filtros {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .buscador {
+    flex: 0 1 320px;
+    order: 2;
+  }
+}
+
+.sin-resultados {
+  padding: 2.5rem 1.25rem;
+}
+
+/* ---------- Tarjetas ---------- */
 /* La tarjeta completa es un enlace al detalle */
 .receta-card {
   height: 100%;

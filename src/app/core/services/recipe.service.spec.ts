@@ -35,6 +35,30 @@ describe('RecipeService', () => {
     }
   });
 
+  it('returns every recipe with no search and "todas"', () => {
+    expect(service.filter('', 'todas').length).toBe(8);
+  });
+
+  it('filters by category', () => {
+    const result = service.filter('', 'desayuno');
+    expect(result.length).toBe(2);
+    expect(result.every((r) => r.category === 'desayuno')).toBe(true);
+  });
+
+  it('searches by name ignoring case and accents', () => {
+    expect(service.filter('SALMON', 'todas').map((r) => r.id)).toEqual([5]);
+  });
+
+  it('searches by tag', () => {
+    const ids = service.filter('vegana', 'todas').map((r) => r.id);
+    expect(ids).toEqual([3, 7, 8]);
+  });
+
+  it('combines search and category', () => {
+    expect(service.filter('vegana', 'snacks').map((r) => r.id)).toEqual([7, 8]);
+    expect(service.filter('pollo', 'cena')).toEqual([]);
+  });
+
   it('has ingredients and steps in every recipe', () => {
     for (const r of service.recipes()) {
       expect(r.ingredients.length).toBeGreaterThan(0);
