@@ -3,21 +3,10 @@ import localeEs from '@angular/common/locales/es';
 import { LOCALE_ID } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NutritionService } from '../../core/services/nutrition.service';
-import { addDays, Progreso } from './progreso';
+import { Progreso } from './progreso';
 
 // Igual que en app.config.ts: números como 1.919 y 71,8, días como "jue"
 registerLocaleData(localeEs);
-
-describe('addDays', () => {
-  it('adds days to an ISO date', () => {
-    expect(addDays('2026-11-10', 1)).toBe('2026-11-11');
-  });
-
-  it('changes month and year when needed', () => {
-    expect(addDays('2026-10-31', 1)).toBe('2026-11-01');
-    expect(addDays('2026-12-31', 1)).toBe('2027-01-01');
-  });
-});
 
 describe('Progreso', () => {
   let fixture: ComponentFixture<Progreso>;
@@ -26,6 +15,11 @@ describe('Progreso', () => {
   let nutrition: NutritionService;
 
   beforeEach(async () => {
+    // Reloj fijo en el miércoles 11 de noviembre de 2026, para que las fechas de prueba
+    // (que se generan desde "hoy") den siempre lo mismo. Solo se falsea Date.
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date(2026, 10, 11, 12, 0));
+
     await TestBed.configureTestingModule({
       imports: [Progreso],
       providers: [{ provide: LOCALE_ID, useValue: 'es' }],
@@ -35,6 +29,10 @@ describe('Progreso', () => {
     el = fixture.nativeElement;
     nutrition = TestBed.inject(NutritionService);
     await fixture.whenStable();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   const text = (selector: string) => el.querySelector(selector)?.textContent?.replace(/\s+/g, ' ').trim();

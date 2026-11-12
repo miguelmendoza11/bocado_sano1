@@ -34,6 +34,13 @@ const MEALS: MealInfo[] = [
 
 const food = (id: number) => FOODS.find((f) => f.id === id)!;
 
+/** Fecha ISO local ("2026-11-12") de hoy menos `days` días. Usa la hora local, no UTC. */
+export function daysAgo(days: number, from: Date = new Date()): string {
+  const d = new Date(from.getFullYear(), from.getMonth(), from.getDate() - days);
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
 /** Kcal que se quitan o suman a la meta según el objetivo. */
 const GOAL_ADJUST = { perder: -500, mantener: 0, ganar: 300 } as const;
 
@@ -48,6 +55,9 @@ export class NutritionService {
   readonly meals = MEALS;
   readonly waterGoalMl = 2500;
   readonly stepsGoal = 10000;
+
+  /** Fecha de hoy en formato ISO local. Los datos de prueba se generan a partir de ella. */
+  readonly today = daysAgo(0);
 
   // ---------- Estado (signals) ----------
   readonly profile = signal<UserProfile>({
@@ -71,22 +81,15 @@ export class NutritionService {
   readonly waterMl = signal(1250);
   readonly steps = signal(6540);
 
-  readonly weightHistory = signal<WeightEntry[]>([
-    { date: '2026-10-14', kg: 74.1 },
-    { date: '2026-10-21', kg: 73.6 },
-    { date: '2026-10-28', kg: 73.4 },
-    { date: '2026-11-04', kg: 73.0 },
-    { date: '2026-11-11', kg: 72.4 },
-  ]);
+  /** Un peso por semana durante 4 semanas; el último es de hoy. */
+  readonly weightHistory = signal<WeightEntry[]>(
+    [74.1, 73.6, 73.4, 73.0, 72.4].map((kg, i) => ({ date: daysAgo(28 - i * 7), kg })),
+  );
 
-  readonly weekHistory = signal<DayHistory[]>([
-    { date: '2026-11-05', kcal: 2050 },
-    { date: '2026-11-06', kcal: 1890 },
-    { date: '2026-11-07', kcal: 2240 },
-    { date: '2026-11-08', kcal: 1980 },
-    { date: '2026-11-09', kcal: 2310 },
-    { date: '2026-11-10', kcal: 2010 },
-  ]);
+  /** Los 6 días anteriores a hoy (hoy sale de las comidas del Diario). */
+  readonly weekHistory = signal<DayHistory[]>(
+    [2050, 1890, 2240, 1980, 2310, 2010].map((kcal, i) => ({ date: daysAgo(6 - i), kcal })),
+  );
 
   private nextId = 100;
 
