@@ -125,6 +125,42 @@
           <text class="fecha" [attr.x]="p.x" [attr.y]="chart.height - 10">{{ p.date | date: 'd MMM' }}</text>
         }
       </svg>
+
+      <!-- Registrar el peso de hoy -->
+      <form class="peso-form" (submit)="saveWeight($event)" novalidate>
+        <label for="peso-hoy" class="fs-sm fw-semibold">Registrar peso de hoy</label>
+        <div class="peso-fila">
+          <div class="peso-input" [class.invalido]="weightError()">
+            <input
+              id="peso-hoy"
+              type="number"
+              inputmode="decimal"
+              step="0.1"
+              min="30"
+              max="300"
+              [placeholder]="nutrition.currentWeight() | number: '1.1-1'"
+              [value]="weightInput()"
+              (input)="weightInput.set($any($event.target).value)"
+              [attr.aria-invalid]="!!weightError()"
+              aria-describedby="peso-ayuda"
+            />
+            <span>kg</span>
+          </div>
+          <button type="submit" class="btn btn-solid theme-warning sano-btn-orange">Guardar</button>
+        </div>
+
+        <p id="peso-ayuda" class="fs-sm mb-0" role="status">
+          @if (weightError()) {
+            <span class="peso-error"><i class="bi bi-exclamation-circle"></i> {{ weightError() }}</span>
+          } @else if (savedWeight() !== null) {
+            <span class="peso-ok"><i class="bi bi-check-circle-fill"></i> Guardado: {{ savedWeight() | number: '1.1-1' }} kg</span>
+          } @else if (todayWeight(); as w) {
+            <span class="text-secondary-sano">Hoy ya registraste {{ w.kg | number: '1.1-1' }} kg. Si guardas otro, se reemplaza.</span>
+          } @else {
+            <span class="text-secondary-sano">Se agrega a la gráfica y a tu peso actual.</span>
+          }
+        </p>
+      </form>
     </section>
   </div>
 </div>

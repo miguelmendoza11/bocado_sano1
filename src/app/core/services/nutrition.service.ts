@@ -177,4 +177,22 @@ export class NutritionService {
   updateProfile(changes: Partial<UserProfile>): void {
     this.profile.update((p) => ({ ...p, ...changes }));
   }
+
+  /**
+   * Registra el peso de un día (fecha ISO "2026-11-11").
+   * Si ese día ya tenía peso lo reemplaza; si no, lo agrega en orden de fecha.
+   * También actualiza el peso del perfil para que la meta de calorías se recalcule.
+   * Devuelve false (y no cambia nada) si el peso no está entre 30 y 300 kg.
+   */
+  addWeight(kg: number, date: string): boolean {
+    if (!Number.isFinite(kg) || kg < 30 || kg > 300) return false;
+    const rounded = Math.round(kg * 10) / 10;
+    this.weightHistory.update((list) =>
+      [...list.filter((w) => w.date !== date), { date, kg: rounded }].sort((a, b) =>
+        a.date.localeCompare(b.date),
+      ),
+    );
+    this.profile.update((p) => ({ ...p, weightKg: this.currentWeight() }));
+    return true;
+  }
 }

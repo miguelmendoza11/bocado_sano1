@@ -1,5 +1,5 @@
 import { DatePipe, DecimalPipe } from '@angular/common';
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { DayHistory } from '../../core/models/nutrition.models';
 import { NutritionService } from '../../core/services/nutrition.service';
 
@@ -108,6 +108,43 @@ export class Progreso {
     const base = this.chart.height - this.chart.bottom;
     return `${points[0].x.toFixed(1)},${base} ${this.weightLine()} ${points.at(-1)!.x.toFixed(1)},${base}`;
   });
+
+  // ---------- Registrar peso de hoy ----------
+
+  /** Fecha de hoy (la misma que usa la barra "hoy" de la semana). */
+  readonly today = computed(() => this.week().at(-1)!.date);
+
+  /** Peso ya registrado hoy, si lo hay. */
+  readonly todayWeight = computed(() =>
+    this.nutrition.weightHistory().find((w) => w.date === this.today()),
+  );
+
+  /** Lo que el usuario escribe en el campo de peso. */
+  readonly weightInput = signal('');
+
+  /** Mensaje de error del formulario ('' = sin error). */
+  readonly weightError = signal('');
+
+  /** Último peso guardado, para el mensaje de confirmación. */
+  readonly savedWeight = signal<number | null>(null);
+
+  saveWeight(event: Event): void {
+    event.preventDefault();
+    this.savedWeight.set(null);
+    const text = this.weightInput().trim().replace(',', '.');
+    if (!text) {
+      this.weightError.set('Escribe tu peso.');
+      return;
+    }
+    const kg = Number(text);
+    if (!this.nutrition.addWeight(kg, this.today())) {
+      this.weightError.set('Escribe un peso entre 30 y 300 kg.');
+      return;
+    }
+    this.weightError.set('');
+    this.weightInput.set('');
+    this.savedWeight.set(this.nutrition.currentWeight());
+  }
 
   /** Primer registro de peso (punto de partida). */
   readonly firstWeight = computed(() => this.nutrition.weightHistory().at(0));
