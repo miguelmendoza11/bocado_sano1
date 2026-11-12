@@ -2,3 +2,165 @@
   <h1 class="fs-2xl mb-1">Progreso</h1>
   <p class="text-secondary-sano mb-0">Tu avance semana a semana.</p>
 </header>
+
+<div class="row g-3">
+  <!-- Resumen: promedio semanal -->
+  <div class="col-6 md:col-4">
+    <section class="sano-card sano-card-lime card-resumen">
+      <i class="bi bi-fire resumen-icon"></i>
+      <div>
+        <p class="fs-sm mb-0">Promedio diario</p>
+        <p class="fs-xl fw-bold mb-0">{{ average() | number }} kcal</p>
+        <p class="fs-sm mb-0 opacity-75">últimos {{ week().length }} días</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- Resumen: días dentro de la meta -->
+  <div class="col-6 md:col-4">
+    <section class="sano-card bg-orange-soft card-resumen">
+      <i class="bi bi-bullseye resumen-icon"></i>
+      <div>
+        <p class="fs-sm text-secondary-sano mb-0">Días en la meta</p>
+        <p class="fs-xl fw-bold mb-0">{{ daysOnGoal() }} / {{ week().length }}</p>
+        <p class="fs-sm text-secondary-sano mb-0">meta: {{ nutrition.calorieGoal() | number }} kcal</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- Resumen: peso actual -->
+  <div class="col-12 md:col-4">
+    <section class="sano-card sano-card-dark card-resumen">
+      <i class="bi bi-speedometer2 resumen-icon"></i>
+      <div>
+        <p class="fs-sm mb-0 opacity-75">Peso actual</p>
+        <p class="fs-xl fw-bold mb-0">{{ nutrition.currentWeight() | number: '1.1-1' }} kg</p>
+        @let cambio = totalWeightChange();
+        <p class="fs-sm mb-0 peso-cambio">
+          <i class="bi" [class.bi-arrow-down-right]="cambio <= 0" [class.bi-arrow-up-right]="cambio > 0"></i>
+          {{ (cambio < 0 ? -cambio : cambio) | number: '1.1-1' }} kg desde el {{ firstWeight()?.date | date: 'd MMM' }}
+        </p>
+      </div>
+    </section>
+  </div>
+
+  <!-- Gráfica de calorías de la semana -->
+  <div class="col-12 xl:col-7">
+    <section class="sano-card card-grafica">
+      <div class="d-flex align-items-center justify-content-between">
+        <div>
+          <h2 class="fs-lg mb-0">Calorías de la semana</h2>
+          <p class="fs-sm text-secondary-sano mb-0">Hoy llevas {{ nutrition.consumedKcal() | number }} kcal</p>
+        </div>
+        <span class="kcal-pill">Meta {{ nutrition.calorieGoal() | number }}</span>
+      </div>
+
+      <!-- Barras: la altura sale de bars() y la línea punteada es la meta -->
+      <div class="barras" role="list" aria-label="Calorías por día">
+        <div class="linea-meta" [style.bottom.%]="goalPct()" aria-hidden="true"></div>
+
+        @for (bar of bars(); track bar.date) {
+          <div
+            class="barra-col"
+            role="listitem"
+            [class.hoy]="bar.isToday"
+            [class.over]="bar.over"
+            [attr.aria-label]="(bar.isToday ? 'Hoy' : (bar.date | date: 'EEEE')) + ': ' + (bar.kcal | number) + ' kcal'"
+          >
+            <span class="barra-valor" [style.--alto]="bar.pct + '%'">{{ bar.kcal | number }}</span>
+            <span class="barra" [style.height.%]="bar.pct"></span>
+          </div>
+        }
+      </div>
+
+      <!-- Días debajo de cada barra -->
+      <div class="barras-dias" aria-hidden="true">
+        @for (bar of bars(); track bar.date) {
+          <span [class.hoy]="bar.isToday">{{ bar.isToday ? 'hoy' : (bar.date | date: 'EEE') }}</span>
+        }
+      </div>
+
+      <div class="leyenda fs-sm text-secondary-sano">
+        <span><i class="punto-leyenda en-meta"></i> En la meta</span>
+        <span><i class="punto-leyenda pasado"></i> Por encima de la meta</span>
+        <span><i class="raya-leyenda"></i> Meta</span>
+      </div>
+    </section>
+  </div>
+
+  <!-- Gráfica de peso: SVG calculado con weightPoints() -->
+  <div class="col-12 xl:col-5">
+    <section class="sano-card card-grafica">
+      @let cambioTotal = totalWeightChange();
+      <div class="d-flex align-items-center justify-content-between">
+        <div>
+          <h2 class="fs-lg mb-0">Peso</h2>
+          <p class="fs-sm text-secondary-sano mb-0">{{ weightPoints().length }} registros</p>
+        </div>
+        <span class="chip" [class.chip-baja]="cambioTotal < 0" [class.chip-sube]="cambioTotal > 0">
+          <i class="bi" [class.bi-arrow-down-right]="cambioTotal <= 0" [class.bi-arrow-up-right]="cambioTotal > 0"></i>
+          {{ cambioTotal > 0 ? '+' : '' }}{{ cambioTotal | number: '1.1-1' }} kg
+        </span>
+      </div>
+
+      <svg
+        class="grafica-peso"
+        [attr.viewBox]="'0 0 ' + chart.width + ' ' + chart.height"
+        role="img"
+        [attr.aria-label]="'Evolución del peso: de ' + (firstWeight()?.kg | number: '1.1-1') + ' a ' + (nutrition.currentWeight() | number: '1.1-1') + ' kg'"
+      >
+        <defs>
+          <linearGradient id="peso-relleno" x1="0" y1="0" x2="0" y2="1">
+            <stop class="relleno-arriba" offset="0%" />
+            <stop class="relleno-abajo" offset="100%" />
+          </linearGradient>
+        </defs>
+
+        <polygon class="area" [attr.points]="weightArea()" fill="url(#peso-relleno)" />
+        <polyline class="linea" [attr.points]="weightLine()" />
+
+        @for (p of weightPoints(); track p.date; let last = $last) {
+          <circle class="punto" [class.ultimo]="last" [attr.cx]="p.x" [attr.cy]="p.y" r="5" />
+          <text class="valor" [class.ultimo]="last" [attr.x]="p.x" [attr.y]="p.y - 11">{{ p.kg | number: '1.1-1' }}</text>
+          <text class="fecha" [attr.x]="p.x" [attr.y]="chart.height - 10">{{ p.date | date: 'd MMM' }}</text>
+        }
+      </svg>
+
+      <!-- Registrar el peso de hoy -->
+      <form class="peso-form" (submit)="saveWeight($event)" novalidate>
+        <label for="peso-hoy" class="fs-sm fw-semibold">Registrar peso de hoy</label>
+        <div class="peso-fila">
+          <div class="peso-input" [class.invalido]="weightError()">
+            <input
+              id="peso-hoy"
+              type="number"
+              inputmode="decimal"
+              step="0.1"
+              min="30"
+              max="300"
+              [placeholder]="nutrition.currentWeight() | number: '1.1-1'"
+              [value]="weightInput()"
+              (input)="weightInput.set($any($event.target).value)"
+              [attr.aria-invalid]="!!weightError()"
+              aria-describedby="peso-ayuda"
+            />
+            <span>kg</span>
+          </div>
+          <button type="submit" class="btn btn-solid theme-warning sano-btn-orange">Guardar</button>
+        </div>
+
+        <p id="peso-ayuda" class="fs-sm mb-0" role="status">
+          @if (weightError()) {
+            <span class="peso-error"><i class="bi bi-exclamation-circle"></i> {{ weightError() }}</span>
+          } @else if (savedWeight() !== null) {
+            <span class="peso-ok"><i class="bi bi-check-circle-fill"></i> Guardado: {{ savedWeight() | number: '1.1-1' }} kg</span>
+          } @else if (todayWeight(); as w) {
+            <span class="text-secondary-sano">Hoy ya registraste {{ w.kg | number: '1.1-1' }} kg. Si guardas otro, se reemplaza.</span>
+          } @else {
+            <span class="text-secondary-sano">Se agrega a la gráfica y a tu peso actual.</span>
+          }
+        </p>
+      </form>
+    </section>
+  </div>
+</div>

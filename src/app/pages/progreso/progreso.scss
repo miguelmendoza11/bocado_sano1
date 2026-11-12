@@ -1,0 +1,280 @@
+.card-resumen,
+.card-grafica {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+/* ---------- Tarjetas de resumen ---------- */
+.resumen-icon {
+  font-size: 1.4rem;
+}
+
+.peso-cambio {
+  color: var(--sano-lime);
+}
+
+/* ---------- Barras de calorías ---------- */
+/* Colores de las barras de días anteriores (hoy usa la versión fuerte) */
+:host {
+  --bar-meta: #def78f;
+  --bar-pasado: #ffc8a1;
+}
+
+/*
+ * Área de la gráfica: las barras, sus números y la línea de la meta se miden
+ * desde abajo (bottom / height en %) dentro de este mismo cuadro, así quedan alineados.
+ * El margin-top deja espacio para el número de la barra más alta.
+ */
+.barras {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.5rem;
+  height: 13rem;
+  margin-top: 1.25rem;
+  border-bottom: 1px solid var(--sano-border);
+}
+
+.barra-col {
+  position: relative;
+  min-width: 0;
+}
+
+.barra {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 2.5rem;
+  border-radius: 10px 10px 4px 4px;
+  background: var(--bar-meta);
+  transition: height 0.4s ease;
+}
+
+/* Número encima de cada barra (fondo blanco para que la línea de la meta no lo tape) */
+.barra-valor {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--alto, 0%) + 0.25rem);
+  transform: translateX(-50%);
+  z-index: 2;
+  padding: 0 0.15rem;
+  border-radius: 4px;
+  background: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--sano-muted);
+  white-space: nowrap;
+}
+
+/* Colores: hoy resaltado; naranja si el día pasó la meta */
+.over .barra {
+  background: var(--bar-pasado);
+}
+
+.hoy .barra {
+  background: var(--sano-lime-strong);
+}
+
+.hoy.over .barra {
+  background: var(--sano-orange);
+}
+
+.hoy .barra-valor {
+  color: var(--sano-ink);
+}
+
+/* Línea punteada de la meta */
+.linea-meta {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-top: 2px dashed var(--sano-ink);
+  opacity: 0.35;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.barras-dias {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.5rem;
+  margin-top: -0.35rem;
+
+  span {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--sano-muted);
+    text-align: center;
+  }
+
+  .hoy {
+    color: var(--sano-ink);
+  }
+}
+
+.leyenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1rem;
+  margin-top: auto;
+
+  span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+}
+
+.punto-leyenda {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 50%;
+
+  &.en-meta {
+    background: var(--bar-meta);
+  }
+
+  &.pasado {
+    background: var(--bar-pasado);
+  }
+}
+
+.raya-leyenda {
+  width: 1.1rem;
+  border-top: 2px dashed var(--sano-ink);
+  opacity: 0.35;
+}
+
+/* ---------- Línea de peso ---------- */
+.chip-baja {
+  background: var(--sano-lime-soft);
+  border-color: var(--sano-lime-soft);
+  color: #3f5503;
+}
+
+.chip-sube {
+  background: #ffeedd;
+  border-color: #ffeedd;
+  color: #c25412;
+}
+
+.grafica-peso {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+
+  .linea {
+    fill: none;
+    stroke: var(--sano-orange);
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* Degradado naranja bajo la línea (los colores van aquí porque var() no sirve en atributos SVG) */
+  .relleno-arriba {
+    stop-color: var(--sano-orange);
+    stop-opacity: 0.25;
+  }
+
+  .relleno-abajo {
+    stop-color: var(--sano-orange);
+    stop-opacity: 0;
+  }
+
+  .punto {
+    fill: #fff;
+    stroke: var(--sano-orange);
+    stroke-width: 3;
+
+    &.ultimo {
+      fill: var(--sano-orange);
+    }
+  }
+
+  text {
+    font-size: 11px;
+    font-weight: 600;
+    text-anchor: middle;
+  }
+
+  .valor {
+    fill: var(--sano-ink);
+
+    &.ultimo {
+      font-weight: 800;
+    }
+  }
+
+  .fecha {
+    fill: var(--sano-muted);
+  }
+}
+
+/* ---------- Registrar peso ---------- */
+.peso-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: auto;
+  padding-top: 1rem;
+  border-top: 1px solid var(--sano-border);
+}
+
+.peso-fila {
+  display: flex;
+  gap: 0.5rem;
+
+  .btn {
+    flex-shrink: 0;
+  }
+}
+
+.peso-input {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 1rem;
+  border-radius: 999px;
+  border: 1px solid var(--sano-border);
+  background: #fff;
+
+  &:focus-within {
+    border-color: var(--sano-lime-strong);
+    box-shadow: 0 0 0 3px var(--sano-lime-soft);
+  }
+
+  &.invalido {
+    border-color: #e5484d;
+  }
+
+  input {
+    flex: 1;
+    min-width: 0;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: var(--sano-ink);
+    font: inherit;
+    font-weight: 600;
+  }
+
+  span {
+    color: var(--sano-muted);
+    font-weight: 600;
+  }
+}
+
+.peso-error {
+  color: #c4292f;
+}
+
+.peso-ok {
+  color: #4d6b04;
+}

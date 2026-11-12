@@ -48,6 +48,34 @@ describe('NutritionService', () => {
     expect(service.weightChange()).toBe(-0.6);
   });
 
+  it('adds a weight for a new day and makes it the current weight', () => {
+    expect(service.addWeight(72.04, '2026-11-18')).toBe(true);
+    expect(service.weightHistory().length).toBe(6);
+    expect(service.currentWeight()).toBe(72);
+    expect(service.weightChange()).toBe(-0.4);
+    expect(service.profile().weightKg).toBe(72);
+  });
+
+  it('replaces the weight when the day already has one', () => {
+    service.addWeight(71.8, '2026-11-11');
+    expect(service.weightHistory().length).toBe(5);
+    expect(service.currentWeight()).toBe(71.8);
+  });
+
+  it('keeps the weight history sorted by date', () => {
+    service.addWeight(73.2, '2026-10-30');
+    const dates = service.weightHistory().map((w) => w.date);
+    expect(dates).toEqual([...dates].sort());
+    expect(service.currentWeight()).toBe(72.4);
+  });
+
+  it('rejects impossible weights without changing anything', () => {
+    expect(service.addWeight(0, '2026-11-18')).toBe(false);
+    expect(service.addWeight(500, '2026-11-18')).toBe(false);
+    expect(service.addWeight(Number.NaN, '2026-11-18')).toBe(false);
+    expect(service.weightHistory().length).toBe(5);
+  });
+
   it('recalculates the goal when the profile changes', () => {
     service.updateProfile({ goal: 'mantener' });
     expect(service.calorieGoal()).toBe(2640);
