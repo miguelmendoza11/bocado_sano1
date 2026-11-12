@@ -90,6 +90,42 @@ function sampleData(name: string, today: string): SavedNutrition {
   };
 }
 
+/** Suma (o resta) días a una fecha ISO: shiftDate("2026-11-30", 1) → "2026-12-01". */
+export function shiftDate(isoDate: string, days: number): string {
+  const [y, m, d] = isoDate.split('-').map(Number);
+  return daysAgo(-days, new Date(y, m - 1, d));
+}
+
+/**
+ * Cambio de día: si lo guardado es de un día anterior a hoy,
+ * - las kcal de ese día pasan al historial de la semana,
+ * - los días en que no se abrió la app quedan con 0 kcal,
+ * - el historial se queda solo con los 6 días anteriores a hoy,
+ * - las comidas, el agua y los pasos empiezan en cero.
+ * Si lo guardado ya es de hoy, se devuelve igual.
+ */
+export function rollOver(saved: SavedNutrition, today: string): SavedNutrition {
+  if (saved.date >= today) return saved;
+
+  const kcalOfSavedDay = saved.entries.reduce((sum, e) => {
+    const f = FOODS.find((x) => x.id === e.foodId);
+    return sum + (f ? f.kcal * e.servings : 0);
+  }, 0);
+
+  // El día guardado con sus kcal, y en 0 los días siguientes hasta ayer
+  const newDays: DayHistory[] = [{ date: saved.date, kcal: kcalOfSavedDay }];
+  for (let day = shiftDate(saved.date, 1); day < today; day = shiftDate(day, 1)) {
+    newDays.push({ date: day, kcal: 0 });
+  }
+
+  const firstDay = shiftDate(today, -6);
+  const week = [...saved.weekHistory.filter((d) => d.date < saved.date), ...newDays]
+    .filter((d) => d.date >= firstDay && d.date < today)
+    .sort((a, b) => a.date.localeCompare(b.date));
+
+  return { ...saved, date: today, weekHistory: week, entries: [], waterMl: 0, steps: 0 };
+}
+
 /** Kcal que se quitan o suman a la meta según el objetivo. */
 const GOAL_ADJUST = { perder: -500, mantener: 0, ganar: 300 } as const;
 
@@ -219,11 +255,16 @@ export class NutritionService {
     };
   }
 
-  /** Carga lo guardado del usuario; si es nuevo, le pone los datos de ejemplo con su nombre. */
+  /**
+   * Carga lo guardado del usuario (pasando al día de hoy si era de otro día);
+   * si es nuevo, le pone los datos de ejemplo con su nombre.
+   */
   private load(key: string): void {
     const saved = readStorage<SavedNutrition>(key);
     const data =
-      saved?.version === 1 ? saved : sampleData(this.auth.user()?.name ?? this.profile().name, this.today);
+      saved?.version === 1
+        ? rollOver(saved, this.today) // si es de otro día, empieza un día nuevo
+        : sampleData(this.auth.user()?.name ?? this.profile().name, this.today);
 
     this.profile.set(data.profile);
     this.entries.set(this.toEntries(data.entries));

@@ -22,15 +22,22 @@ export class Progreso {
     { date: this.nutrition.today, kcal: this.nutrition.consumedKcal() },
   ]);
 
-  /** Promedio diario de kcal de la semana (redondeado). */
+  /**
+   * Días con algo registrado. Un día en 0 kcal es un día en que no se abrió la app
+   * (o hoy, si todavía no comes nada): no cuenta para el promedio ni para la meta.
+   */
+  readonly loggedDays = computed(() => this.week().filter((d) => d.kcal > 0));
+
+  /** Promedio diario de kcal de los días con registro (redondeado). */
   readonly average = computed(() => {
-    const days = this.week();
+    const days = this.loggedDays();
+    if (!days.length) return 0;
     return Math.round(days.reduce((sum, d) => sum + d.kcal, 0) / days.length);
   });
 
-  /** Cuántos días quedaron en la meta o por debajo. */
+  /** De los días con registro, cuántos quedaron en la meta o por debajo. */
   readonly daysOnGoal = computed(
-    () => this.week().filter((d) => d.kcal <= this.nutrition.calorieGoal()).length,
+    () => this.loggedDays().filter((d) => d.kcal <= this.nutrition.calorieGoal()).length,
   );
 
   // ---------- Gráfica de barras ----------
