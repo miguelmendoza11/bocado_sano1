@@ -27,19 +27,178 @@
   line-height: 1;
 }
 
-/* ---------- Panel (diseño completo en el siguiente commit) ---------- */
+/* ---------- Panel ---------- */
+// Celular: casi todo el ancho (el contenido tiene 1rem de margen a cada lado)
 .panel {
   position: absolute;
-  top: calc(100% + 0.5rem);
+  top: calc(100% + 0.6rem);
   right: 0;
-  z-index: 20;
-  width: 22rem;
+  z-index: 30;
+  width: calc(100vw - 2rem);
+  max-height: min(70vh, 30rem);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   background: var(--sano-surface);
   border: 1px solid var(--sano-border);
+  border-radius: var(--sano-radius);
+  box-shadow: var(--sano-shadow-hover);
+  color: var(--sano-ink);
+  transform-origin: top right;
 }
 
+// Escritorio: tarjeta de ~22rem alineada a la derecha de la campana
+@media (min-width: 576px) {
+  .panel {
+    width: 22rem;
+  }
+}
+
+.panel-header {
+  padding: 1rem 1.25rem 0.75rem;
+  border-bottom: 1px solid var(--sano-border);
+}
+
+/* ---------- Lista ---------- */
 .lista {
   list-style: none;
   margin: 0;
-  padding: 0;
+  padding: 0.4rem;
+  overflow-y: auto;
+}
+
+.recordatorio {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.65rem 0.75rem;
+  border: 0;
+  border-radius: 16px;
+  background: none;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background: var(--sano-bg);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--sano-lime-strong);
+    outline-offset: -2px;
+  }
+
+  // Ya leído: se ve más tenue y sin negrita
+  &.leido {
+    color: var(--sano-muted);
+
+    .texto {
+      font-weight: 500;
+    }
+
+    .icono {
+      opacity: 0.6;
+    }
+  }
+}
+
+// Ícono dentro de un círculo de color suave (bg-lime-soft / bg-orange-soft / bg-blue-soft)
+.icono {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  font-size: 1.05rem;
+
+  &.bg-lime-soft {
+    color: var(--sano-lime-ink);
+  }
+
+  &.bg-orange-soft {
+    color: var(--sano-orange-ink);
+  }
+
+  &.bg-blue-soft {
+    color: var(--sano-blue);
+  }
+}
+
+.texto {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+/* ---------- Pie ---------- */
+.panel-footer {
+  padding: 0.6rem 1rem;
+  border-top: 1px solid var(--sano-border);
+  text-align: center;
+}
+
+.btn-texto {
+  border: 0;
+  border-radius: 999px;
+  padding: 0.35rem 0.8rem;
+  background: none;
+  color: var(--sano-ink);
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--sano-lime-soft);
+    color: var(--sano-lime-ink);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--sano-lime-strong);
+    outline-offset: 2px;
+  }
+}
+
+/* ---------- Estado vacío ---------- */
+.vacio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 2rem 1.25rem;
+  text-align: center;
+
+  i {
+    display: grid;
+    place-items: center;
+    width: 3.5rem;
+    height: 3.5rem;
+    margin-bottom: 0.4rem;
+    border-radius: 50%;
+    background: var(--sano-lime-soft);
+    color: var(--sano-lime-ink);
+    font-size: 1.6rem;
+  }
+}
+
+/* ---------- Animación ---------- */
+.panel-enter {
+  animation: panel-in 0.18s ease-out;
+}
+
+@keyframes panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.97);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel-enter {
+    animation: none;
+  }
 }

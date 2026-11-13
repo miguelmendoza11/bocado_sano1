@@ -14,7 +14,7 @@
 </button>
 
 @if (open()) {
-  <section class="panel" [id]="panelId" [attr.aria-labelledby]="panelId + '-titulo'">
+  <section class="panel" animate.enter="panel-enter" [id]="panelId" [attr.aria-labelledby]="panelId + '-titulo'">
     <header class="panel-header">
       <h2 class="fs-md mb-0" [id]="panelId + '-titulo'">Recordatorios</h2>
     </header>
