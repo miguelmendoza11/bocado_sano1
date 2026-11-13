@@ -1,6 +1,14 @@
 import { TestBed } from '@angular/core/testing';
 import { AuthService } from './auth.service';
-import { NutritionService, SavedNutrition, dataKey, rollOver, shiftDate } from './nutrition.service';
+import {
+  NutritionService,
+  SavedNutrition,
+  dataKey,
+  recipeAsFood,
+  rollOver,
+  shiftDate,
+} from './nutrition.service';
+import { RECIPES } from './recipe.service';
 
 /**
  * Guardado en localStorage por usuario y cambio de día.
@@ -135,6 +143,64 @@ describe('NutritionService · persistencia', () => {
     expect(nutrition.profile()).toEqual(expect.objectContaining({ name: 'Ana', age: 24 }));
     expect(saved(ANA)!.entries.length).toBe(5);
   });
+
+  it('saves a recipe with its recipeId', () => {
+    const { auth, nutrition } = openApp();
+    auth.register('Ana', ANA);
+    TestBed.tick();
+
+    nutrition.addRecipe(1, 'desayuno', 2); // 2 porciones de pancakes (350 c/u)
+    TestBed.tick();
+
+    const entry = saved(ANA)!.entries.at(-1)!;
+    expect(entry).toEqual(
+      expect.objectContaining({ recipeId: 1, meal: 'desayuno', servings: 2 }),
+    );
+    expect(entry.foodId).toBeUndefined();
+    expect(nutrition.kcalFor('desayuno')).toBe(420 + 700);
+  });
+
+  it('keeps a recipe after reloading the page', () => {
+    const first = openApp();
+    first.auth.register('Ana', ANA);
+    TestBed.tick();
+    first.nutrition.addRecipe(1, 'cena');
+    TestBed.tick();
+
+    const { nutrition } = openApp();
+    const recipe = nutrition.entries().find((e) => e.recipeId === 1);
+    // No se confunde con el alimento 1 (Avena con frutas): los ids se repiten
+    expect(recipe?.food).toEqual(
+      expect.objectContaining({ name: 'Pancakes de avena y banano', portion: '1 porción', kcal: 350 }),
+    );
+    expect(nutrition.consumedKcal()).toBe(950 + 350);
+  });
+
+  it('ignores saved recipes that are no longer in the catalog', () => {
+    const { auth } = openApp();
+    auth.register('Ana', ANA);
+    TestBed.tick();
+    const data = saved(ANA)!;
+    data.entries.push({ id: 999, recipeId: 12345, meal: 'cena', servings: 1 });
+    localStorage.setItem(dataKey(ANA), JSON.stringify(data));
+
+    const { nutrition } = openApp();
+    expect(nutrition.entries().some((e) => e.id === 999)).toBe(false);
+    expect(nutrition.consumedKcal()).toBe(950);
+  });
+});
+
+describe('recipeAsFood', () => {
+  it('turns a recipe into a one-serving food', () => {
+    const recipe = RECIPES.find((r) => r.id === 5)!;
+    expect(recipeAsFood(recipe)).toEqual({
+      id: 5,
+      name: 'Salmón al horno con verduras',
+      portion: '1 porción',
+      kcal: 510,
+      macros: { protein: 38, carbs: 22, fat: 30 },
+    });
+  });
 });
 
 describe('shiftDate', () => {
@@ -195,5 +261,13 @@ describe('rollOver', () => {
       '2026-11-10',
     ]);
     expect(result.weekHistory.slice(-3).map((d) => d.kcal)).toEqual([190, 0, 0]);
+  });
+
+  it('also counts the kcal of recipes', () => {
+    const data = base('2026-11-10', []);
+    // 2 manzanas (190) + 1 porción de salmón al horno (510)
+    data.entries.push({ id: 2, recipeId: 5, meal: 'cena', servings: 1 });
+    const result = rollOver(data, '2026-11-11');
+    expect(result.weekHistory).toEqual([{ date: '2026-11-10', kcal: 700 }]);
   });
 });
