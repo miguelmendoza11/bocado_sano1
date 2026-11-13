@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 import { ActivityLevel, Goal, Sex } from '../../core/models/nutrition.models';
 import { AuthService } from '../../core/services/auth.service';
 import { NutritionService } from '../../core/services/nutrition.service';
+import { ToastService } from '../../core/services/toast.service';
 import { ThemePreference, ThemeService } from '../../core/services/theme.service';
 
 @Component({
@@ -20,6 +21,7 @@ export class Perfil {
   protected readonly auth = inject(AuthService);
   protected readonly nutrition = inject(NutritionService);
   protected readonly theme = inject(ThemeService);
+  private readonly toast = inject(ToastService);
 
   /** Opciones de la tarjeta Apariencia. */
   protected readonly themeOptions: { value: ThemePreference; label: string }[] = [
@@ -103,6 +105,8 @@ export class Perfil {
   /** Borra la sesión y vuelve a la bienvenida. */
   logout(): void {
     this.auth.logout();
+    // El aviso vive fuera del router-outlet: se sigue viendo en /bienvenida
+    this.toast.info('Sesión cerrada. ¡Vuelve pronto!');
     this.router.navigate(['/bienvenida']);
   }
 

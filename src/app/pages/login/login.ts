@@ -3,6 +3,7 @@ import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angula
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { NutritionService } from '../../core/services/nutrition.service';
+import { ToastService } from '../../core/services/toast.service';
 import { ThemeToggle } from '../../shared/theme-toggle/theme-toggle';
 
 @Component({
@@ -16,6 +17,7 @@ export class Login {
   private readonly router = inject(Router);
   private readonly auth = inject(AuthService);
   private readonly nutrition = inject(NutritionService);
+  private readonly toast = inject(ToastService);
 
   readonly form = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
@@ -29,7 +31,9 @@ export class Login {
     }
     // Guarda la sesión y pone el nombre del usuario en el perfil (Inicio lo saluda)
     this.auth.login(this.form.controls.email.value);
-    this.nutrition.updateProfile({ name: this.auth.user()!.name });
+    const { name } = this.auth.user()!;
+    this.nutrition.updateProfile({ name });
+    this.toast.success(`¡Hola de nuevo, ${name}!`);
     this.router.navigate(['/inicio']);
   }
 }

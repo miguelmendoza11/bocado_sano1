@@ -10,6 +10,7 @@ import {
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { NutritionService } from '../../core/services/nutrition.service';
+import { ToastService } from '../../core/services/toast.service';
 import { ThemeToggle } from '../../shared/theme-toggle/theme-toggle';
 
 /** Valida que los campos password y confirmPassword del grupo sean iguales. */
@@ -30,6 +31,7 @@ export class Registro {
   private readonly router = inject(Router);
   private readonly nutrition = inject(NutritionService);
   private readonly auth = inject(AuthService);
+  private readonly toast = inject(ToastService);
 
   readonly form = this.fb.group(
     {
@@ -50,6 +52,7 @@ export class Registro {
     // Crea la cuenta y deja la sesión iniciada
     this.auth.register(name, email);
     this.nutrition.updateProfile({ name: name.trim() });
+    this.toast.success(`Cuenta creada. ¡Bienvenido, ${name.trim()}!`);
     this.router.navigate(['/inicio']);
   }
 }
