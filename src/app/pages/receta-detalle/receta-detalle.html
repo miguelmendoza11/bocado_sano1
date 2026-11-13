@@ -14,7 +14,21 @@
     <div class="col-12 lg:col-5">
       <section class="sano-card detalle-card">
         <div class="detalle-media {{ r.colorClass }}">
-          <span class="detalle-emoji" aria-hidden="true">{{ r.emoji }}</span>
+          @if (imageFailed()) {
+            <!-- Respaldo: si la foto no carga, se ve el emoji como antes -->
+            <span class="detalle-emoji" aria-hidden="true">{{ r.emoji }}</span>
+          } @else {
+            <img
+              class="detalle-foto"
+              [ngSrc]="r.image"
+              [alt]="r.imageAlt"
+              [style.object-position]="r.imagePosition"
+              fill
+              priority
+              sizes="(min-width: 1024px) 40vw, 100vw"
+              (error)="imageFailed.set(true)"
+            />
+          }
         </div>
         <p class="mb-0">{{ r.description }}</p>
         <div class="detalle-datos">

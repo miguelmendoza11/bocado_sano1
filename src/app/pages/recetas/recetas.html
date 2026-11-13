@@ -36,7 +36,21 @@
     <div class="col-12 md:col-6 lg:col-4">
       <a [routerLink]="['/recetas', recipe.id]" class="sano-card receta-card">
         <div class="receta-media {{ recipe.colorClass }}">
-          <span class="receta-emoji" aria-hidden="true">{{ recipe.emoji }}</span>
+          @if (failedImages().has(recipe.id)) {
+            <!-- Respaldo: si la foto no carga, se ve el emoji como antes -->
+            <span class="receta-emoji" aria-hidden="true">{{ recipe.emoji }}</span>
+          } @else {
+            <img
+              class="receta-foto"
+              [ngSrc]="recipe.image"
+              [alt]="recipe.imageAlt"
+              [style.object-position]="recipe.imagePosition"
+              fill
+              [priority]="priorityIds.has(recipe.id)"
+              sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
+              (error)="onImageError(recipe.id)"
+            />
+          }
         </div>
         <div class="receta-body">
           <h2 class="fs-md fw-bold mb-0 receta-nombre">{{ recipe.name }}</h2>

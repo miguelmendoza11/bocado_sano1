@@ -5,7 +5,13 @@ export interface Recipe {
   id: number;
   name: string;
   description: string;
-  /** Emoji que hace de "foto" de la receta. */
+  /** Foto de la receta, dentro de public/ (ej. 'recetas/crema-ahuyama.jpg'). */
+  image: string;
+  /** Qué se ve en la foto, para lectores de pantalla. */
+  imageAlt: string;
+  /** Parte de la foto que se deja ver al recortarla (object-position). Útil en fotos verticales. */
+  imagePosition?: string;
+  /** Respaldo: se muestra si la foto no carga. */
   emoji: string;
   /** Clase de fondo global: bg-lime-soft, bg-orange-soft o bg-blue-soft. */
   colorClass: string;

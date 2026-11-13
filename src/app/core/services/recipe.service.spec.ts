@@ -65,4 +65,18 @@ describe('RecipeService', () => {
       expect(r.steps.length).toBeGreaterThan(0);
     }
   });
+
+  it('has a photo, a description of the photo and a backup emoji in every recipe', () => {
+    for (const r of service.recipes()) {
+      // Ruta dentro de public/, sin "public/" y con el nombre en minúsculas y guiones
+      expect(r.image).toMatch(/^recetas\/[a-z0-9-]+\.jpg$/);
+      expect(r.imageAlt.trim().length).toBeGreaterThan(10);
+      expect(r.emoji).toBeTruthy();
+    }
+  });
+
+  it('uses a different photo for each recipe', () => {
+    const images = service.recipes().map((r) => r.image);
+    expect(new Set(images).size).toBe(images.length);
+  });
 });
