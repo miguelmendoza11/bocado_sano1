@@ -24,12 +24,15 @@ export interface MealInfo {
   colorClass: string;
 }
 
-/** Un alimento que el usuario registró en una comida. */
+/** Un alimento (o una receta) que el usuario registró en una comida. */
 export interface LoggedFood {
   id: number;
+  /** Si es una receta, aquí va la receta convertida en "alimento" (1 porción). */
   food: Food;
   meal: MealType;
   servings: number;
+  /** Solo para recetas: id de la receta en el catálogo de recetas. */
+  recipeId?: number;
 }
 
 export type Sex = 'hombre' | 'mujer';

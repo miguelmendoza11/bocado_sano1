@@ -61,6 +61,69 @@
       </section>
     </div>
 
+    <!-- Agregar al diario -->
+    <div class="col-12">
+      <section class="sano-card agregar-card" aria-labelledby="agregar-titulo">
+        <div class="agregar-texto">
+          <h2 id="agregar-titulo" class="fs-lg mb-1">Agregar al diario</h2>
+          <p class="fs-sm text-secondary-sano mb-0">Elige la comida y cuántas porciones comiste.</p>
+        </div>
+
+        <div class="agregar-controles">
+          <div class="tabs-pill comidas-tabs" role="group" aria-label="Comida">
+            @for (meal of nutrition.meals; track meal.type) {
+              <button
+                type="button"
+                class="tab"
+                [class.active]="selectedMeal() === meal.type"
+                [attr.aria-pressed]="selectedMeal() === meal.type"
+                (click)="selectedMeal.set(meal.type)"
+              >
+                {{ meal.label }}
+              </button>
+            }
+          </div>
+
+          <div class="porciones" role="group" aria-label="Porciones">
+            <button
+              type="button"
+              class="icon-btn"
+              aria-label="Quitar una porción"
+              [disabled]="servings() <= minServings"
+              (click)="changeServings(-1)"
+            >
+              <i class="bi bi-dash-lg"></i>
+            </button>
+            <span class="porciones-num" aria-live="polite">{{ servings() }}</span>
+            <button
+              type="button"
+              class="icon-btn"
+              aria-label="Agregar una porción"
+              [disabled]="servings() >= maxServings"
+              (click)="changeServings(1)"
+            >
+              <i class="bi bi-plus-lg"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="agregar-accion">
+          <span class="kcal-pill"><i class="bi bi-fire"></i> {{ r.kcal * servings() }} kcal</span>
+          <button type="button" class="btn btn-solid theme-warning sano-btn-orange" (click)="addToDiary()">
+            <i class="bi bi-journal-plus me-1"></i> Agregar al diario
+          </button>
+        </div>
+
+        @if (added(); as a) {
+          <p class="feedback fs-sm mb-0" role="status">
+            <i class="bi bi-check-circle-fill"></i>
+            <span>{{ a.message }}</span>
+            <a routerLink="/diario" [queryParams]="{ comida: a.meal }" class="feedback-link">Ver en el diario</a>
+          </p>
+        }
+      </section>
+    </div>
+
     <!-- Ingredientes -->
     <div class="col-12 lg:col-5">
       <section class="sano-card detalle-card">

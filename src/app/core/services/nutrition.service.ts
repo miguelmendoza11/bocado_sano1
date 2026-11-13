@@ -10,8 +10,10 @@ import {
   UserProfile,
   WeightEntry,
 } from '../models/nutrition.models';
+import { Recipe } from '../models/recipe.models';
 import { STORAGE_PREFIX, readStorage, writeStorage } from '../utils/storage';
 import { AuthService } from './auth.service';
+import { RECIPES } from './recipe.service';
 
 /** Catálogo de alimentos de prueba (valores por porción). */
 const FOODS: Food[] = [
@@ -41,14 +43,43 @@ export function daysAgo(days: number, from: Date = new Date()): string {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 }
 
+/** Un registro guardado: lleva foodId (alimento) o recipeId (receta). */
+export interface SavedEntry {
+  id: number;
+  foodId?: number;
+  recipeId?: number;
+  meal: MealType;
+  servings: number;
+}
+
+/**
+ * Una receta vista como "alimento" de 1 porción, para que el Diario, Inicio y Progreso
+ * la muestren y la sumen igual que cualquier otro alimento.
+ */
+export function recipeAsFood(recipe: Recipe): Food {
+  return { id: recipe.id, name: recipe.name, portion: '1 porción', kcal: recipe.kcal, macros: recipe.macros };
+}
+
+/** Busca el alimento de un registro guardado (en recetas o en alimentos); undefined si ya no existe. */
+function foodOf(entry: SavedEntry): Food | undefined {
+  if (entry.recipeId !== undefined) {
+    const recipe = RECIPES.find((r) => r.id === entry.recipeId);
+    return recipe ? recipeAsFood(recipe) : undefined;
+  }
+  return FOODS.find((f) => f.id === entry.foodId);
+}
+
 /** Lo que se guarda en localStorage por cada usuario. */
 export interface SavedNutrition {
   version: 1;
   /** Día al que pertenecen las comidas, el agua y los pasos. */
   date: string;
   profile: UserProfile;
-  /** Solo el id del alimento: el resto se toma del catálogo al cargar. */
-  entries: { id: number; foodId: number; meal: MealType; servings: number }[];
+  /**
+   * Solo el id del alimento (foodId) o de la receta (recipeId):
+   * el resto se toma del catálogo al cargar. Los datos viejos solo traen foodId.
+   */
+  entries: SavedEntry[];
   waterMl: number;
   steps: number;
   weightHistory: WeightEntry[];
@@ -107,8 +138,9 @@ export function shiftDate(isoDate: string, days: number): string {
 export function rollOver(saved: SavedNutrition, today: string): SavedNutrition {
   if (saved.date >= today) return saved;
 
+  // Suma alimentos y recetas; los ids que ya no existen cuentan 0
   const kcalOfSavedDay = saved.entries.reduce((sum, e) => {
-    const f = FOODS.find((x) => x.id === e.foodId);
+    const f = foodOf(e);
     return sum + (f ? f.kcal * e.servings : 0);
   }, 0);
 
@@ -246,7 +278,12 @@ export class NutritionService {
       version: 1,
       date: this.today,
       profile: this.profile(),
-      entries: this.entries().map((e) => ({ id: e.id, foodId: e.food.id, meal: e.meal, servings: e.servings })),
+      // Las recetas se guardan con recipeId (sus ids se repiten con los de alimentos)
+      entries: this.entries().map((e) =>
+        e.recipeId !== undefined
+          ? { id: e.id, recipeId: e.recipeId, meal: e.meal, servings: e.servings }
+          : { id: e.id, foodId: e.food.id, meal: e.meal, servings: e.servings },
+      ),
       waterMl: this.waterMl(),
       steps: this.steps(),
       weightHistory: this.weightHistory(),
@@ -293,10 +330,12 @@ export class NutritionService {
   }
 
   /** Convierte lo guardado (ids) en registros con el alimento completo; ignora ids que ya no existen. */
-  private toEntries(saved: SavedNutrition['entries']): LoggedFood[] {
+  private toEntries(saved: SavedEntry[]): LoggedFood[] {
     return saved.flatMap((e) => {
-      const f = FOODS.find((x) => x.id === e.foodId);
-      return f ? [{ id: e.id, food: f, meal: e.meal, servings: e.servings }] : [];
+      const f = foodOf(e);
+      if (!f) return [];
+      const entry: LoggedFood = { id: e.id, food: f, meal: e.meal, servings: e.servings };
+      return e.recipeId !== undefined ? [{ ...entry, recipeId: e.recipeId }] : [entry];
     });
   }
 
@@ -316,6 +355,16 @@ export class NutritionService {
     const f = FOODS.find((x) => x.id === foodId);
     if (!f || servings <= 0) return;
     this.entries.update((list) => [...list, { id: this.nextId++, food: f, meal, servings }]);
+  }
+
+  /** Registra una receta en una comida (servings = porciones que se comieron). */
+  addRecipe(recipeId: number, meal: MealType, servings = 1): void {
+    const recipe = RECIPES.find((r) => r.id === recipeId);
+    if (!recipe || servings <= 0) return;
+    this.entries.update((list) => [
+      ...list,
+      { id: this.nextId++, food: recipeAsFood(recipe), meal, servings, recipeId },
+    ]);
   }
 
   removeEntry(id: number): void {

@@ -1,8 +1,11 @@
 import { Injectable, signal } from '@angular/core';
 import { Recipe, RecipeCategoryFilter } from '../models/recipe.models';
 
-/** Recetas de prueba (kcal y macros por porción). */
-const RECIPES: Recipe[] = [
+/**
+ * Recetas de prueba (kcal y macros por porción).
+ * Se exporta para que NutritionService pueda reconstruir las recetas guardadas en el Diario.
+ */
+export const RECIPES: Recipe[] = [
   {
     id: 1,
     name: 'Pancakes de avena y banano',

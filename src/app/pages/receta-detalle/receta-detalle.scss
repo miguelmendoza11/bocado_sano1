@@ -72,6 +72,102 @@
   background: var(--sano-blue);
 }
 
+/* ---------- Agregar al diario ---------- */
+.agregar-card {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem 1.5rem;
+}
+
+/* Título arriba; debajo, los controles a la izquierda y la acción a la derecha */
+.agregar-texto {
+  flex: 1 1 100%;
+}
+
+.agregar-controles {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1rem;
+}
+
+.comidas-tabs {
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.tab {
+  flex: 1 0 auto;
+  border: 0;
+  border-radius: 999px;
+  padding: 0.35rem 0.75rem;
+  background: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--sano-muted);
+  cursor: pointer;
+
+  &.active {
+    background: var(--sano-lime);
+    color: var(--sano-on-lime);
+  }
+}
+
+.porciones {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+
+  .icon-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+/* Confirmación (mismo estilo que el mensaje del Diario) */
+.feedback {
+  flex: 1 1 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 0.6rem;
+  padding: 0.55rem 0.85rem;
+  border-radius: 14px;
+  background: var(--sano-lime-soft);
+  color: var(--sano-lime-ink);
+  font-weight: 600;
+}
+
+/* El texto se queda junto al ícono; si no cabe, el enlace baja a otra línea */
+.feedback > span {
+  flex: 1 1 0;
+  min-width: 10rem;
+}
+
+.feedback-link {
+  margin-left: auto;
+  color: inherit;
+  text-decoration: underline;
+  white-space: nowrap;
+}
+
+.porciones-num {
+  min-width: 1.5rem;
+  text-align: center;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.agregar-accion {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-left: auto;
+}
+
 /* ---------- Ingredientes ---------- */
 .ingredientes li {
   display: flex;
@@ -129,5 +225,22 @@
     app-calorie-ring {
       align-self: center;
     }
+  }
+
+  /* El panel de agregar ocupa todo el ancho y el botón se estira */
+  .agregar-controles,
+  .agregar-accion,
+  .comidas-tabs {
+    width: 100%;
+  }
+
+  .agregar-accion .btn {
+    flex: 1;
+  }
+
+  /* Que las 4 comidas quepan sin cortarse en pantallas angostas */
+  .tab {
+    padding: 0.35rem 0.45rem;
+    font-size: 0.8rem;
   }
 }
