@@ -21,11 +21,28 @@
 }
 
 /* ---------- Imagen y datos ---------- */
+/* Foto grande: recuadro 4:3. El fondo de color se ve mientras carga o detrás del emoji. */
 .detalle-media {
+  position: relative; /* necesario para <img fill> */
   display: grid;
   place-items: center;
-  height: 12rem;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
   border-radius: calc(var(--sano-radius) - 8px);
+}
+
+.detalle-foto {
+  object-fit: cover;
+}
+
+/* En oscuro, un borde sutil para que la foto no se pegue al fondo */
+:host-context([data-bs-theme='dark']) .detalle-media::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--sano-border);
+  border-radius: inherit;
+  pointer-events: none;
 }
 
 .detalle-emoji {

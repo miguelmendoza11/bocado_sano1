@@ -1,4 +1,4 @@
-import { TitleCasePipe } from '@angular/common';
+import { NgOptimizedImage, TitleCasePipe } from '@angular/common';
 import { Component, computed, inject, input, linkedSignal, numberAttribute } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MealType } from '../../core/models/nutrition.models';
@@ -8,7 +8,7 @@ import { CalorieRing } from '../../shared/calorie-ring/calorie-ring';
 
 @Component({
   selector: 'app-receta-detalle',
-  imports: [RouterLink, TitleCasePipe, CalorieRing],
+  imports: [RouterLink, TitleCasePipe, CalorieRing, NgOptimizedImage],
   templateUrl: './receta-detalle.html',
   styleUrl: './receta-detalle.scss',
 })
@@ -21,6 +21,12 @@ export class RecetaDetalle {
 
   /** La receta de la URL, o undefined si el id no existe. */
   protected readonly recipe = computed(() => this.recipeService.getById(this.id()));
+
+  /** true si la foto no cargó (se muestra el emoji). Vuelve a false al abrir otra receta. */
+  protected readonly imageFailed = linkedSignal(() => {
+    this.recipe();
+    return false;
+  });
 
   /** Porcentaje de la meta diaria de kcal que aporta una porción. */
   protected readonly goalPct = computed(() => {
