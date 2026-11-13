@@ -1,1 +1,146 @@
-// Estilos en el siguiente commit
+/* ---------- Pila de avisos ---------- */
+// Celular: abajo y centrado, ENCIMA de la barra inferior del Shell
+// (barra: 0.75rem de margen + ~3.6rem de alto; el botón naranja sobresale un poco más)
+.toast-stack {
+  position: fixed;
+  left: 0.75rem;
+  right: 0.75rem;
+  bottom: calc(6rem + env(safe-area-inset-bottom));
+  z-index: 1080; // por encima de la barra inferior (z-index 10) y del contenido
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  // La pila no bloquea los clics a lo que está detrás; solo los avisos los reciben
+  pointer-events: none;
+}
+
+// Escritorio: abajo a la derecha (ya no hay barra inferior)
+@media (min-width: 992px) {
+  .toast-stack {
+    left: auto;
+    right: 1.5rem;
+    bottom: 1.5rem;
+    align-items: flex-end;
+  }
+}
+
+/* ---------- Pastilla ---------- */
+.sano-toast {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  max-width: 26rem;
+  padding: 0.7rem 0.6rem 0.7rem 1rem;
+  border-radius: var(--sano-radius);
+  // Borde muy suave: en modo oscuro separa la pastilla del fondo
+  border: 1px solid color-mix(in srgb, var(--sano-on-dark) 10%, transparent);
+  background: var(--sano-surface-dark);
+  color: var(--sano-on-dark);
+  box-shadow: var(--sano-shadow-hover);
+}
+
+.toast-icon {
+  flex-shrink: 0;
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.toast-success .toast-icon {
+  color: var(--sano-lime);
+}
+
+.toast-info .toast-icon {
+  color: var(--sano-blue);
+}
+
+.toast-error .toast-icon {
+  color: var(--sano-danger);
+}
+
+.toast-message {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+/* ---------- Botones ---------- */
+.toast-action,
+.toast-close {
+  flex-shrink: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+
+  &:focus-visible {
+    outline: 2px solid var(--sano-lime);
+    outline-offset: 2px;
+  }
+}
+
+// Botón de texto en lima ("Deshacer", "Ver diario")
+.toast-action {
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  color: var(--sano-lime);
+  font-size: 0.85rem;
+  font-weight: 700;
+
+  &:hover {
+    background: color-mix(in srgb, var(--sano-lime) 15%, transparent);
+  }
+}
+
+.toast-close {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  color: color-mix(in srgb, var(--sano-on-dark) 70%, transparent);
+  font-size: 0.8rem;
+
+  &:hover {
+    background: color-mix(in srgb, var(--sano-on-dark) 12%, transparent);
+    color: var(--sano-on-dark);
+  }
+}
+
+/* ---------- Animaciones ---------- */
+// Entra subiendo con fade; sale con fade (animate.enter / animate.leave de Angular)
+.toast-enter {
+  animation: toast-in 0.25s ease-out;
+}
+
+.toast-leave {
+  animation: toast-out 0.2s ease-in forwards;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+@keyframes toast-out {
+  to {
+    opacity: 0;
+  }
+}
+
+// Si el usuario pidió menos movimiento: sin desplazamiento, solo un cambio rápido
+@media (prefers-reduced-motion: reduce) {
+  .toast-enter,
+  .toast-leave {
+    animation-duration: 0.01ms;
+  }
+}

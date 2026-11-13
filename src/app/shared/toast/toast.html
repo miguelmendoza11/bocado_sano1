@@ -3,6 +3,8 @@
   @for (toast of toastService.toasts(); track toast.id) {
     <div
       class="sano-toast"
+      animate.enter="toast-enter"
+      animate.leave="toast-leave"
       [class]="'toast-' + toast.type"
       [attr.role]="toast.type === 'error' ? 'alert' : 'status'"
     >
