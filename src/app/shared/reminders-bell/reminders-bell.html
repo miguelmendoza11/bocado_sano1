@@ -1,0 +1,7 @@
+<button type="button" class="icon-btn campana" [attr.aria-label]="label()">
+  <i class="bi bi-bell" aria-hidden="true"></i>
+  @if (reminders.unreadCount() > 0) {
+    <!-- El número ya va en el aria-label del botón: aquí se oculta al lector -->
+    <span class="contador" aria-hidden="true">{{ badge() }}</span>
+  }
+</button>
