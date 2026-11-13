@@ -64,6 +64,64 @@ describe('RecetaDetalle', () => {
     expect(create('abc').textContent).toContain('Receta no encontrada');
   });
 
+  describe('photo', () => {
+    function setup(id: string) {
+      const fixture = TestBed.createComponent(RecetaDetalle);
+      fixture.componentRef.setInput('id', id);
+      fixture.detectChanges();
+      return { fixture, el: fixture.nativeElement as HTMLElement };
+    }
+
+    it('should show the recipe photo with its description, loaded first', () => {
+      const img = setup('5').el.querySelector('.detalle-media img')!;
+      expect(img.getAttribute('src')).toContain('recetas/salmon-verduras.jpg');
+      expect(img.getAttribute('alt')).toBe(
+        'Filete de salmón a la plancha con brócoli, zanahoria, habichuelas y puré',
+      );
+      expect(img.getAttribute('fetchpriority')).toBe('high'); // priority
+    });
+
+    it('should crop vertical photos with their own position', () => {
+      const img = setup('8').el.querySelector<HTMLImageElement>('.detalle-media img')!;
+      expect(img.style.objectPosition).toBe('center 85%');
+    });
+
+    it('should change the photo when another recipe is opened', () => {
+      const { fixture, el } = setup('5');
+      fixture.componentRef.setInput('id', '1');
+      fixture.detectChanges();
+      const img = el.querySelector('.detalle-media img');
+      expect(img?.getAttribute('src')).toContain('recetas/pancakes-avena-banano.jpg');
+      expect(img?.getAttribute('alt')).toContain('Pila de pancakes');
+    });
+
+    it('should show the emoji when the photo fails to load', () => {
+      const { fixture, el } = setup('5');
+      el.querySelector('.detalle-media img')!.dispatchEvent(new Event('error'));
+      fixture.detectChanges();
+
+      expect(el.querySelector('.detalle-media img')).toBeNull();
+      expect(el.querySelector('.detalle-media .detalle-emoji')?.textContent).toBe('🐟');
+    });
+
+    it('should try the photo again when another recipe is opened', () => {
+      const { fixture, el } = setup('5');
+      el.querySelector('.detalle-media img')!.dispatchEvent(new Event('error'));
+      fixture.detectChanges();
+
+      fixture.componentRef.setInput('id', '3');
+      fixture.detectChanges();
+      const img = el.querySelector('.detalle-media img');
+      expect(img?.getAttribute('src')).toContain('recetas/ensalada-quinoa-aguacate.jpg');
+    });
+
+    it('should keep the 🍽️ emoji for an unknown recipe', () => {
+      const { el } = setup('999');
+      expect(el.querySelector('img')).toBeNull();
+      expect(el.querySelector('.detalle-emoji')?.textContent).toBe('🍽️');
+    });
+  });
+
   it('should read the id from the URL', async () => {
     const harness = await RouterTestingHarness.create();
     await harness.navigateByUrl('/recetas/3', RecetaDetalle);

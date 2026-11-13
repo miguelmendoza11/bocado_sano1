@@ -72,4 +72,38 @@ describe('Recetas', () => {
     expect(cards().length).toBe(8);
     expect(el.querySelector<HTMLInputElement>('input[type="search"]')!.value).toBe('');
   });
+
+  it('should show a photo with its description in every card', () => {
+    const { cards } = setup();
+    const first = cards()[0].querySelector('img.receta-foto')!;
+    expect(first.getAttribute('src')).toContain('recetas/pancakes-avena-banano.jpg');
+    expect(first.getAttribute('alt')).toBe(
+      'Pila de pancakes con miel, arándanos y rodajas de banano en un plato rojo',
+    );
+    // Todas las tarjetas tienen foto y ninguna muestra el emoji
+    expect([...cards()].every((c) => c.querySelector('img.receta-foto'))).toBe(true);
+    expect(cards()[0].querySelector('.receta-emoji')).toBeNull();
+  });
+
+  it('should show the emoji only in the card whose photo fails to load', () => {
+    const { fixture, cards } = setup();
+    cards()[1].querySelector('img')!.dispatchEvent(new Event('error')); // yogur
+    fixture.detectChanges();
+
+    expect(cards()[1].querySelector('img')).toBeNull();
+    expect(cards()[1].querySelector('.receta-emoji')?.textContent).toBe('🍓');
+    // Las demás siguen con su foto
+    expect(cards()[0].querySelector('img.receta-foto')).not.toBeNull();
+  });
+
+  it('should keep the emoji after filtering if the photo already failed', () => {
+    const { fixture, cards, tab } = setup();
+    cards()[6].querySelector('img')!.dispatchEvent(new Event('error')); // hummus
+    fixture.detectChanges();
+
+    tab('Snacks').click();
+    fixture.detectChanges();
+    expect(cards()[0].querySelector('.receta-emoji')?.textContent).toBe('🥕');
+    expect(cards()[1].querySelector('img.receta-foto')).not.toBeNull();
+  });
 });
