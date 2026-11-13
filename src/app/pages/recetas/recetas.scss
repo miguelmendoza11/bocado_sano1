@@ -103,12 +103,47 @@
   }
 }
 
-/* Imagen de la receta: fondo suave de color + emoji grande */
+/* Foto de la receta: recuadro 4:3 con bordes redondeados.
+   El fondo de color se ve mientras carga la foto o si no carga (con el emoji). */
 .receta-media {
+  position: relative; /* necesario para <img fill> */
   display: grid;
   place-items: center;
-  height: 9rem;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
   border-radius: calc(var(--sano-radius) - 8px);
+}
+
+.receta-foto {
+  object-fit: cover;
+  transition: transform 0.35s ease;
+}
+
+/* Zoom suave de la foto al pasar el mouse o enfocar la tarjeta */
+.receta-card:hover .receta-foto,
+.receta-card:focus-visible .receta-foto {
+  transform: scale(1.04);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .receta-foto {
+    transition: none;
+  }
+
+  .receta-card:hover .receta-foto,
+  .receta-card:focus-visible .receta-foto {
+    transform: none;
+  }
+}
+
+/* En oscuro, un borde sutil para que la foto no se pegue al fondo */
+:host-context([data-bs-theme='dark']) .receta-media::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--sano-border);
+  border-radius: inherit;
+  pointer-events: none;
 }
 
 .receta-emoji {
