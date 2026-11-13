@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NutritionService } from '../../core/services/nutrition.service';
+import { ToastService } from '../../core/services/toast.service';
 import { Diario } from './diario';
 
 describe('Diario', () => {
@@ -62,7 +63,8 @@ describe('Diario', () => {
     await fixture.whenStable();
 
     expect(nutrition.kcalFor('cena')).toBe(95);
-    expect(el.querySelector('.feedback')?.textContent).toContain('Manzana agregado a Cena');
+    // El aviso ya no va pegado en la página: va en el toast
+    expect(TestBed.inject(ToastService).toasts().at(-1)?.message).toBe('Manzana agregado a Cena');
   });
 
   it('removes a food with the trash button', async () => {

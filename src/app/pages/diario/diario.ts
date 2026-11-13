@@ -3,7 +3,6 @@ import {
   Component,
   ElementRef,
   Injector,
-  OnDestroy,
   afterNextRender,
   computed,
   effect,
@@ -15,6 +14,7 @@ import {
 } from '@angular/core';
 import { Food, MealType } from '../../core/models/nutrition.models';
 import { NutritionService } from '../../core/services/nutrition.service';
+import { ToastService } from '../../core/services/toast.service';
 
 /** Quita tildes y pasa a minúsculas para comparar ("Salmón" = "salmon"). */
 const normalize = (text: string) =>
@@ -26,9 +26,10 @@ const normalize = (text: string) =>
   templateUrl: './diario.html',
   styleUrl: './diario.scss',
 })
-export class Diario implements OnDestroy {
+export class Diario {
   protected readonly nutrition = inject(NutritionService);
   private readonly injector = inject(Injector);
+  private readonly toast = inject(ToastService);
 
   /**
    * Comida que llega por la URL: /diario?comida=cena
@@ -37,16 +38,12 @@ export class Diario implements OnDestroy {
   readonly comida = input<string>();
 
   private readonly searchInput = viewChild<ElementRef<HTMLInputElement>>('searchInput');
-  private feedbackTimer?: ReturnType<typeof setTimeout>;
 
   /** Comida elegida en las pestañas del buscador. */
   protected readonly selectedMeal = signal<MealType>('desayuno');
 
   /** Texto escrito en el buscador. */
   protected readonly query = signal('');
-
-  /** Mensaje corto después de agregar un alimento. */
-  protected readonly feedback = signal('');
 
   /** Catálogo filtrado por el texto del buscador. */
   protected readonly results = computed(() => {
@@ -89,14 +86,13 @@ export class Diario implements OnDestroy {
   protected add(food: Food): void {
     const meal = this.selectedMeal();
     this.nutrition.addFood(food.id, meal);
+    // addFood no devuelve el id: la entrada nueva es la última de la lista
+    const entryId = this.nutrition.entries().at(-1)?.id;
 
     const label = this.nutrition.meals.find((m) => m.type === meal)?.label ?? meal;
-    this.feedback.set(`${food.name} agregado a ${label}`);
-    clearTimeout(this.feedbackTimer);
-    this.feedbackTimer = setTimeout(() => this.feedback.set(''), 2500);
-  }
-
-  ngOnDestroy(): void {
-    clearTimeout(this.feedbackTimer);
+    this.toast.success(`${food.name} agregado a ${label}`, {
+      // "Deshacer" quita justo esa entrada (no la última que haya en ese momento)
+      action: { label: 'Deshacer', run: () => entryId && this.nutrition.removeEntry(entryId) },
+    });
   }
 }

@@ -115,10 +115,6 @@
           }
         </div>
 
-        @if (feedback()) {
-          <p class="feedback fs-sm mb-3" role="status"><i class="bi bi-check-circle-fill"></i> {{ feedback() }}</p>
-        }
-
         <ul class="list-unstyled mb-0">
           @for (food of results(); track food.id) {
             <li class="resultado">
