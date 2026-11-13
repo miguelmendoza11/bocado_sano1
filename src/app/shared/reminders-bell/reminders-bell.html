@@ -1,7 +1,47 @@
-<button type="button" class="icon-btn campana" [attr.aria-label]="label()">
+<button
+  type="button"
+  class="icon-btn campana"
+  [attr.aria-label]="label()"
+  [attr.aria-expanded]="open()"
+  [attr.aria-controls]="panelId"
+  (click)="toggle()"
+>
   <i class="bi bi-bell" aria-hidden="true"></i>
   @if (reminders.unreadCount() > 0) {
     <!-- El número ya va en el aria-label del botón: aquí se oculta al lector -->
     <span class="contador" aria-hidden="true">{{ badge() }}</span>
   }
 </button>
+
+@if (open()) {
+  <section class="panel" [id]="panelId" [attr.aria-labelledby]="panelId + '-titulo'">
+    <header class="panel-header">
+      <h2 class="fs-md mb-0" [id]="panelId + '-titulo'">Recordatorios</h2>
+    </header>
+
+    @if (reminders.reminders().length) {
+      <ul class="lista">
+        @for (reminder of reminders.reminders(); track reminder.id) {
+          <li>
+            <button type="button" class="recordatorio" [class.leido]="reminders.isRead(reminder.id)">
+              <span class="icono" [class]="'bg-' + reminder.tone + '-soft'">
+                <i class="bi" [class]="reminder.icon" aria-hidden="true"></i>
+              </span>
+              <span class="texto">{{ reminder.text }}</span>
+            </button>
+          </li>
+        }
+      </ul>
+
+      <footer class="panel-footer">
+        <button type="button" class="btn-texto">Marcar todo como leído</button>
+      </footer>
+    } @else {
+      <div class="vacio">
+        <i class="bi bi-check2-circle" aria-hidden="true"></i>
+        <p class="fw-semibold mb-0">Todo al día</p>
+        <p class="text-secondary-sano fs-sm mb-0">No tienes recordatorios pendientes.</p>
+      </div>
+    }
+  </section>
+}

@@ -1,5 +1,7 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { RemindersService } from '../../core/services/reminders.service';
+
+let nextId = 0;
 
 /**
  * Campana de recordatorios: botón con el contador de no leídos.
@@ -13,6 +15,12 @@ import { RemindersService } from '../../core/services/reminders.service';
 export class RemindersBell {
   protected readonly reminders = inject(RemindersService);
 
+  /** true mientras el panel está abierto. */
+  protected readonly open = signal(false);
+
+  /** Id del panel para aria-controls (único por si hay dos campanas en la página). */
+  protected readonly panelId = `recordatorios-${nextId++}`;
+
   /** Lo que lee el lector de pantalla: "Notificaciones, 2 sin leer". */
   protected readonly label = computed(() => {
     const count = this.reminders.unreadCount();
@@ -24,4 +32,8 @@ export class RemindersBell {
     const count = this.reminders.unreadCount();
     return count > 9 ? '9+' : String(count);
   });
+
+  toggle(): void {
+    this.open.update((value) => !value);
+  }
 }
