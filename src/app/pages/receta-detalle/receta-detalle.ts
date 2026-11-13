@@ -1,9 +1,10 @@
 import { NgOptimizedImage, TitleCasePipe } from '@angular/common';
 import { Component, computed, inject, input, linkedSignal, numberAttribute } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { MealType } from '../../core/models/nutrition.models';
 import { NutritionService } from '../../core/services/nutrition.service';
 import { RecipeService } from '../../core/services/recipe.service';
+import { ToastService } from '../../core/services/toast.service';
 import { CalorieRing } from '../../shared/calorie-ring/calorie-ring';
 
 @Component({
@@ -15,6 +16,8 @@ import { CalorieRing } from '../../shared/calorie-ring/calorie-ring';
 export class RecetaDetalle {
   private readonly recipeService = inject(RecipeService);
   protected readonly nutrition = inject(NutritionService);
+  private readonly router = inject(Router);
+  private readonly toast = inject(ToastService);
 
   /** Viene de la URL /recetas/:id gracias a withComponentInputBinding(). */
   readonly id = input.required({ transform: numberAttribute });
@@ -51,12 +54,6 @@ export class RecetaDetalle {
     return 1;
   });
 
-  /** Confirmación después de agregar (se borra al abrir otra receta). */
-  protected readonly added = linkedSignal<{ message: string; meal: MealType } | null>(() => {
-    this.recipe();
-    return null;
-  });
-
   protected changeServings(delta: number): void {
     this.servings.update((n) => Math.min(Math.max(n + delta, this.minServings), this.maxServings));
   }
@@ -70,7 +67,12 @@ export class RecetaDetalle {
 
     const label = this.nutrition.meals.find((m) => m.type === meal)?.label ?? meal;
     const portions = servings === 1 ? '1 porción' : `${servings} porciones`;
-    this.added.set({ message: `${r.name} (${portions}) agregado a ${label}.`, meal });
+    this.toast.success(`${r.name} (${portions}) agregado a ${label}.`, {
+      action: {
+        label: 'Ver diario',
+        run: () => this.router.navigate(['/diario'], { queryParams: { comida: meal } }),
+      },
+    });
   }
 
   /** Filas de macros con su porcentaje frente a la meta diaria (para las barras). */

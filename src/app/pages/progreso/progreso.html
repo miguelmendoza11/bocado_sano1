@@ -158,8 +158,6 @@
         <p id="peso-ayuda" class="fs-sm mb-0" role="status">
           @if (weightError()) {
             <span class="peso-error"><i class="bi bi-exclamation-circle"></i> {{ weightError() }}</span>
-          } @else if (savedWeight() !== null) {
-            <span class="peso-ok"><i class="bi bi-check-circle-fill"></i> Guardado: {{ savedWeight() | number: '1.1-1' }} kg</span>
           } @else if (todayWeight(); as w) {
             <span class="text-secondary-sano">Hoy ya registraste {{ w.kg | number: '1.1-1' }} kg. Si guardas otro, se reemplaza.</span>
           } @else {

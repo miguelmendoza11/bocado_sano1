@@ -43,18 +43,6 @@
   height: 100%;
 }
 
-// Mensaje verde después de guardar
-.guardado {
-  color: var(--sano-ink);
-  font-weight: 600;
-  text-align: center;
-
-  // El verde lima sobre blanco se lee poco: solo el ícono va en verde
-  i {
-    color: var(--sano-lime-strong);
-  }
-}
-
 // Texto a la izquierda y botón a la derecha; en celular, uno debajo del otro
 .card-sesion {
   display: flex;
@@ -126,13 +114,4 @@
 .aviso-reset {
   color: var(--sano-orange-ink);
   font-weight: 600;
-}
-
-.reset-ok {
-  color: var(--sano-ink);
-  font-weight: 600;
-
-  i {
-    color: var(--sano-lime-strong);
-  }
 }

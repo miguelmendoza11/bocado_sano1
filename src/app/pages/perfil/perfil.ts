@@ -1,6 +1,5 @@
 import { DecimalPipe } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ActivityLevel, Goal, Sex } from '../../core/models/nutrition.models';
@@ -50,23 +49,13 @@ export class Perfil {
   /** Formulario precargado con el perfil actual y el nombre de la sesión. */
   readonly form = this.buildForm();
 
-  /** true justo después de guardar; se apaga al volver a editar. */
-  protected readonly saved = signal(false);
-
   /** Restablecer datos: false → botón normal, true → pide confirmación. */
   protected readonly confirmingReset = signal(false);
-
-  /** true justo después de restablecer, para mostrar el aviso. */
-  protected readonly resetDone = signal(false);
 
   /** Texto del objetivo actual para el chip de la meta. */
   protected readonly goalLabel = computed(
     () => this.goalOptions.find((o) => o.value === this.nutrition.profile().goal)?.label ?? '',
   );
-
-  constructor() {
-    this.form.valueChanges.pipe(takeUntilDestroyed()).subscribe(() => this.saved.set(false));
-  }
 
   /** Iniciales para el avatar: "Juan Montezuma" → "JM", "ana" → "A". */
   protected readonly initials = computed(() => {
@@ -90,7 +79,7 @@ export class Perfil {
     // El nombre también va a la sesión (avatar, saludo y login futuro)
     this.auth.updateName(name);
     this.form.markAsPristine();
-    this.saved.set(true);
+    this.toast.success('Perfil guardado. Tu meta se actualizó.');
   }
 
   /** Segundo clic de "Restablecer": vuelve a los datos de ejemplo y recarga el formulario. */
@@ -98,8 +87,7 @@ export class Perfil {
     this.nutrition.resetToSample();
     this.form.reset(this.formValues());
     this.confirmingReset.set(false);
-    this.saved.set(false);
-    this.resetDone.set(true);
+    this.toast.success('Se restauraron los datos de ejemplo.');
   }
 
   /** Borra la sesión y vuelve a la bienvenida. */

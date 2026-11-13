@@ -1,7 +1,8 @@
 import { TestBed } from '@angular/core/testing';
-import { provideRouter, withComponentInputBinding } from '@angular/router';
+import { Router, provideRouter, withComponentInputBinding } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { NutritionService } from '../../core/services/nutrition.service';
+import { ToastService } from '../../core/services/toast.service';
 import { RecetaDetalle } from './receta-detalle';
 
 describe('RecetaDetalle', () => {
@@ -199,17 +200,22 @@ describe('RecetaDetalle', () => {
       expect(ui.nutrition.kcalFor('almuerzo')).toBe(before + 1020);
     });
 
-    it('should confirm and link to the diary on the chosen meal', () => {
+    it('should confirm with a toast that links to the diary on the chosen meal', () => {
       const ui = setup('2'); // yogur: desayuno
-      expect(ui.el.querySelector('.feedback')).toBeNull();
+      const toasts = TestBed.inject(ToastService);
+      const navigate = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
 
       ui.click('.agregar-accion .btn');
 
-      const feedback = ui.el.querySelector('.feedback');
-      expect(feedback?.textContent).toContain(
+      const toast = toasts.toasts().at(-1)!;
+      expect(toast.message).toBe(
         'Bowl de yogur griego y frutos rojos (1 porción) agregado a Desayuno.',
       );
-      expect(feedback?.querySelector('a')?.getAttribute('href')).toBe('/diario?comida=desayuno');
+      expect(toast.action?.label).toBe('Ver diario');
+
+      toasts.runAction(toast);
+      expect(navigate).toHaveBeenCalledWith(['/diario'], { queryParams: { comida: 'desayuno' } });
+      expect(toasts.toasts()).toHaveLength(0);
     });
 
     it('should reset the panel when another recipe is opened', () => {
@@ -223,7 +229,6 @@ describe('RecetaDetalle', () => {
 
       expect(ui.activeMeal()).toBe('Desayuno');
       expect(ui.servings()).toBe('1');
-      expect(ui.el.querySelector('.feedback')).toBeNull();
     });
   });
 });

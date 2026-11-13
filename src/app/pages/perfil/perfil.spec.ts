@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { NutritionService } from '../../core/services/nutrition.service';
+import { ToastService } from '../../core/services/toast.service';
 import { ThemeService } from '../../core/services/theme.service';
 import { Perfil } from './perfil';
 
@@ -78,16 +79,8 @@ describe('Perfil', () => {
     expect(nutrition.profile().goal).toBe('ganar');
     expect(nutrition.calorieGoal()).toBe(before + 800); // −500 → +300
     expect(TestBed.inject(AuthService).user()?.name).toBe('Juan Carlos');
-    expect(el.textContent).toContain('Guardado');
+    expect(TestBed.inject(ToastService).toasts().at(-1)?.message).toBe('Perfil guardado. Tu meta se actualizó.');
     expect(el.querySelector('.avatar')?.textContent?.trim()).toBe('JC');
-  });
-
-  it('hides the saved message when editing again', () => {
-    const { fixture, component, el } = setup();
-    component.onSubmit();
-    component.form.controls.age.setValue(30);
-    fixture.detectChanges();
-    expect(el.textContent).not.toContain('Guardado');
   });
 
   it('logs out and goes to /bienvenida', () => {
@@ -164,6 +157,6 @@ describe('Perfil', () => {
     expect(nutrition.consumedKcal()).toBe(950);
     expect(component.form.controls.age.value).toBe(24);
     expect(component.form.controls.name.value).toBe('Juan Montezuma');
-    expect(el.querySelector('.reset-ok')?.textContent).toContain('se restauraron');
+    expect(TestBed.inject(ToastService).toasts().at(-1)?.message).toBe('Se restauraron los datos de ejemplo.');
   });
 });

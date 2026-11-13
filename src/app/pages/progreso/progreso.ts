@@ -1,7 +1,8 @@
-import { DatePipe, DecimalPipe } from '@angular/common';
-import { Component, computed, inject, signal } from '@angular/core';
+import { DatePipe, DecimalPipe, formatNumber } from '@angular/common';
+import { Component, LOCALE_ID, computed, inject, signal } from '@angular/core';
 import { DayHistory } from '../../core/models/nutrition.models';
 import { NutritionService } from '../../core/services/nutrition.service';
+import { ToastService } from '../../core/services/toast.service';
 
 @Component({
   selector: 'app-progreso',
@@ -11,6 +12,8 @@ import { NutritionService } from '../../core/services/nutrition.service';
 })
 export class Progreso {
   protected readonly nutrition = inject(NutritionService);
+  private readonly toast = inject(ToastService);
+  private readonly locale = inject(LOCALE_ID);
 
   /**
    * Los 7 días de la semana: el historial + HOY (la fecha real del computador).
@@ -123,12 +126,8 @@ export class Progreso {
   /** Mensaje de error del formulario ('' = sin error). */
   readonly weightError = signal('');
 
-  /** Último peso guardado, para el mensaje de confirmación. */
-  readonly savedWeight = signal<number | null>(null);
-
   saveWeight(event: Event): void {
     event.preventDefault();
-    this.savedWeight.set(null);
     const text = this.weightInput().trim().replace(',', '.');
     if (!text) {
       this.weightError.set('Escribe tu peso.');
@@ -141,7 +140,9 @@ export class Progreso {
     }
     this.weightError.set('');
     this.weightInput.set('');
-    this.savedWeight.set(this.nutrition.currentWeight());
+    // Mismo formato que el pipe number: '1.1-1' de la página: 72,4
+    const kgText = formatNumber(this.nutrition.currentWeight(), this.locale, '1.1-1');
+    this.toast.success(`Peso guardado: ${kgText} kg`);
   }
 
   /** Primer registro de peso (punto de partida). */

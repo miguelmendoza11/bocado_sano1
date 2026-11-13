@@ -143,33 +143,6 @@
   }
 }
 
-/* Confirmación (mismo estilo que el mensaje del Diario) */
-.feedback {
-  flex: 1 1 100%;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.4rem 0.6rem;
-  padding: 0.55rem 0.85rem;
-  border-radius: 14px;
-  background: var(--sano-lime-soft);
-  color: var(--sano-lime-ink);
-  font-weight: 600;
-}
-
-/* El texto se queda junto al ícono; si no cabe, el enlace baja a otra línea */
-.feedback > span {
-  flex: 1 1 0;
-  min-width: 10rem;
-}
-
-.feedback-link {
-  margin-left: auto;
-  color: inherit;
-  text-decoration: underline;
-  white-space: nowrap;
-}
-
 .porciones-num {
   min-width: 1.5rem;
   text-align: center;
