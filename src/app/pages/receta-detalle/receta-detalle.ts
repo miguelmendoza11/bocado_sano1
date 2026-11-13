@@ -1,6 +1,7 @@
 import { TitleCasePipe } from '@angular/common';
-import { Component, computed, inject, input, numberAttribute } from '@angular/core';
+import { Component, computed, inject, input, linkedSignal, numberAttribute } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { MealType } from '../../core/models/nutrition.models';
 import { NutritionService } from '../../core/services/nutrition.service';
 import { RecipeService } from '../../core/services/recipe.service';
 import { CalorieRing } from '../../shared/calorie-ring/calorie-ring';
@@ -26,6 +27,45 @@ export class RecetaDetalle {
     const r = this.recipe();
     return r ? Math.round((r.kcal / this.nutrition.calorieGoal()) * 100) : 0;
   });
+
+  // ---------- Agregar al diario ----------
+
+  protected readonly minServings = 1;
+  protected readonly maxServings = 12;
+
+  /**
+   * Comida elegida. Empieza en la categoría de la receta y vuelve a ella si se abre otra receta
+   * (linkedSignal: se puede cambiar con set(), pero se reinicia cuando cambia la receta).
+   */
+  protected readonly selectedMeal = linkedSignal<MealType>(() => this.recipe()?.category ?? 'desayuno');
+
+  /** Porciones que se van a registrar (empieza en 1 con cada receta). */
+  protected readonly servings = linkedSignal(() => {
+    this.recipe();
+    return 1;
+  });
+
+  /** Confirmación después de agregar (se borra al abrir otra receta). */
+  protected readonly added = linkedSignal<{ message: string; meal: MealType } | null>(() => {
+    this.recipe();
+    return null;
+  });
+
+  protected changeServings(delta: number): void {
+    this.servings.update((n) => Math.min(Math.max(n + delta, this.minServings), this.maxServings));
+  }
+
+  protected addToDiary(): void {
+    const r = this.recipe();
+    if (!r) return;
+    const meal = this.selectedMeal();
+    const servings = this.servings();
+    this.nutrition.addRecipe(r.id, meal, servings);
+
+    const label = this.nutrition.meals.find((m) => m.type === meal)?.label ?? meal;
+    const portions = servings === 1 ? '1 porción' : `${servings} porciones`;
+    this.added.set({ message: `${r.name} (${portions}) agregado a ${label}.`, meal });
+  }
 
   /** Filas de macros con su porcentaje frente a la meta diaria (para las barras). */
   protected readonly macros = computed(() => {
