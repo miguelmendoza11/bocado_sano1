@@ -161,6 +161,13 @@
     outline: 2px solid var(--sano-lime-strong);
     outline-offset: 2px;
   }
+
+  // Sin nada por leer: el botón se apaga
+  &:disabled {
+    color: var(--sano-muted);
+    background: none;
+    cursor: default;
+  }
 }
 
 /* ---------- Estado vacío ---------- */

@@ -1,4 +1,5 @@
 <button
+  #bellButton
   type="button"
   class="icon-btn campana"
   [attr.aria-label]="label()"
@@ -23,7 +24,12 @@
       <ul class="lista">
         @for (reminder of reminders.reminders(); track reminder.id) {
           <li>
-            <button type="button" class="recordatorio" [class.leido]="reminders.isRead(reminder.id)">
+            <button
+              type="button"
+              class="recordatorio"
+              [class.leido]="reminders.isRead(reminder.id)"
+              (click)="go(reminder)"
+            >
               <span class="icono" [class]="'bg-' + reminder.tone + '-soft'">
                 <i class="bi" [class]="reminder.icon" aria-hidden="true"></i>
               </span>
@@ -34,7 +40,14 @@
       </ul>
 
       <footer class="panel-footer">
-        <button type="button" class="btn-texto">Marcar todo como leído</button>
+        <button
+          type="button"
+          class="btn-texto"
+          [disabled]="reminders.unreadCount() === 0"
+          (click)="markAll()"
+        >
+          Marcar todo como leído
+        </button>
       </footer>
     } @else {
       <div class="vacio">
