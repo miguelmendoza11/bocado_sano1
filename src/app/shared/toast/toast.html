@@ -1,0 +1,30 @@
+<!-- aria-live: el lector de pantalla lee cada aviso nuevo sin mover el foco -->
+<div class="toast-stack" aria-live="polite">
+  @for (toast of toastService.toasts(); track toast.id) {
+    <div
+      class="sano-toast"
+      animate.enter="toast-enter"
+      animate.leave="toast-leave"
+      [class]="'toast-' + toast.type"
+      [attr.role]="toast.type === 'error' ? 'alert' : 'status'"
+    >
+      <i class="bi toast-icon" [class]="icons[toast.type]" aria-hidden="true"></i>
+      <p class="toast-message">{{ toast.message }}</p>
+
+      @if (toast.action; as action) {
+        <button type="button" class="toast-action" (click)="toastService.runAction(toast)">
+          {{ action.label }}
+        </button>
+      }
+
+      <button
+        type="button"
+        class="toast-close"
+        aria-label="Cerrar aviso"
+        (click)="toastService.dismiss(toast.id)"
+      >
+        <i class="bi bi-x-lg" aria-hidden="true"></i>
+      </button>
+    </div>
+  }
+</div>

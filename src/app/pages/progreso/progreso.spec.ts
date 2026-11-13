@@ -3,6 +3,7 @@ import localeEs from '@angular/common/locales/es';
 import { LOCALE_ID } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NutritionService } from '../../core/services/nutrition.service';
+import { ToastService } from '../../core/services/toast.service';
 import { Progreso } from './progreso';
 
 // Igual que en app.config.ts: números como 1.919 y 71,8, días como "jue"
@@ -151,7 +152,7 @@ describe('Progreso', () => {
 
   it('saves today’s weight and updates the chart and summary', async () => {
     await submitWeight('71.8');
-    expect(text('#peso-ayuda')).toContain('Guardado: 71,8 kg');
+    expect(TestBed.inject(ToastService).toasts().at(-1)?.message).toBe('Peso guardado: 71,8 kg');
     // Hoy (11 nov) ya tenía peso, así que se reemplaza: siguen 5 puntos
     expect(component.weightPoints().length).toBe(5);
     expect(el.querySelector('.grafica-peso .valor.ultimo')?.textContent?.trim()).toBe('71,8');

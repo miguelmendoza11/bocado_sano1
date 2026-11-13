@@ -127,14 +127,6 @@
             <i class="bi bi-journal-plus me-1"></i> Agregar al diario
           </button>
         </div>
-
-        @if (added(); as a) {
-          <p class="feedback fs-sm mb-0" role="status">
-            <i class="bi bi-check-circle-fill"></i>
-            <span>{{ a.message }}</span>
-            <a routerLink="/diario" [queryParams]="{ comida: a.meal }" class="feedback-link">Ver en el diario</a>
-          </p>
-        }
       </section>
     </div>
 

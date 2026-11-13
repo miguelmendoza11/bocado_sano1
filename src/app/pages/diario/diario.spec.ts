@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NutritionService } from '../../core/services/nutrition.service';
+import { ToastService } from '../../core/services/toast.service';
 import { Diario } from './diario';
 
 describe('Diario', () => {
@@ -62,7 +63,28 @@ describe('Diario', () => {
     await fixture.whenStable();
 
     expect(nutrition.kcalFor('cena')).toBe(95);
-    expect(el.querySelector('.feedback')?.textContent).toContain('Manzana agregado a Cena');
+    // El aviso ya no va pegado en la página: va en el toast
+    expect(TestBed.inject(ToastService).toasts().at(-1)?.message).toBe('Manzana agregado a Cena');
+  });
+
+  it('undoes only the food that was just added', async () => {
+    const toasts = TestBed.inject(ToastService);
+    el.querySelector<HTMLButtonElement>('.tab:nth-child(3)')!.click(); // Cena
+    await search('manzana');
+    el.querySelector<HTMLButtonElement>('[aria-label="Agregar Manzana"]')!.click();
+    await search('huevo');
+    el.querySelector<HTMLButtonElement>('[aria-label="Agregar Huevo cocido"]')!.click();
+    await fixture.whenStable();
+    expect(nutrition.kcalFor('cena')).toBe(95 + 78);
+
+    // "Deshacer" del aviso de la manzana: se va la manzana, el huevo se queda
+    const appleToast = toasts.toasts().find((t) => t.message.startsWith('Manzana'))!;
+    expect(appleToast.action?.label).toBe('Deshacer');
+    toasts.runAction(appleToast);
+    await fixture.whenStable();
+
+    expect(nutrition.kcalFor('cena')).toBe(78);
+    expect(toasts.toasts().map((t) => t.message)).toEqual(['Huevo cocido agregado a Cena']);
   });
 
   it('removes a food with the trash button', async () => {
