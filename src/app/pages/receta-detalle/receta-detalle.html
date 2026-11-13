@@ -18,20 +18,16 @@
             <!-- Respaldo: si la foto no carga, se ve el emoji como antes -->
             <span class="detalle-emoji" aria-hidden="true">{{ r.emoji }}</span>
           } @else {
-            <!-- @for con track por id: si se abre otra receta, la <img> se crea de nuevo
-                 (NgOptimizedImage no deja cambiar ngSrc a una imagen ya creada) -->
-            @for (photo of [r]; track photo.id) {
-              <img
-                class="detalle-foto"
-                [ngSrc]="photo.image"
-                [alt]="photo.imageAlt"
-                [style.object-position]="photo.imagePosition"
-                fill
-                priority
-                sizes="(min-width: 1024px) 40vw, 100vw"
-                (error)="imageFailed.set(true)"
-              />
-            }
+            <img
+              class="detalle-foto"
+              [ngSrc]="r.image"
+              [alt]="r.imageAlt"
+              [style.object-position]="r.imagePosition"
+              fill
+              priority
+              sizes="(min-width: 1024px) 40vw, 100vw"
+              (error)="imageFailed.set(true)"
+            />
           }
         </div>
         <p class="mb-0">{{ r.description }}</p>
