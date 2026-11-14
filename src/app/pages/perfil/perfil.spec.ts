@@ -121,42 +121,44 @@ describe('Perfil', () => {
     expect(el.querySelector('.card-apariencia')?.textContent).toContain('Sigue el modo de tu dispositivo');
   });
 
-  // ---------- Datos de ejemplo ----------
+  // ---------- Empezar de cero ----------
 
   const buttonWith = (el: HTMLElement, text: string) =>
     [...el.querySelectorAll('button')].find((b) => b.textContent?.includes(text));
 
-  it('asks for confirmation before resetting the data', async () => {
+  it('asks for confirmation before starting over', async () => {
     const { fixture, el } = setup();
     const nutrition = TestBed.inject(NutritionService);
-    nutrition.removeEntry(1);
+    nutrition.addFood(7, 'snacks'); // manzana 95
 
-    buttonWith(el, 'Restablecer')!.click();
+    buttonWith(el, 'Empezar de cero')!.click();
     await fixture.whenStable();
     expect(el.querySelector('.aviso-reset')?.textContent).toContain('Se borrarán');
-    expect(nutrition.consumedKcal()).toBe(630); // todavía no se borró nada
+    expect(nutrition.consumedKcal()).toBe(95); // todavía no se borró nada
 
     buttonWith(el, 'Cancelar')!.click();
     await fixture.whenStable();
     expect(el.querySelector('.aviso-reset')).toBeNull();
-    expect(nutrition.consumedKcal()).toBe(630);
+    expect(nutrition.consumedKcal()).toBe(95);
   });
 
-  it('resets the data and reloads the form after confirming', async () => {
+  it('clears the diet data but keeps the profile after confirming', async () => {
     const { fixture, el, component } = setup();
     const nutrition = TestBed.inject(NutritionService);
-    nutrition.removeEntry(1);
+    const toast = vi.spyOn(TestBed.inject(ToastService), 'success');
+    nutrition.addFood(7, 'snacks');
+    nutrition.addWater(500);
     nutrition.updateProfile({ age: 40 });
-    component.form.controls.age.setValue(40);
 
-    buttonWith(el, 'Restablecer')!.click();
+    buttonWith(el, 'Empezar de cero')!.click();
     await fixture.whenStable();
-    buttonWith(el, 'Sí, restablecer')!.click();
+    buttonWith(el, 'Sí, borrar todo')!.click();
     await fixture.whenStable();
 
-    expect(nutrition.consumedKcal()).toBe(950);
-    expect(component.form.controls.age.value).toBe(24);
+    expect(nutrition.consumedKcal()).toBe(0);
+    expect(nutrition.waterMl()).toBe(0);
+    expect(component.form.controls.age.value).toBe(40);
     expect(component.form.controls.name.value).toBe('Juan Montezuma');
-    expect(TestBed.inject(ToastService).toasts().at(-1)?.message).toBe('Se restauraron los datos de ejemplo.');
+    expect(toast).toHaveBeenCalledWith('Listo, empezaste de cero.');
   });
 });

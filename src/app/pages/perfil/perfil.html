@@ -200,17 +200,17 @@
     </section>
   </div>
 
-  <!-- Restablecer datos de ejemplo (pide confirmación) -->
+  <!-- Empezar de cero (pide confirmación) -->
   <div class="col-12">
     <section class="sano-card card-sesion card-datos-demo">
       <div>
-        <h2 class="fs-lg mb-0">Datos de ejemplo</h2>
+        <h2 class="fs-lg mb-0">Empezar de cero</h2>
         @if (confirmingReset()) {
           <p class="fs-sm mb-0 aviso-reset" role="alert">
-            Se borrarán tus comidas, agua, pasos, pesos e historial, y volverán los datos de ejemplo.
+            Se borrarán tus comidas, agua, pasos, pesos e historial. Tu perfil se conserva.
           </p>
         } @else {
-          <p class="text-secondary-sano fs-sm mb-0">Vuelve a ver la app como nueva (útil para una demo).</p>
+          <p class="text-secondary-sano fs-sm mb-0">Borra tu registro y vuelve a empezar desde hoy.</p>
         }
       </div>
 
@@ -218,12 +218,12 @@
         <div class="d-flex gap-2">
           <button type="button" class="btn btn-subtle" (click)="confirmingReset.set(false)">Cancelar</button>
           <button type="button" class="btn btn-solid theme-warning sano-btn-orange" (click)="resetData()">
-            Sí, restablecer
+            Sí, borrar todo
           </button>
         </div>
       } @else {
         <button type="button" class="btn btn-outline" (click)="confirmingReset.set(true)">
-          <i class="bi bi-arrow-counterclockwise"></i> Restablecer
+          <i class="bi bi-arrow-counterclockwise"></i> Empezar de cero
         </button>
       }
     </section>

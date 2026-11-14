@@ -82,12 +82,12 @@ export class Perfil {
     this.toast.success('Perfil guardado. Tu meta se actualizó.');
   }
 
-  /** Segundo clic de "Restablecer": vuelve a los datos de ejemplo y recarga el formulario. */
+  /** Segundo clic de "Empezar de cero": borra el registro (conserva el perfil). */
   resetData(): void {
-    this.nutrition.resetToSample();
+    this.nutrition.clearData();
     this.form.reset(this.formValues());
     this.confirmingReset.set(false);
-    this.toast.success('Se restauraron los datos de ejemplo.');
+    this.toast.success('Listo, empezaste de cero.');
   }
 
   /** Borra la sesión y vuelve a la bienvenida. */

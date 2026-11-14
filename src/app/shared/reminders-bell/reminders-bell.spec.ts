@@ -29,7 +29,8 @@ describe('RemindersBell', () => {
     TestBed.inject(AuthService).register('Ana', 'ana@correo.com');
     nutrition = TestBed.inject(NutritionService);
     reminders = TestBed.inject(RemindersService);
-    TestBed.tick(); // carga los datos de ejemplo del usuario
+    TestBed.tick(); // carga los datos del usuario (vacíos: es nuevo)
+    nutrition.resetToSample(); // y se ponen los de ejemplo
     nutrition.steps.set(8000); // pasos cerca de la meta: sin recordatorio de pasos
 
     fixture = TestBed.createComponent(RemindersBell);

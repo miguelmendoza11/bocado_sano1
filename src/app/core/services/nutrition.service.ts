@@ -90,20 +90,35 @@ export interface SavedNutrition {
 /** Clave de localStorage de cada usuario: bocado-sano.data.ana@correo.com */
 export const dataKey = (email: string) => `${STORAGE_PREFIX}data.${email}`;
 
-/** Datos de ejemplo para alguien que entra por primera vez (con su nombre). */
-function sampleData(name: string, today: string): SavedNutrition {
+/** Perfil inicial: valores típicos para calcular una meta hasta que el usuario edite el suyo. */
+function defaultProfile(name: string): UserProfile {
+  return { name, sex: 'hombre', age: 24, heightCm: 175, weightKg: 72.4, activity: 'moderado', goal: 'perder' };
+}
+
+/**
+ * Datos de alguien que entra por primera vez: sin comidas, agua, pasos ni historial.
+ * Solo el perfil inicial (con su nombre) para que haya una meta de calorías.
+ */
+export function emptyData(name: string, today: string): SavedNutrition {
   return {
     version: 1,
     date: today,
-    profile: {
-      name,
-      sex: 'hombre',
-      age: 24,
-      heightCm: 175,
-      weightKg: 72.4,
-      activity: 'moderado',
-      goal: 'perder',
-    },
+    profile: defaultProfile(name),
+    entries: [],
+    waterMl: 0,
+    steps: 0,
+    weightHistory: [],
+    weekHistory: [],
+    nextId: 1,
+  };
+}
+
+/** Datos de ejemplo llenos (para pruebas y demos). */
+export function sampleData(name: string, today: string): SavedNutrition {
+  return {
+    version: 1,
+    date: today,
+    profile: defaultProfile(name),
     entries: [
       { id: 1, foodId: 1, meal: 'desayuno', servings: 1 },
       { id: 2, foodId: 2, meal: 'desayuno', servings: 1 },
@@ -178,18 +193,18 @@ export class NutritionService {
   readonly today = daysAgo(0);
 
   // ---------- Estado (signals) ----------
-  // Empiezan con los datos de ejemplo; al haber sesión se cargan los del usuario.
+  // Empiezan vacíos; al haber sesión se cargan los del usuario.
   private readonly auth = inject(AuthService);
-  private readonly sample = sampleData('Miguel', this.today);
+  private readonly initial = emptyData('', this.today);
 
-  readonly profile = signal<UserProfile>(this.sample.profile);
-  readonly entries = signal<LoggedFood[]>(this.toEntries(this.sample.entries));
-  readonly waterMl = signal(this.sample.waterMl);
-  readonly steps = signal(this.sample.steps);
-  readonly weightHistory = signal<WeightEntry[]>(this.sample.weightHistory);
-  readonly weekHistory = signal<DayHistory[]>(this.sample.weekHistory);
+  readonly profile = signal<UserProfile>(this.initial.profile);
+  readonly entries = signal<LoggedFood[]>([]);
+  readonly waterMl = signal(0);
+  readonly steps = signal(0);
+  readonly weightHistory = signal<WeightEntry[]>([]);
+  readonly weekHistory = signal<DayHistory[]>([]);
 
-  private nextId = this.sample.nextId;
+  private nextId = this.initial.nextId;
 
   /** Clave del usuario con sesión (null sin sesión). */
   private readonly storageKey = computed(() => {
@@ -294,14 +309,14 @@ export class NutritionService {
 
   /**
    * Carga lo guardado del usuario (pasando al día de hoy si era de otro día);
-   * si es nuevo, le pone los datos de ejemplo con su nombre.
+   * si es nuevo, empieza en cero (solo el perfil inicial con su nombre).
    */
   private load(key: string): void {
     const saved = readStorage<SavedNutrition>(key);
     const data =
       saved?.version === 1
         ? rollOver(saved, this.today) // si es de otro día, empieza un día nuevo
-        : sampleData(this.currentName(), this.today);
+        : emptyData(this.currentName(), this.today);
     this.apply(data);
     this.loadedKey = key;
   }
@@ -312,6 +327,14 @@ export class NutritionService {
    */
   resetToSample(): void {
     this.apply(sampleData(this.currentName(), this.today));
+  }
+
+  /**
+   * Empezar de cero: borra comidas, agua, pasos, pesos e historial.
+   * Conserva el perfil (edad, altura, objetivo...) para no perder la meta.
+   */
+  clearData(): void {
+    this.apply({ ...emptyData(this.currentName(), this.today), profile: this.profile(), nextId: this.nextId });
   }
 
   private currentName(): string {

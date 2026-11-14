@@ -162,6 +162,24 @@
   color: var(--sano-orange-ink);
 }
 
+/* Sin pesos registrados (cuenta nueva) */
+.peso-vacio {
+  display: grid;
+  place-items: center;
+  gap: 0.25rem;
+  min-height: 10rem;
+  margin: 0.75rem 0;
+  padding: 1rem;
+  border: 1px dashed var(--sano-border);
+  border-radius: 18px;
+  text-align: center;
+
+  > i {
+    font-size: 1.6rem;
+    color: var(--sano-orange);
+  }
+}
+
 .grafica-peso {
   width: 100%;
   height: auto;

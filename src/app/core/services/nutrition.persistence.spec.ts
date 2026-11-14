@@ -54,30 +54,56 @@ describe('NutritionService · persistencia', () => {
     const data = saved(ANA)!;
     expect(data.date).toBe('2026-11-11');
     expect(data.entries.some((e) => e.foodId === 7 && e.meal === 'snacks')).toBe(true);
-    expect(data.waterMl).toBe(1750);
+    expect(data.waterMl).toBe(500);
   });
 
   it('keeps the data after reloading the page', () => {
     const first = openApp();
     first.auth.register('Ana', ANA);
     TestBed.tick();
-    first.nutrition.removeEntry(2); // café con leche
+    first.nutrition.addFood(1, 'desayuno'); // avena 320
+    first.nutrition.addFood(2, 'desayuno'); // café 100
     first.nutrition.setSteps(9000);
     TestBed.tick();
 
     const { nutrition } = openApp(); // F5: la sesión sigue en localStorage
-    expect(nutrition.consumedKcal()).toBe(850);
+    expect(nutrition.consumedKcal()).toBe(420);
     expect(nutrition.steps()).toBe(9000);
   });
 
-  it('gives a new user the sample data with their own name', () => {
+  it('starts a new user with no diet data, only their profile', () => {
     const { auth, nutrition } = openApp();
     auth.register('Pedro Pérez', PEDRO);
     TestBed.tick();
 
     expect(nutrition.profile().name).toBe('Pedro Pérez');
-    expect(nutrition.consumedKcal()).toBe(950);
+    expect(nutrition.entries()).toEqual([]);
+    expect(nutrition.waterMl()).toBe(0);
+    expect(nutrition.steps()).toBe(0);
+    expect(nutrition.weightHistory()).toEqual([]);
+    expect(nutrition.weekHistory()).toEqual([]);
+    expect(nutrition.calorieGoal()).toBeGreaterThan(0); // hay meta desde el perfil inicial
     expect(saved(PEDRO)).not.toBeNull();
+  });
+
+  it('keeps the progress of a user who logs out and back in', () => {
+    const { auth, nutrition } = openApp();
+    auth.register('Ana', ANA);
+    TestBed.tick();
+    nutrition.addFood(3, 'almuerzo'); // pollo 250
+    nutrition.addWeight(65, nutrition.today);
+    TestBed.tick();
+
+    auth.logout();
+    auth.register('Pedro', PEDRO); // otra persona en el mismo computador: empieza vacía
+    TestBed.tick();
+    expect(nutrition.consumedKcal()).toBe(0);
+
+    auth.logout();
+    auth.login(ANA);
+    TestBed.tick();
+    expect(nutrition.consumedKcal()).toBe(250);
+    expect(nutrition.currentWeight()).toBe(65);
   });
 
   it('does not mix the data of two users', () => {
@@ -108,14 +134,16 @@ describe('NutritionService · persistencia', () => {
 
     const { nutrition } = openApp();
     expect(nutrition.entries().some((e) => e.id === 999)).toBe(false);
-    expect(nutrition.consumedKcal()).toBe(950);
+    expect(nutrition.consumedKcal()).toBe(0);
   });
 
   it('starts a new day when the saved data is from a previous day', () => {
     const first = openApp();
     first.auth.register('Ana', ANA);
     TestBed.tick();
-    // Lo guardado pasa a ser del lunes 9 (950 kcal de comidas)
+    first.nutrition.addFood(1, 'desayuno'); // avena 320
+    TestBed.tick();
+    // Lo guardado pasa a ser del lunes 9 (320 kcal de comidas)
     const data = saved(ANA)!;
     localStorage.setItem(dataKey(ANA), JSON.stringify({ ...data, date: '2026-11-09' }));
 
@@ -123,7 +151,7 @@ describe('NutritionService · persistencia', () => {
     expect(nutrition.entries()).toEqual([]);
     expect(nutrition.waterMl()).toBe(0);
     expect(nutrition.weekHistory().slice(-2)).toEqual([
-      { date: '2026-11-09', kcal: 950 },
+      { date: '2026-11-09', kcal: 320 },
       { date: '2026-11-10', kcal: 0 },
     ]);
   });
@@ -144,6 +172,26 @@ describe('NutritionService · persistencia', () => {
     expect(saved(ANA)!.entries.length).toBe(5);
   });
 
+  it('clears the diet data but keeps the profile when starting over', () => {
+    const { auth, nutrition } = openApp();
+    auth.register('Ana', ANA);
+    TestBed.tick();
+    nutrition.updateProfile({ age: 40 });
+    nutrition.addFood(7, 'snacks');
+    nutrition.addWater(750);
+    nutrition.addWeight(64, nutrition.today);
+    TestBed.tick();
+
+    nutrition.clearData();
+    TestBed.tick();
+
+    expect(nutrition.entries()).toEqual([]);
+    expect(nutrition.waterMl()).toBe(0);
+    expect(nutrition.weightHistory()).toEqual([]);
+    expect(nutrition.profile()).toEqual(expect.objectContaining({ name: 'Ana', age: 40, weightKg: 64 }));
+    expect(saved(ANA)!.entries).toEqual([]);
+  });
+
   it('saves a recipe with its recipeId', () => {
     const { auth, nutrition } = openApp();
     auth.register('Ana', ANA);
@@ -157,7 +205,7 @@ describe('NutritionService · persistencia', () => {
       expect.objectContaining({ recipeId: 1, meal: 'desayuno', servings: 2 }),
     );
     expect(entry.foodId).toBeUndefined();
-    expect(nutrition.kcalFor('desayuno')).toBe(420 + 700);
+    expect(nutrition.kcalFor('desayuno')).toBe(700);
   });
 
   it('keeps a recipe after reloading the page', () => {
@@ -173,7 +221,7 @@ describe('NutritionService · persistencia', () => {
     expect(recipe?.food).toEqual(
       expect.objectContaining({ name: 'Pancakes de avena y banano', portion: '1 porción', kcal: 350 }),
     );
-    expect(nutrition.consumedKcal()).toBe(950 + 350);
+    expect(nutrition.consumedKcal()).toBe(350);
   });
 
   it('ignores saved recipes that are no longer in the catalog', () => {
@@ -186,7 +234,7 @@ describe('NutritionService · persistencia', () => {
 
     const { nutrition } = openApp();
     expect(nutrition.entries().some((e) => e.id === 999)).toBe(false);
-    expect(nutrition.consumedKcal()).toBe(950);
+    expect(nutrition.consumedKcal()).toBe(0);
   });
 });
 
