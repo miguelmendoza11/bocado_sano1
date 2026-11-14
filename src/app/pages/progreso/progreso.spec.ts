@@ -29,6 +29,7 @@ describe('Progreso', () => {
     component = fixture.componentInstance;
     el = fixture.nativeElement;
     nutrition = TestBed.inject(NutritionService);
+    nutrition.resetToSample(); // estas pruebas parten de los datos de ejemplo
     await fixture.whenStable();
   });
 
@@ -165,5 +166,16 @@ describe('Progreso', () => {
     component.saveWeight(new Event('submit'));
     await fixture.whenStable();
     expect(nutrition.currentWeight()).toBe(71.5);
+  });
+
+  it('shows 7 empty days and an empty weight chart for a new account', async () => {
+    nutrition.clearData();
+    nutrition.weightHistory.set([]);
+    await fixture.whenStable();
+
+    expect(barCols().length).toBe(7);
+    expect(component.average()).toBe(0);
+    expect(el.querySelector('.grafica-peso')).toBeNull();
+    expect(text('.peso-vacio')).toContain('Aún no hay pesos registrados');
   });
 });

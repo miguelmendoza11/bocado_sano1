@@ -13,6 +13,7 @@ describe('Diario', () => {
     fixture = TestBed.createComponent(Diario);
     el = fixture.nativeElement;
     nutrition = TestBed.inject(NutritionService);
+    nutrition.resetToSample(); // estas pruebas parten de los datos de ejemplo
     await fixture.whenStable();
   });
 

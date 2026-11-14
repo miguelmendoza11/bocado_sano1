@@ -10,6 +10,7 @@ describe('NutritionService', () => {
     vi.setSystemTime(new Date(2026, 10, 11, 12, 0));
     TestBed.configureTestingModule({});
     service = TestBed.inject(NutritionService);
+    service.resetToSample(); // estas pruebas parten de los datos de ejemplo
   });
 
   afterEach(() => {

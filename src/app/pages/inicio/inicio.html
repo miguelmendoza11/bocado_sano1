@@ -108,11 +108,15 @@
       <i class="bi bi-speedometer2 mini-icon"></i>
       <p class="fs-sm mb-0 opacity-75">Peso actual</p>
       <p class="fs-xl fw-bold mb-0">{{ nutrition.currentWeight() | number: '1.1-1' }} kg</p>
-      @let cambio = nutrition.weightChange();
-      <p class="fs-sm mb-0 peso-cambio">
-        <i class="bi" [class.bi-arrow-down-right]="cambio <= 0" [class.bi-arrow-up-right]="cambio > 0"></i>
-        {{ (cambio < 0 ? -cambio : cambio) | number: '1.1-1' }} kg esta semana
-      </p>
+      @if (nutrition.weightHistory().length >= 2) {
+        @let cambio = nutrition.weightChange();
+        <p class="fs-sm mb-0 peso-cambio">
+          <i class="bi" [class.bi-arrow-down-right]="cambio <= 0" [class.bi-arrow-up-right]="cambio > 0"></i>
+          {{ (cambio < 0 ? -cambio : cambio) | number: '1.1-1' }} kg esta semana
+        </p>
+      } @else {
+        <a routerLink="/progreso" class="fs-sm mb-0 peso-cambio link-sano">Registra tu peso</a>
+      }
     </section>
   </div>
 

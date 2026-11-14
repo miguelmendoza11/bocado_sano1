@@ -41,11 +41,15 @@
       <div>
         <p class="fs-sm mb-0 opacity-75">Peso actual</p>
         <p class="fs-xl fw-bold mb-0">{{ nutrition.currentWeight() | number: '1.1-1' }} kg</p>
-        @let cambio = totalWeightChange();
-        <p class="fs-sm mb-0 peso-cambio">
-          <i class="bi" [class.bi-arrow-down-right]="cambio <= 0" [class.bi-arrow-up-right]="cambio > 0"></i>
-          {{ (cambio < 0 ? -cambio : cambio) | number: '1.1-1' }} kg desde el {{ firstWeight()?.date | date: 'd MMM' }}
-        </p>
+        @if (firstWeight(); as first) {
+          @let cambio = totalWeightChange();
+          <p class="fs-sm mb-0 peso-cambio">
+            <i class="bi" [class.bi-arrow-down-right]="cambio <= 0" [class.bi-arrow-up-right]="cambio > 0"></i>
+            {{ (cambio < 0 ? -cambio : cambio) | number: '1.1-1' }} kg desde el {{ first.date | date: 'd MMM' }}
+          </p>
+        } @else {
+          <p class="fs-sm mb-0 opacity-75">Del perfil · aún sin registros</p>
+        }
       </div>
     </section>
   </div>
@@ -101,36 +105,48 @@
       <div class="d-flex align-items-center justify-content-between">
         <div>
           <h2 class="fs-lg mb-0">Peso</h2>
-          <p class="fs-sm text-secondary-sano mb-0">{{ weightPoints().length }} registros</p>
+          <p class="fs-sm text-secondary-sano mb-0">
+            {{ weightPoints().length }} {{ weightPoints().length === 1 ? 'registro' : 'registros' }}
+          </p>
         </div>
-        <span class="chip" [class.chip-baja]="cambioTotal < 0" [class.chip-sube]="cambioTotal > 0">
-          <i class="bi" [class.bi-arrow-down-right]="cambioTotal <= 0" [class.bi-arrow-up-right]="cambioTotal > 0"></i>
-          {{ cambioTotal > 0 ? '+' : '' }}{{ cambioTotal | number: '1.1-1' }} kg
-        </span>
+        @if (firstWeight()) {
+          <span class="chip" [class.chip-baja]="cambioTotal < 0" [class.chip-sube]="cambioTotal > 0">
+            <i class="bi" [class.bi-arrow-down-right]="cambioTotal <= 0" [class.bi-arrow-up-right]="cambioTotal > 0"></i>
+            {{ cambioTotal > 0 ? '+' : '' }}{{ cambioTotal | number: '1.1-1' }} kg
+          </span>
+        }
       </div>
 
-      <svg
-        class="grafica-peso"
-        [attr.viewBox]="'0 0 ' + chart.width + ' ' + chart.height"
-        role="img"
-        [attr.aria-label]="'Evolución del peso: de ' + (firstWeight()?.kg | number: '1.1-1') + ' a ' + (nutrition.currentWeight() | number: '1.1-1') + ' kg'"
-      >
-        <defs>
-          <linearGradient id="peso-relleno" x1="0" y1="0" x2="0" y2="1">
-            <stop class="relleno-arriba" offset="0%" />
-            <stop class="relleno-abajo" offset="100%" />
-          </linearGradient>
-        </defs>
+      @if (weightPoints().length) {
+        <svg
+          class="grafica-peso"
+          [attr.viewBox]="'0 0 ' + chart.width + ' ' + chart.height"
+          role="img"
+          [attr.aria-label]="'Evolución del peso: de ' + (firstWeight()?.kg | number: '1.1-1') + ' a ' + (nutrition.currentWeight() | number: '1.1-1') + ' kg'"
+        >
+          <defs>
+            <linearGradient id="peso-relleno" x1="0" y1="0" x2="0" y2="1">
+              <stop class="relleno-arriba" offset="0%" />
+              <stop class="relleno-abajo" offset="100%" />
+            </linearGradient>
+          </defs>
 
-        <polygon class="area" [attr.points]="weightArea()" fill="url(#peso-relleno)" />
-        <polyline class="linea" [attr.points]="weightLine()" />
+          <polygon class="area" [attr.points]="weightArea()" fill="url(#peso-relleno)" />
+          <polyline class="linea" [attr.points]="weightLine()" />
 
-        @for (p of weightPoints(); track p.date; let last = $last) {
-          <circle class="punto" [class.ultimo]="last" [attr.cx]="p.x" [attr.cy]="p.y" r="5" />
-          <text class="valor" [class.ultimo]="last" [attr.x]="p.x" [attr.y]="p.y - 11">{{ p.kg | number: '1.1-1' }}</text>
-          <text class="fecha" [attr.x]="p.x" [attr.y]="chart.height - 10">{{ p.date | date: 'd MMM' }}</text>
-        }
-      </svg>
+          @for (p of weightPoints(); track p.date; let last = $last) {
+            <circle class="punto" [class.ultimo]="last" [attr.cx]="p.x" [attr.cy]="p.y" r="5" />
+            <text class="valor" [class.ultimo]="last" [attr.x]="p.x" [attr.y]="p.y - 11">{{ p.kg | number: '1.1-1' }}</text>
+            <text class="fecha" [attr.x]="p.x" [attr.y]="chart.height - 10">{{ p.date | date: 'd MMM' }}</text>
+          }
+        </svg>
+      } @else {
+        <div class="peso-vacio">
+          <i class="bi bi-graph-down-arrow"></i>
+          <p class="fw-semibold mb-0">Aún no hay pesos registrados</p>
+          <p class="fs-sm text-secondary-sano mb-0">Registra tu peso de hoy para empezar a ver tu evolución.</p>
+        </div>
+      }
 
       <!-- Registrar el peso de hoy -->
       <form class="peso-form" (submit)="saveWeight($event)" novalidate>

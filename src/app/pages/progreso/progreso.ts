@@ -1,7 +1,7 @@
 import { DatePipe, DecimalPipe, formatNumber } from '@angular/common';
 import { Component, LOCALE_ID, computed, inject, signal } from '@angular/core';
 import { DayHistory } from '../../core/models/nutrition.models';
-import { NutritionService } from '../../core/services/nutrition.service';
+import { NutritionService, shiftDate } from '../../core/services/nutrition.service';
 import { ToastService } from '../../core/services/toast.service';
 
 @Component({
@@ -20,10 +20,16 @@ export class Progreso {
    * Las kcal de hoy son las del Diario, así que esta lista cambia en vivo
    * cuando agregas o quitas comida.
    */
-  readonly week = computed<DayHistory[]>(() => [
-    ...this.nutrition.weekHistory(),
-    { date: this.nutrition.today, kcal: this.nutrition.consumedKcal() },
-  ]);
+  readonly week = computed<DayHistory[]>(() => {
+    const today = this.nutrition.today;
+    // Siempre 7 barras: los días sin historial (cuenta nueva) quedan en 0
+    const saved = new Map(this.nutrition.weekHistory().map((d) => [d.date, d.kcal]));
+    const previous = [6, 5, 4, 3, 2, 1].map((n) => {
+      const date = shiftDate(today, -n);
+      return { date, kcal: saved.get(date) ?? 0 };
+    });
+    return [...previous, { date: today, kcal: this.nutrition.consumedKcal() }];
+  });
 
   /**
    * Días con algo registrado. Un día en 0 kcal es un día en que no se abrió la app
@@ -82,6 +88,7 @@ export class Progreso {
    */
   readonly weightPoints = computed(() => {
     const history = this.nutrition.weightHistory();
+    if (!history.length) return [];
     const { width, height, padX, top, bottom } = this.chart;
     const kgs = history.map((w) => w.kg);
     const min = Math.min(...kgs) - 0.3;

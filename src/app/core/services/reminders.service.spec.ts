@@ -28,7 +28,8 @@ describe('RemindersService', () => {
     auth.register('Ana', 'ana@correo.com');
     nutrition = TestBed.inject(NutritionService);
     service = TestBed.inject(RemindersService);
-    TestBed.tick(); // NutritionService carga los datos de ejemplo del usuario
+    TestBed.tick(); // NutritionService carga los datos del usuario (vacíos: es nuevo)
+    nutrition.resetToSample(); // estas pruebas parten de los datos de ejemplo
   });
 
   afterEach(() => {
