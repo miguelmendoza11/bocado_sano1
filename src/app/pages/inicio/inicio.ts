@@ -24,7 +24,7 @@ export class Inicio {
     Math.round((this.nutrition.consumedKcal() / this.nutrition.calorieGoal()) * 100),
   );
 
-  /** Avance de agua y pasos (0–100) para las barras. */
+  /** Avance de agua (0–100, para el vaso) y de pasos (0–100, para la barra). */
   protected readonly waterPct = computed(() =>
     Math.min((this.nutrition.waterMl() / this.nutrition.waterGoalMl) * 100, 100),
   );
