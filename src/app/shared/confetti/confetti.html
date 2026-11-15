@@ -1,0 +1,12 @@
+@for (burst of confetti.bursts(); track burst.id) {
+  @for (piece of burst.pieces; track $index) {
+    <span
+      class="papelito {{ piece.color }} {{ piece.shape }}"
+      [style.left.%]="piece.left"
+      [style.animation-delay.s]="piece.delay"
+      [style.animation-duration.s]="piece.duration"
+      [style.--drift.px]="piece.drift"
+      [style.--spin.deg]="piece.spin"
+    ></span>
+  }
+}
