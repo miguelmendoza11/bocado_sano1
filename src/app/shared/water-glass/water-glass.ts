@@ -25,6 +25,12 @@ export class WaterGlass {
    */
   protected readonly glassPath = 'M6 5 H42 L37.5 57 Q37 60 34 60 H14 Q11 60 10.5 57 Z';
 
+  /**
+   * Agua con la superficie ondulada: 4 ondas de 24 de ancho (de x=0 a x=96, el doble del vaso).
+   * Al moverla 24 hacia la izquierda queda igual que al principio, así el bucle no se nota.
+   */
+  protected readonly wavePath = 'M0 5 Q6 2 12 5 T24 5 T36 5 T48 5 T60 5 T72 5 T84 5 T96 5 V64 H0 Z';
+
   /** Borde de arriba y fondo del vaso (en unidades del lienzo). */
   private readonly top = 5;
   private readonly bottom = 60;
@@ -33,11 +39,13 @@ export class WaterGlass {
   protected readonly level = computed(() => Math.min(Math.max(this.percent(), 0), 100));
 
   /**
-   * El agua es un rectángulo del alto del vaso que se baja con translateY:
-   * vacío = baja todo (queda escondido debajo del fondo), lleno = 0.
+   * El agua tiene el alto del vaso y se baja con translateY:
+   * lleno = 0; vacío = baja todo y un poco más, para que ni la cresta de la ola se vea.
    * Se anima con CSS (transition), así el agua "sube" al tocar +.
    */
-  protected readonly waterOffset = computed(
-    () => ((100 - this.level()) / 100) * (this.bottom - this.top),
-  );
+  protected readonly waterOffset = computed(() => {
+    const level = this.level();
+    const offset = ((100 - level) / 100) * (this.bottom - this.top);
+    return level === 0 ? offset + 4 : offset;
+  });
 }

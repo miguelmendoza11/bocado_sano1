@@ -5,9 +5,13 @@
     </clipPath>
   </defs>
 
-  <!-- Agua: recortada con la forma del vaso -->
+  <!-- Agua: recortada con la forma del vaso. El grupo sube o baja según el nivel. -->
   <g [attr.clip-path]="'url(#' + clipId + ')'">
-    <rect class="agua" x="0" y="5" width="48" height="55" [style.transform]="'translateY(' + waterOffset() + 'px)'" />
+    <g class="agua" [style.transform]="'translateY(' + waterOffset() + 'px)'">
+      <!-- Dos olas que se mueven de lado en bucle: la de atrás más clara, para dar profundidad -->
+      <path class="ola ola-atras" [attr.d]="wavePath" />
+      <path class="ola ola-frente" [attr.d]="wavePath" />
+    </g>
   </g>
 
   <!-- Contorno del vaso -->
