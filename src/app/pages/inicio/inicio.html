@@ -74,9 +74,14 @@
           </button>
         </div>
       </div>
-      <p class="fs-sm text-secondary-sano mb-0">Agua</p>
-      <p class="fs-xl fw-bold mb-0">{{ nutrition.waterMl() / 1000 | number: '1.1-2' }} L</p>
-      <p class="fs-sm text-secondary-sano mb-2">de {{ nutrition.waterGoalMl / 1000 | number: '1.1-1' }} L</p>
+      <div class="agua-cuerpo">
+        <div>
+          <p class="fs-sm text-secondary-sano mb-0">Agua</p>
+          <p class="fs-xl fw-bold mb-0">{{ nutrition.waterMl() / 1000 | number: '1.1-2' }} L</p>
+          <p class="fs-sm text-secondary-sano mb-2">de {{ nutrition.waterGoalMl / 1000 | number: '1.1-1' }} L</p>
+        </div>
+        <app-water-glass />
+      </div>
       <div class="sano-progress progress-agua"><span [style.width.%]="waterPct()"></span></div>
     </section>
   </div>

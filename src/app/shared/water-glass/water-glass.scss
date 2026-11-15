@@ -1,0 +1,28 @@
+:host {
+  display: block;
+  width: 3rem;
+  /* El vaso toma el color del texto donde se pone (en Inicio, azul) */
+  color: var(--sano-blue);
+}
+
+.vaso {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.vaso-borde {
+  fill: color-mix(in srgb, currentColor 8%, transparent);
+  stroke: currentColor;
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+}
+
+.vaso-brillo {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  opacity: 0.35;
+}

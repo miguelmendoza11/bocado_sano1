@@ -57,6 +57,18 @@
   font-size: 1.4rem;
 }
 
+.agua-cuerpo {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.5rem;
+
+  app-water-glass {
+    flex-shrink: 0;
+    margin-bottom: 0.5rem;
+  }
+}
+
 .mini-actions {
   display: flex;
   gap: 0.35rem;
