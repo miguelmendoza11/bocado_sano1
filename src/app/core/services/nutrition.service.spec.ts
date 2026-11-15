@@ -65,6 +65,20 @@ describe('NutritionService', () => {
     expect(service.waterMl()).toBe(0);
   });
 
+  it('lets water and steps go over the goal but not over the cap', () => {
+    service.addWater(3000 - service.waterMl());
+    expect(service.waterMl()).toBe(3000); // pasa la meta de 2,5 L
+    service.addWater(10000);
+    expect(service.waterMl()).toBe(6000);
+
+    service.setSteps(15000);
+    expect(service.steps()).toBe(15000); // pasa la meta de 10.000
+    service.setSteps(999999);
+    expect(service.steps()).toBe(60000);
+    service.setSteps(-50);
+    expect(service.steps()).toBe(0);
+  });
+
   it('reports the latest weight change', () => {
     expect(service.currentWeight()).toBe(72.4);
     expect(service.weightChange()).toBe(-0.6);
