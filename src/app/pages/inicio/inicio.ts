@@ -36,6 +36,14 @@ export class Inicio {
     Math.min((this.nutrition.steps() / this.nutrition.stepsGoal) * 100, 100),
   );
 
+  /** Metas cumplidas: muestran la pastilla "Meta cumplida". */
+  protected readonly waterDone = computed(() => this.nutrition.waterMl() >= this.nutrition.waterGoalMl);
+  protected readonly stepsDone = computed(() => this.nutrition.steps() >= this.nutrition.stepsGoal);
+
+  /** Llegó al tope: el botón + se desactiva. */
+  protected readonly waterAtMax = computed(() => this.nutrition.waterMl() >= this.nutrition.maxWaterMl);
+  protected readonly stepsAtMax = computed(() => this.nutrition.steps() >= this.nutrition.maxSteps);
+
   /** Filas de la tarjeta de macros. */
   protected readonly macros = computed(() => {
     const done = this.nutrition.consumedMacros();
