@@ -1,0 +1,21 @@
+<svg class="vaso" viewBox="0 0 48 64" aria-hidden="true">
+  <defs>
+    <clipPath [attr.id]="clipId">
+      <path [attr.d]="glassPath" />
+    </clipPath>
+  </defs>
+
+  <!-- Agua: recortada con la forma del vaso. El grupo sube o baja según el nivel. -->
+  <g [attr.clip-path]="'url(#' + clipId + ')'">
+    <g class="agua" [style.transform]="'translateY(' + waterOffset() + 'px)'">
+      <!-- Dos olas que se mueven de lado en bucle: la de atrás más clara, para dar profundidad -->
+      <path class="ola ola-atras" [attr.d]="wavePath" />
+      <path class="ola ola-frente" [attr.d]="wavePath" />
+    </g>
+  </g>
+
+  <!-- Contorno del vaso -->
+  <path class="vaso-borde" [attr.d]="glassPath" />
+  <!-- Brillo del vidrio -->
+  <path class="vaso-brillo" d="M11 11 L14 50" />
+</svg>

@@ -57,6 +57,22 @@
   font-size: 1.4rem;
 }
 
+.agua-cuerpo {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.5rem;
+
+  /* El texto se encoge antes que el vaso: el vaso nunca se sale de la tarjeta */
+  > div {
+    min-width: 0;
+  }
+
+  app-water-glass {
+    flex-shrink: 0;
+  }
+}
+
 .mini-actions {
   display: flex;
   gap: 0.35rem;
@@ -74,18 +90,49 @@
   font-size: 0.85rem;
   cursor: pointer;
 
-  &:active {
+  &:active:not(:disabled) {
     transform: scale(0.92);
+  }
+
+  /* Llegó al tope: el + se ve apagado */
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+/* Pastilla "Cumplida" (en lugar de "de 2,5 L" / "de 10.000") */
+.meta-ok {
+  display: inline-flex;
+  align-self: flex-start;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  background: var(--sano-lime);
+  color: var(--sano-on-lime);
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+  animation: aparecer 0.35s ease-out;
+}
+
+@keyframes aparecer {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .meta-ok {
+    animation: none;
   }
 }
 
 .card-mini .sano-progress {
   margin-top: auto;
   background: var(--sano-track-soft);
-}
-
-.progress-agua > span {
-  background: var(--sano-blue);
 }
 
 .progress-pasos > span {

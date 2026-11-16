@@ -66,18 +66,34 @@
       <div class="mini-top">
         <i class="bi bi-droplet-fill mini-icon"></i>
         <div class="mini-actions">
-          <button type="button" class="mini-btn" aria-label="Quitar 250 ml de agua" (click)="nutrition.addWater(-250)">
+          <button type="button" class="mini-btn" aria-label="Quitar 250 ml de agua" (click)="addWater(-250)">
             <i class="bi bi-dash-lg"></i>
           </button>
-          <button type="button" class="mini-btn" aria-label="Agregar 250 ml de agua" (click)="nutrition.addWater(250)">
+          <button
+            type="button"
+            class="mini-btn"
+            aria-label="Agregar 250 ml de agua"
+            [disabled]="waterAtMax()"
+            [attr.title]="waterAtMax() ? 'Llegaste al máximo de 6 L' : null"
+            (click)="addWater(250)"
+          >
             <i class="bi bi-plus-lg"></i>
           </button>
         </div>
       </div>
-      <p class="fs-sm text-secondary-sano mb-0">Agua</p>
-      <p class="fs-xl fw-bold mb-0">{{ nutrition.waterMl() / 1000 | number: '1.1-2' }} L</p>
-      <p class="fs-sm text-secondary-sano mb-2">de {{ nutrition.waterGoalMl / 1000 | number: '1.1-1' }} L</p>
-      <div class="sano-progress progress-agua"><span [style.width.%]="waterPct()"></span></div>
+      <div class="agua-cuerpo">
+        <div>
+          <p class="fs-sm text-secondary-sano mb-0">Agua</p>
+          <p class="fs-xl fw-bold mb-0">{{ nutrition.waterMl() / 1000 | number: '1.1-2' }} L</p>
+        </div>
+        <app-water-glass [percent]="waterPct()" />
+      </div>
+      <!-- Debajo y a todo el ancho: en celulares angostos no cabe al lado del vaso -->
+      @if (waterDone()) {
+        <p class="meta-ok mb-0" title="Meta cumplida"><i class="bi bi-check-circle-fill"></i> Cumplida</p>
+      } @else {
+        <p class="fs-sm text-secondary-sano mb-0">de {{ nutrition.waterGoalMl / 1000 | number: '1.1-1' }} L</p>
+      }
     </section>
   </div>
 
@@ -87,17 +103,28 @@
       <div class="mini-top">
         <i class="bi bi-person-walking mini-icon"></i>
         <div class="mini-actions">
-          <button type="button" class="mini-btn" aria-label="Quitar 1.000 pasos" (click)="nutrition.setSteps(nutrition.steps() - 1000)">
+          <button type="button" class="mini-btn" aria-label="Quitar 1.000 pasos" (click)="addSteps(-1000)">
             <i class="bi bi-dash-lg"></i>
           </button>
-          <button type="button" class="mini-btn" aria-label="Agregar 1.000 pasos" (click)="nutrition.setSteps(nutrition.steps() + 1000)">
+          <button
+            type="button"
+            class="mini-btn"
+            aria-label="Agregar 1.000 pasos"
+            [disabled]="stepsAtMax()"
+            [attr.title]="stepsAtMax() ? 'Llegaste al máximo de 60.000 pasos' : null"
+            (click)="addSteps(1000)"
+          >
             <i class="bi bi-plus-lg"></i>
           </button>
         </div>
       </div>
       <p class="fs-sm text-secondary-sano mb-0">Pasos</p>
       <p class="fs-xl fw-bold mb-0">{{ nutrition.steps() | number }}</p>
-      <p class="fs-sm text-secondary-sano mb-2">de {{ nutrition.stepsGoal | number }}</p>
+      @if (stepsDone()) {
+        <p class="meta-ok mb-2" title="Meta cumplida"><i class="bi bi-check-circle-fill"></i> Cumplida</p>
+      } @else {
+        <p class="fs-sm text-secondary-sano mb-2">de {{ nutrition.stepsGoal | number }}</p>
+      }
       <div class="sano-progress progress-pasos"><span [style.width.%]="stepsPct()"></span></div>
     </section>
   </div>

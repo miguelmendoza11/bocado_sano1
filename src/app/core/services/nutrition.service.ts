@@ -188,6 +188,9 @@ export class NutritionService {
   readonly meals = MEALS;
   readonly waterGoalMl = 2500;
   readonly stepsGoal = 10000;
+  /** Topes razonables: se puede pasar la meta, pero no llegar a números absurdos. */
+  readonly maxWaterMl = 6000;
+  readonly maxSteps = 60000;
 
   /** Fecha de hoy en formato ISO local. Los datos de prueba se generan a partir de ella. */
   readonly today = daysAgo(0);
@@ -394,12 +397,14 @@ export class NutritionService {
     this.entries.update((list) => list.filter((e) => e.id !== id));
   }
 
+  /** Suma (o resta) agua, siempre entre 0 y el tope de 6 L. */
   addWater(ml: number): void {
-    this.waterMl.update((w) => Math.max(w + ml, 0));
+    this.waterMl.update((w) => Math.min(Math.max(w + ml, 0), this.maxWaterMl));
   }
 
+  /** Pone los pasos del día, siempre entre 0 y el tope de 60.000. */
   setSteps(steps: number): void {
-    this.steps.set(Math.max(Math.round(steps), 0));
+    this.steps.set(Math.min(Math.max(Math.round(steps), 0), this.maxSteps));
   }
 
   updateProfile(changes: Partial<UserProfile>): void {

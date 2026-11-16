@@ -2,19 +2,24 @@ import { DatePipe, DecimalPipe } from '@angular/common';
 import { Component, computed, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MealType } from '../../core/models/nutrition.models';
+import { ConfettiService } from '../../core/services/confetti.service';
 import { NutritionService } from '../../core/services/nutrition.service';
+import { ToastService } from '../../core/services/toast.service';
 import { CalorieRing } from '../../shared/calorie-ring/calorie-ring';
 import { RemindersBell } from '../../shared/reminders-bell/reminders-bell';
 import { ThemeToggle } from '../../shared/theme-toggle/theme-toggle';
+import { WaterGlass } from '../../shared/water-glass/water-glass';
 
 @Component({
   selector: 'app-inicio',
-  imports: [CalorieRing, DecimalPipe, DatePipe, RouterLink, ThemeToggle, RemindersBell],
+  imports: [CalorieRing, DecimalPipe, DatePipe, RouterLink, ThemeToggle, RemindersBell, WaterGlass],
   templateUrl: './inicio.html',
   styleUrl: './inicio.scss',
 })
 export class Inicio {
   protected readonly nutrition = inject(NutritionService);
+  private readonly confetti = inject(ConfettiService);
+  private readonly toast = inject(ToastService);
 
   protected readonly today = new Date();
 
@@ -23,13 +28,21 @@ export class Inicio {
     Math.round((this.nutrition.consumedKcal() / this.nutrition.calorieGoal()) * 100),
   );
 
-  /** Avance de agua y pasos (0–100) para las barras. */
+  /** Avance de agua (0–100, para el vaso) y de pasos (0–100, para la barra). */
   protected readonly waterPct = computed(() =>
     Math.min((this.nutrition.waterMl() / this.nutrition.waterGoalMl) * 100, 100),
   );
   protected readonly stepsPct = computed(() =>
     Math.min((this.nutrition.steps() / this.nutrition.stepsGoal) * 100, 100),
   );
+
+  /** Metas cumplidas: muestran la pastilla "Meta cumplida". */
+  protected readonly waterDone = computed(() => this.nutrition.waterMl() >= this.nutrition.waterGoalMl);
+  protected readonly stepsDone = computed(() => this.nutrition.steps() >= this.nutrition.stepsGoal);
+
+  /** Llegó al tope: el botón + se desactiva. */
+  protected readonly waterAtMax = computed(() => this.nutrition.waterMl() >= this.nutrition.maxWaterMl);
+  protected readonly stepsAtMax = computed(() => this.nutrition.steps() >= this.nutrition.maxSteps);
 
   /** Filas de la tarjeta de macros. */
   protected readonly macros = computed(() => {
@@ -41,6 +54,39 @@ export class Inicio {
       { label: 'Grasas', done: done.fat, goal: goal.fat },
     ].map((m) => ({ ...m, pct: Math.min((m.done / m.goal) * 100, 100) }));
   });
+
+  /** Botones + y − del agua (ml). Celebra si con este vaso se llega a la meta. */
+  protected addWater(ml: number): void {
+    const goal = this.nutrition.waterGoalMl;
+    const before = this.nutrition.waterMl();
+    this.nutrition.addWater(ml);
+    if (this.reachedGoal(before, this.nutrition.waterMl(), goal)) {
+      this.celebrate('¡Meta de agua cumplida! Bien hidratado hoy.');
+    }
+  }
+
+  /** Botones + y − de los pasos. Celebra si con estos pasos se llega a la meta. */
+  protected addSteps(delta: number): void {
+    const goal = this.nutrition.stepsGoal;
+    const before = this.nutrition.steps();
+    this.nutrition.setSteps(before + delta);
+    if (this.reachedGoal(before, this.nutrition.steps(), goal)) {
+      this.celebrate('¡Meta de pasos cumplida! Sigue moviéndote.');
+    }
+  }
+
+  /**
+   * true solo en el momento de cruzar la meta (antes no llegaba, ahora sí).
+   * Así no se celebra otra vez con cada + después de cumplirla.
+   */
+  private reachedGoal(before: number, after: number, goal: number): boolean {
+    return before < goal && after >= goal;
+  }
+
+  private celebrate(message: string): void {
+    this.confetti.launch();
+    this.toast.success(message);
+  }
 
   /** Texto corto con lo que se comió, o "Sin registrar". */
   protected summary(meal: MealType): string {
