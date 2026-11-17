@@ -106,6 +106,57 @@ describe('AuthService', () => {
     expect(service.user()?.name).toBe('Juan');
   });
 
+  describe('old accounts (saved before passwords)', () => {
+    /** Así guardaba las cuentas la versión anterior: { correo: "Nombre" }. */
+    const saveOldAccount = () =>
+      localStorage.setItem('bocado-sano.users', JSON.stringify({ 'vieja@mail.com': 'Rosa' }));
+
+    it('lets the old account in with the password it types and saves its hash', async () => {
+      saveOldAccount();
+      expect(await service.login('vieja@mail.com', 'nueva-clave')).toEqual({ ok: true });
+      expect(service.user()).toEqual({ name: 'Rosa', email: 'vieja@mail.com' });
+
+      const account = JSON.parse(localStorage.getItem('bocado-sano.users')!)['vieja@mail.com'];
+      expect(account.name).toBe('Rosa');
+      expect(account.passwordHash).toMatch(/^[0-9a-f]{64}$/);
+      expect(localStorage.getItem('bocado-sano.users')).not.toContain('nueva-clave');
+    });
+
+    it('asks for that same password from then on', async () => {
+      saveOldAccount();
+      await service.login('vieja@mail.com', 'nueva-clave');
+      service.logout();
+
+      expect(await service.login('vieja@mail.com', 'otra-cosa')).toEqual({
+        ok: false,
+        error: 'wrong-password',
+      });
+      expect(await service.login('vieja@mail.com', 'nueva-clave')).toEqual({ ok: true });
+    });
+
+    it('does not let someone register over an old account', async () => {
+      saveOldAccount();
+      expect(await service.register('Otra', 'vieja@mail.com', 'secreto123')).toEqual({
+        ok: false,
+        error: 'email-taken',
+      });
+    });
+
+    it('keeps the old account when its name changes before having a password', () => {
+      saveOldAccount();
+      localStorage.setItem(
+        'bocado-sano.session',
+        JSON.stringify({ name: 'Rosa', email: 'vieja@mail.com' }),
+      );
+      TestBed.resetTestingModule();
+      const reloaded = TestBed.inject(AuthService); // sesión abierta desde antes del cambio
+      reloaded.updateName('Rosa María');
+      expect(JSON.parse(localStorage.getItem('bocado-sano.users')!)['vieja@mail.com']).toBe(
+        'Rosa María',
+      );
+    });
+  });
+
   it('restores the session after a reload', async () => {
     await service.register('Ana', 'ana@mail.com', 'secreto123');
     TestBed.resetTestingModule();

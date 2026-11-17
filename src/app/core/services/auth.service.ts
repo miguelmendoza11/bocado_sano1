@@ -73,13 +73,7 @@ export class AuthService {
     const user = { name: name.trim(), email: normalize(email) };
     if (this.readAccounts()[user.email]) return { ok: false, error: 'email-taken' };
 
-    const salt = newSalt();
-    const passwordHash = await hashPassword(password, salt);
-
-    // Se vuelve a leer después del await, por si algo cambió mientras se calculaba el hash
-    const accounts = this.readAccounts();
-    accounts[user.email] = { name: user.name, salt, passwordHash };
-    writeStorage(USERS_KEY, accounts);
+    await this.saveAccount(user.email, user.name, password);
     this.setUser(user);
     return { ok: true };
   }
@@ -91,8 +85,16 @@ export class AuthService {
   async login(email: string, password: string): Promise<LoginResult> {
     const clean = normalize(email);
     const account = this.readAccounts()[clean];
-    // Cuenta vieja sin contraseña (texto): se resuelve en el siguiente commit
-    if (!account || typeof account === 'string') return { ok: false, error: 'not-found' };
+    if (!account) return { ok: false, error: 'not-found' };
+
+    // MIGRACIÓN: cuenta vieja (solo el nombre, sin contraseña guardada).
+    // Se acepta la contraseña que escriba y desde ahora se le guarda su hash:
+    // así nadie pierde su cuenta ni sus datos (bocado-sano.data.<correo>).
+    if (typeof account === 'string') {
+      await this.saveAccount(clean, account, password);
+      this.setUser({ name: account, email: clean });
+      return { ok: true };
+    }
 
     const hash = await hashPassword(password, account.salt);
     if (hash !== account.passwordHash) return { ok: false, error: 'wrong-password' };
@@ -117,6 +119,16 @@ export class AuthService {
 
   logout(): void {
     this.setUser(null);
+  }
+
+  /** Guarda la cuenta con un salt nuevo y el hash de su contraseña. */
+  private async saveAccount(email: string, name: string, password: string): Promise<void> {
+    const salt = newSalt();
+    const passwordHash = await hashPassword(password, salt);
+    // Se vuelve a leer después del await, por si algo cambió mientras se calculaba el hash
+    const accounts = this.readAccounts();
+    accounts[email] = { name, salt, passwordHash };
+    writeStorage(USERS_KEY, accounts);
   }
 
   private readAccounts(): Accounts {
