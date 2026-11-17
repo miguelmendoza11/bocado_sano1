@@ -117,10 +117,12 @@ describe('RecetaDetalle', () => {
       expect(img?.getAttribute('src')).toContain('recetas/ensalada-quinoa-aguacate.jpg');
     });
 
-    it('should keep the 🍽️ emoji for an unknown recipe', () => {
+    it('should show an icon, not an emoji, for an unknown recipe', () => {
       const { el } = setup('999');
       expect(el.querySelector('img')).toBeNull();
-      expect(el.querySelector('.detalle-emoji')?.textContent).toBe('🍽️');
+      expect(el.querySelector('.detalle-emoji')).toBeNull();
+      expect(el.querySelector('.no-encontrada .no-encontrada-icon svg')).not.toBeNull();
+      expect(el.querySelector('.no-encontrada')?.textContent).not.toContain('🍽');
     });
   });
 
