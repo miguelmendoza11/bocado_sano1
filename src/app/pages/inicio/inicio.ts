@@ -7,13 +7,23 @@ import { NutritionService } from '../../core/services/nutrition.service';
 import { ToastService } from '../../core/services/toast.service';
 import { greetingFor, greetingText } from '../../core/utils/greeting';
 import { CalorieRing } from '../../shared/calorie-ring/calorie-ring';
+import { DailyTip } from '../../shared/daily-tip/daily-tip';
 import { RemindersBell } from '../../shared/reminders-bell/reminders-bell';
 import { ThemeToggle } from '../../shared/theme-toggle/theme-toggle';
 import { WaterGlass } from '../../shared/water-glass/water-glass';
 
 @Component({
   selector: 'app-inicio',
-  imports: [CalorieRing, DecimalPipe, DatePipe, RouterLink, ThemeToggle, RemindersBell, WaterGlass],
+  imports: [
+    CalorieRing,
+    DailyTip,
+    DecimalPipe,
+    DatePipe,
+    RouterLink,
+    ThemeToggle,
+    RemindersBell,
+    WaterGlass,
+  ],
   templateUrl: './inicio.html',
   styleUrl: './inicio.scss',
 })

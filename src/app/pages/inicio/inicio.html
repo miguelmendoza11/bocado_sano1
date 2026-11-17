@@ -188,6 +188,12 @@
     </section>
   </div>
 
+  <!-- Consejo del día -->
+  <div class="col-12">
+    <!-- Recibe la hora de Inicio: al pasar la medianoche cambia solo al consejo del nuevo día -->
+    <app-daily-tip [date]="now()" />
+  </div>
+
   <!-- Comidas del día -->
   <div class="col-12">
     <section class="sano-card">
