@@ -80,6 +80,22 @@
 }
 
 /* ---------- Tarjetas ---------- */
+/*
+ * .receta-tile contiene dos hermanos: el enlace (toda la tarjeta) y el corazón.
+ * El "levantarse" va en el contenedor para que la foto y el corazón se muevan juntos,
+ * también cuando el mouse está sobre el corazón.
+ */
+.receta-tile {
+  position: relative;
+  height: 100%;
+  transition: transform 0.2s ease;
+
+  &:hover,
+  &:has(.receta-card:focus-visible) {
+    transform: translateY(-3px);
+  }
+}
+
 /* La tarjeta completa es un enlace al detalle */
 .receta-card {
   height: 100%;
@@ -88,19 +104,24 @@
   gap: 1rem;
   color: inherit;
   text-decoration: none;
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
-
-  &:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--sano-shadow-hover);
-  }
+  transition: box-shadow 0.2s ease;
 
   &:focus-visible {
     outline: 3px solid var(--sano-lime-strong);
     outline-offset: 2px;
   }
+}
+
+.receta-tile:hover .receta-card {
+  box-shadow: var(--sano-shadow-hover);
+}
+
+/* Corazón arriba a la derecha de la foto (padding de la tarjeta + un margen) */
+.receta-fav {
+  position: absolute;
+  top: calc(1.25rem + 0.6rem);
+  right: calc(1.25rem + 0.6rem);
+  z-index: 1;
 }
 
 /* Foto de la receta: recuadro 4:3 con bordes redondeados.
@@ -119,18 +140,24 @@
   transition: transform 0.35s ease;
 }
 
-/* Zoom suave de la foto al pasar el mouse o enfocar la tarjeta */
-.receta-card:hover .receta-foto,
+/* Zoom suave de la foto al pasar el mouse por la tarjeta (o el corazón) o enfocar el enlace */
+.receta-tile:hover .receta-foto,
 .receta-card:focus-visible .receta-foto {
   transform: scale(1.04);
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .receta-tile,
   .receta-foto {
     transition: none;
   }
 
-  .receta-card:hover .receta-foto,
+  .receta-tile:hover,
+  .receta-tile:has(.receta-card:focus-visible) {
+    transform: none;
+  }
+
+  .receta-tile:hover .receta-foto,
   .receta-card:focus-visible .receta-foto {
     transform: none;
   }

@@ -34,38 +34,54 @@
 <div class="row g-3">
   @for (recipe of filtered(); track recipe.id) {
     <div class="col-12 md:col-6 lg:col-4">
-      <a [routerLink]="['/recetas', recipe.id]" class="sano-card receta-card">
-        <div class="receta-media {{ recipe.colorClass }}">
-          @if (failedImages().has(recipe.id)) {
-            <!-- Respaldo: si la foto no carga, se ve el emoji como antes -->
-            <span class="receta-emoji" aria-hidden="true">{{ recipe.emoji }}</span>
-          } @else {
-            <img
-              class="receta-foto"
-              [ngSrc]="recipe.image"
-              [alt]="recipe.imageAlt"
-              [style.object-position]="recipe.imagePosition"
-              fill
-              [priority]="priorityIds.has(recipe.id)"
-              sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
-              (error)="onImageError(recipe.id)"
-            />
-          }
-        </div>
-        <div class="receta-body">
-          <h2 class="fs-md fw-bold mb-0 receta-nombre">{{ recipe.name }}</h2>
-          <div class="receta-meta">
-            <span class="kcal-pill"><i class="bi bi-fire"></i> {{ recipe.kcal }} kcal</span>
-            <span class="fs-sm text-secondary-sano"><i class="bi bi-clock"></i> {{ recipe.minutes }} min</span>
-          </div>
-          <div class="receta-tags">
-            <span class="chip">{{ recipe.category | titlecase }}</span>
-            @for (tag of recipe.tags; track tag) {
-              <span class="chip">{{ tag }}</span>
+      <!--
+        La tarjeta es un contenedor con DOS hermanos: el enlace (foto + textos) y el corazón.
+        El <button> no puede ir dentro del <a>: sería HTML inválido y al tocarlo se abriría la receta.
+      -->
+      <div class="receta-tile">
+        <a [routerLink]="['/recetas', recipe.id]" class="sano-card receta-card">
+          <div class="receta-media {{ recipe.colorClass }}">
+            @if (failedImages().has(recipe.id)) {
+              <!-- Respaldo: si la foto no carga, se ve el emoji como antes -->
+              <span class="receta-emoji" aria-hidden="true">{{ recipe.emoji }}</span>
+            } @else {
+              <img
+                class="receta-foto"
+                [ngSrc]="recipe.image"
+                [alt]="recipe.imageAlt"
+                [style.object-position]="recipe.imagePosition"
+                fill
+                [priority]="priorityIds.has(recipe.id)"
+                sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
+                (error)="onImageError(recipe.id)"
+              />
             }
           </div>
-        </div>
-      </a>
+          <div class="receta-body">
+            <h2 class="fs-md fw-bold mb-0 receta-nombre" [id]="'receta-nombre-' + recipe.id">
+              {{ recipe.name }}
+            </h2>
+            <div class="receta-meta">
+              <span class="kcal-pill"><i class="bi bi-fire"></i> {{ recipe.kcal }} kcal</span>
+              <span class="fs-sm text-secondary-sano"><i class="bi bi-clock"></i> {{ recipe.minutes }} min</span>
+            </div>
+            <div class="receta-tags">
+              <span class="chip">{{ recipe.category | titlecase }}</span>
+              @for (tag of recipe.tags; track tag) {
+                <span class="chip">{{ tag }}</span>
+              }
+            </div>
+          </div>
+        </a>
+
+        <!-- Corazón arriba a la derecha, sobre la foto -->
+        <app-favorite-button
+          class="receta-fav"
+          overlay
+          [recipeId]="recipe.id"
+          [describedBy]="'receta-nombre-' + recipe.id"
+        />
+      </div>
     </div>
   } @empty {
     <div class="col-12">

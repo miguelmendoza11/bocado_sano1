@@ -27,6 +27,14 @@
   }
 }
 
+/* Sobre una foto: superficie semitransparente para que se vea en cualquier imagen */
+.overlay {
+  border-color: transparent;
+  background: color-mix(in srgb, var(--sano-surface) 82%, transparent);
+  box-shadow: var(--sano-shadow);
+  backdrop-filter: blur(6px);
+}
+
 /* Corazón lleno */
 .is-fav {
   color: var(--sano-danger);

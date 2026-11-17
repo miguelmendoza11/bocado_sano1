@@ -3,10 +3,11 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { RecipeCategoryFilter } from '../../core/models/recipe.models';
 import { RecipeService } from '../../core/services/recipe.service';
+import { FavoriteButton } from '../../shared/favorite-button/favorite-button';
 
 @Component({
   selector: 'app-recetas',
-  imports: [RouterLink, TitleCasePipe, NgOptimizedImage],
+  imports: [RouterLink, TitleCasePipe, NgOptimizedImage, FavoriteButton],
   templateUrl: './recetas.html',
   styleUrl: './recetas.scss',
 })

@@ -1,10 +1,11 @@
-import { Component, computed, inject, input, signal } from '@angular/core';
+import { Component, booleanAttribute, computed, inject, input, signal } from '@angular/core';
 import { FavoritesService } from '../../core/services/favorites.service';
 import { ToastService } from '../../core/services/toast.service';
 
 /**
  * Corazón para marcar una receta como favorita.
  * Uso: <app-favorite-button [recipeId]="receta.id" />
+ *      <app-favorite-button [recipeId]="receta.id" overlay describedBy="id-del-titulo" />
  * OJO: es un <button>, así que NO debe ir dentro de un <a>.
  */
 @Component({
@@ -18,6 +19,16 @@ export class FavoriteButton {
 
   /** Receta que marca o desmarca este botón. */
   readonly recipeId = input.required<number>();
+
+  /** Estilo para ir sobre una foto: círculo semitransparente con desenfoque. */
+  readonly overlay = input(false, { transform: booleanAttribute });
+
+  /**
+   * Id del elemento con el nombre de la receta (aria-describedby).
+   * Así el lector de pantalla dice "Agregar a favoritas, Ensalada de quinoa…"
+   * y se distinguen los corazones de una grilla.
+   */
+  readonly describedBy = input<string | null>(null);
 
   /** ¿La receta está en favoritas? Cambia sola si se marca desde otro lugar. */
   protected readonly isFavorite = computed(() => this.favorites.ids().has(this.recipeId()));
