@@ -3,10 +3,12 @@
     <a routerLink="/recetas" class="icon-btn" aria-label="Volver a recetas">
       <i class="bi bi-arrow-left"></i>
     </a>
-    <div class="min-w-0">
+    <div class="min-w-0 flex-grow-1">
       <p class="text-secondary-sano fs-sm mb-0">Recetas · {{ r.category | titlecase }}</p>
-      <h1 class="fs-2xl mb-0">{{ r.name }}</h1>
+      <h1 id="detalle-titulo" class="fs-2xl mb-0">{{ r.name }}</h1>
     </div>
+    <!-- Corazón junto al título (fuera de cualquier enlace) -->
+    <app-favorite-button class="detalle-fav" [recipeId]="r.id" describedBy="detalle-titulo" />
   </header>
 
   <div class="row g-3">

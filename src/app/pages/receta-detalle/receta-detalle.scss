@@ -9,6 +9,11 @@
   }
 }
 
+/* El corazón no se encoge aunque el nombre sea largo */
+.detalle-fav {
+  flex-shrink: 0;
+}
+
 .min-w-0 {
   min-width: 0;
 }
