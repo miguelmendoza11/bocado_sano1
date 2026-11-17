@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard, guestGuard } from './core/guards/auth.guard';
+import { recipeTitle } from './pages/receta-detalle/receta-title.resolver';
 
 export const routes: Routes = [
   // Páginas fuera del layout (sin barra lateral ni inferior)
@@ -47,7 +48,8 @@ export const routes: Routes = [
       },
       {
         path: 'recetas/:id',
-        title: 'Receta · Bocado Sano',
+        // El título sale del nombre de la receta (o "Receta no encontrada")
+        title: recipeTitle,
         loadComponent: () =>
           import('./pages/receta-detalle/receta-detalle').then((m) => m.RecetaDetalle),
       },

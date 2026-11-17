@@ -211,6 +211,22 @@
   padding: 2.5rem 1.25rem;
 }
 
+/* Ícono de "no encontrada": del mismo alto que el emoji que había (5rem) */
+.no-encontrada-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 5rem;
+  height: 5rem;
+  border-radius: 50%;
+  background: var(--sano-orange-soft);
+  color: var(--sano-orange-ink);
+
+  svg {
+    width: 2.9rem;
+    height: 2.9rem;
+  }
+}
+
 /* En celular el anillo va arriba y las barras debajo */
 @media (max-width: 479.98px) {
   .macros-body {

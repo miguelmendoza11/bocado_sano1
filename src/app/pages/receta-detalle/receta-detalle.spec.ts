@@ -66,6 +66,19 @@ describe('RecetaDetalle', () => {
     expect(create('abc').textContent).toContain('Receta no encontrada');
   });
 
+  it('should show the not found block with a decorative icon and a way back', () => {
+    const block = create('999').querySelector('.no-encontrada')!;
+    expect(block.querySelector('h2')?.textContent?.trim()).toBe('Receta no encontrada');
+
+    // Ícono SVG decorativo (el texto ya lo explica), sin emoji
+    const icon = block.querySelector('.no-encontrada-icon')!;
+    expect(icon.getAttribute('aria-hidden')).toBe('true');
+    expect(icon.querySelector('svg')).not.toBeNull();
+    expect(/\p{Extended_Pictographic}/u.test(block.textContent ?? '')).toBe(false);
+
+    expect(block.querySelector('a')?.getAttribute('href')).toBe('/recetas');
+  });
+
   describe('photo', () => {
     function setup(id: string) {
       const fixture = TestBed.createComponent(RecetaDetalle);
@@ -117,10 +130,12 @@ describe('RecetaDetalle', () => {
       expect(img?.getAttribute('src')).toContain('recetas/ensalada-quinoa-aguacate.jpg');
     });
 
-    it('should keep the 🍽️ emoji for an unknown recipe', () => {
+    it('should show an icon, not an emoji, for an unknown recipe', () => {
       const { el } = setup('999');
       expect(el.querySelector('img')).toBeNull();
-      expect(el.querySelector('.detalle-emoji')?.textContent).toBe('🍽️');
+      expect(el.querySelector('.detalle-emoji')).toBeNull();
+      expect(el.querySelector('.no-encontrada .no-encontrada-icon svg')).not.toBeNull();
+      expect(el.querySelector('.no-encontrada')?.textContent).not.toContain('🍽');
     });
   });
 

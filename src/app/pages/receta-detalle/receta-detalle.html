@@ -169,7 +169,15 @@
   </header>
 
   <section class="sano-card text-center no-encontrada">
-    <span class="detalle-emoji" aria-hidden="true">🍽️</span>
+    <!-- Plato con cubiertos (SVG, sin emoji). El emoji de respaldo de las fotos es otra cosa y se queda. -->
+    <span class="no-encontrada-icon" aria-hidden="true">
+      <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="24" cy="24" r="12" />
+        <circle cx="24" cy="24" r="7" />
+        <path d="M6 8v8M9 8v8M12 8v8M6 16c0 2.5 6 2.5 6 0M9 18v22" />
+        <path d="M40 40V8c3.5 2.5 4.5 10 0 14" />
+      </svg>
+    </span>
     <h2 class="fs-lg mt-3 mb-1">Receta no encontrada</h2>
     <p class="fs-sm text-secondary-sano mb-3">La receta que buscas no existe o fue eliminada.</p>
     <a routerLink="/recetas" class="btn btn-solid theme-warning sano-btn-orange">Ver todas las recetas</a>
