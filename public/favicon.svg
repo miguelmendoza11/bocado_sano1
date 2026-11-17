@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Bocado Sano: huevo frito sobre cuadrado lima. Colores de la marca. -->
+  <rect width="100" height="100" rx="22" fill="#C6F432"/>
+  <!-- Clara (forma ondulada) -->
+  <path fill="#1C1F1A" d="M30 27C40 27 46 22 52 19C62 13 72 15 75 27C77 34 80 37 85 39C92 42 92 54 88 60C84 66 77 68 74 74C70 83 62 86 52 81C45 77 40 73 30 75C18 77 9 68 15 57C18 51 19 48 16 43C10 33 19 26 30 27Z"/>
+  <!-- Yema -->
+  <circle cx="50" cy="50" r="16.5" fill="#FF8A3D"/>
+  <!-- Brillo de la yema -->
+  <path d="M39.5 47.5Q41.5 41.5 48 39.8" fill="none" stroke="#FFFFFF" stroke-width="3.6" stroke-linecap="round"/>
+</svg>
