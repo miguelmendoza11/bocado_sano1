@@ -1,10 +1,11 @@
 import { DatePipe, DecimalPipe } from '@angular/common';
-import { Component, computed, inject } from '@angular/core';
+import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MealType } from '../../core/models/nutrition.models';
 import { ConfettiService } from '../../core/services/confetti.service';
 import { NutritionService } from '../../core/services/nutrition.service';
 import { ToastService } from '../../core/services/toast.service';
+import { greetingFor, greetingText } from '../../core/utils/greeting';
 import { CalorieRing } from '../../shared/calorie-ring/calorie-ring';
 import { RemindersBell } from '../../shared/reminders-bell/reminders-bell';
 import { ThemeToggle } from '../../shared/theme-toggle/theme-toggle';
@@ -21,7 +22,24 @@ export class Inicio {
   private readonly confetti = inject(ConfettiService);
   private readonly toast = inject(ToastService);
 
-  protected readonly today = new Date();
+  /**
+   * Hora actual (del computador). Se actualiza cada minuto, así el saludo y la fecha
+   * cambian solos (por ejemplo a las 12:00 pasa a "Buenas tardes").
+   */
+  protected readonly now = signal(new Date());
+
+  /** "Buenos días" + ícono, según la hora. */
+  protected readonly greeting = computed(() => greetingFor(this.now().getHours()));
+
+  /** "Buenos días, Juan": solo el primer nombre del perfil. */
+  protected readonly greetingTitle = computed(() =>
+    greetingText(this.now().getHours(), this.nutrition.profile().name),
+  );
+
+  constructor() {
+    const timer = setInterval(() => this.now.set(new Date()), 60_000);
+    inject(DestroyRef).onDestroy(() => clearInterval(timer));
+  }
 
   /** Porcentaje de la meta ya consumido (0–100). */
   protected readonly percent = computed(() =>

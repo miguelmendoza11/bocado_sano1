@@ -4,9 +4,85 @@
   justify-content: space-between;
 }
 
+.inicio-header {
+  gap: 0.75rem;
+}
+
 .inicio-acciones {
+  flex-shrink: 0;
   display: flex;
   gap: 0.5rem;
+}
+
+/* ---------- Saludo según la hora ---------- */
+// min-width: 0 deja que el título se ajuste (baje de línea) en vez de empujar los botones
+.saludo {
+  flex: 1;
+  min-width: 0;
+}
+
+.saludo-titulo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: 0.5rem;
+  overflow-wrap: anywhere;
+}
+
+.saludo-icono {
+  flex-shrink: 0;
+  width: 1.6rem;
+  height: 1.6rem;
+  overflow: visible;
+  animation: saludo-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  &.morning {
+    color: var(--sano-orange);
+  }
+
+  &.afternoon {
+    .sol {
+      color: var(--sano-orange);
+    }
+
+    .nube {
+      color: var(--sano-muted);
+    }
+  }
+
+  &.night {
+    color: var(--sano-blue);
+  }
+}
+
+// En modo oscuro la luna va en lima, que resalta más sobre el fondo oscuro
+:host-context([data-bs-theme='dark']) .saludo-icono.night {
+  color: var(--sano-lime);
+}
+
+@keyframes saludo-in {
+  from {
+    opacity: 0;
+    transform: scale(0.6) rotate(-15deg);
+  }
+}
+
+// Celular angosto (360 px): título un poco más chico para que no choque con los botones
+@media (max-width: 400px) {
+  .saludo-titulo {
+    font-size: 1.35rem;
+  }
+
+  .saludo-icono {
+    width: 1.4rem;
+    height: 1.4rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .saludo-icono {
+    animation: none;
+  }
 }
 
 // Mismo corte que la barra lateral del Shell (992px)

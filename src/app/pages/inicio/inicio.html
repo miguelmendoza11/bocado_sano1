@@ -1,7 +1,48 @@
 <header class="inicio-header mb-4">
-  <div>
-    <p class="text-secondary-sano mb-1 capitalize">{{ today | date: "EEEE, d 'de' MMMM" }}</p>
-    <h1 class="fs-2xl mb-0">¡Hola, {{ nutrition.profile().name }}!&nbsp;👋</h1>
+  <div class="saludo">
+    <p class="text-secondary-sano mb-1 capitalize">{{ now() | date: "EEEE, d 'de' MMMM" }}</p>
+    <h1 class="fs-2xl mb-0 saludo-titulo">
+      <span>{{ greetingTitle() }}</span>
+      <!-- Ícono según la hora; @switch lo vuelve a crear al cambiar, así se anima otra vez -->
+      @switch (greeting().icon) {
+        @case ('morning') {
+          <svg class="saludo-icono morning" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="4.5" fill="currentColor" />
+            <g stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <line x1="12" y1="1.5" x2="12" y2="3.5" />
+              <line x1="12" y1="20.5" x2="12" y2="22.5" />
+              <line x1="1.5" y1="12" x2="3.5" y2="12" />
+              <line x1="20.5" y1="12" x2="22.5" y2="12" />
+              <line x1="4.6" y1="4.6" x2="6" y2="6" />
+              <line x1="18" y1="18" x2="19.4" y2="19.4" />
+              <line x1="4.6" y1="19.4" x2="6" y2="18" />
+              <line x1="18" y1="6" x2="19.4" y2="4.6" />
+            </g>
+          </svg>
+        }
+        @case ('afternoon') {
+          <svg class="saludo-icono afternoon" viewBox="0 0 24 24" aria-hidden="true">
+            <!-- Sol detrás (naranja) y nube delante (gris) -->
+            <g class="sol">
+              <circle cx="9" cy="9" r="3.6" fill="currentColor" />
+              <g stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                <line x1="9" y1="1.5" x2="9" y2="3" />
+                <line x1="1.5" y1="9" x2="3" y2="9" />
+                <line x1="3.7" y1="3.7" x2="4.8" y2="4.8" />
+                <line x1="14.3" y1="3.7" x2="13.2" y2="4.8" />
+              </g>
+            </g>
+            <path class="nube" d="M7.5 20h10a4 4 0 0 0 .5-7.97A5.5 5.5 0 0 0 7.4 13.6 3.2 3.2 0 0 0 7.5 20Z" fill="currentColor" />
+          </svg>
+        }
+        @case ('night') {
+          <svg class="saludo-icono night" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M19.5 14.5A8 8 0 0 1 9.5 4.5a8 8 0 1 0 10 10Z" fill="currentColor" />
+            <path class="estrella" d="M18 2.5l.7 1.6 1.6.7-1.6.7-.7 1.6-.7-1.6-1.6-.7 1.6-.7Z" fill="currentColor" />
+          </svg>
+        }
+      }
+    </h1>
   </div>
   <div class="inicio-acciones">
     <!-- En escritorio el botón de tema está en la barra lateral; aquí solo en celular -->
