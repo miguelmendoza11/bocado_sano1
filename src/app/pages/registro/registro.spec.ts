@@ -46,28 +46,28 @@ describe('Registro', () => {
     expect((fixture.nativeElement as HTMLElement).textContent).toContain('Las contraseñas no coinciden.');
   });
 
-  it('should save the name and navigate to /inicio on submit', () => {
+  it('should save the name and navigate to /inicio on submit', async () => {
     const { component } = setup();
     const navigate = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
     const nutrition = TestBed.inject(NutritionService);
     component.form.setValue({ ...valid, name: '  Ana  ' });
-    component.onSubmit();
+    await component.onSubmit();
     expect(nutrition.profile().name).toBe('Ana');
     expect(navigate).toHaveBeenCalledWith(['/inicio']);
   });
 
-  it('should save the session with name and email', () => {
+  it('should save the session with name and email', async () => {
     const { component } = setup();
     vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
     component.form.setValue(valid);
-    component.onSubmit();
+    await component.onSubmit();
     expect(TestBed.inject(AuthService).user()).toEqual({ name: 'Ana', email: 'ana@correo.com' });
   });
 
-  it('should not navigate when the form is invalid', () => {
+  it('should not navigate when the form is invalid', async () => {
     const { component } = setup();
     const navigate = vi.spyOn(TestBed.inject(Router), 'navigate');
-    component.onSubmit();
+    await component.onSubmit();
     expect(navigate).not.toHaveBeenCalled();
   });
 });

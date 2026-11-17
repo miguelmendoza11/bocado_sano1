@@ -43,14 +43,14 @@ export class Registro {
     { validators: passwordsMatch },
   );
 
-  onSubmit(): void {
+  async onSubmit(): Promise<void> {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
-    const { name, email } = this.form.getRawValue();
-    // Crea la cuenta y deja la sesión iniciada
-    this.auth.register(name, email);
+    const { name, email, password } = this.form.getRawValue();
+    // Crea la cuenta (con la contraseña protegida con hash) y deja la sesión iniciada
+    await this.auth.register(name, email, password);
     this.nutrition.updateProfile({ name: name.trim() });
     this.toast.success(`Cuenta creada. ¡Bienvenido, ${name.trim()}!`);
     this.router.navigate(['/inicio']);

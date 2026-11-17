@@ -13,7 +13,7 @@ describe('Perfil', () => {
       imports: [Perfil],
       providers: [provideRouter([])],
     }).compileComponents();
-    TestBed.inject(AuthService).register('Juan Montezuma', 'juan@correo.com');
+    await TestBed.inject(AuthService).register('Juan Montezuma', 'juan@correo.com', 'secreto123');
   });
 
   afterEach(() => localStorage.clear());

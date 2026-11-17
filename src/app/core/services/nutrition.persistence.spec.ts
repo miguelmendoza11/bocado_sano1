@@ -42,9 +42,9 @@ describe('NutritionService · persistencia', () => {
   const saved = (email: string) =>
     JSON.parse(localStorage.getItem(dataKey(email)) ?? 'null') as SavedNutrition | null;
 
-  it('saves the diary of the logged in user', () => {
+  it('saves the diary of the logged in user', async () => {
     const { auth, nutrition } = openApp();
-    auth.register('Ana', ANA);
+    await auth.register('Ana', ANA, 'secreto123');
     TestBed.tick();
 
     nutrition.addFood(7, 'snacks'); // manzana
@@ -57,9 +57,9 @@ describe('NutritionService · persistencia', () => {
     expect(data.waterMl).toBe(500);
   });
 
-  it('keeps the data after reloading the page', () => {
+  it('keeps the data after reloading the page', async () => {
     const first = openApp();
-    first.auth.register('Ana', ANA);
+    await first.auth.register('Ana', ANA, 'secreto123');
     TestBed.tick();
     first.nutrition.addFood(1, 'desayuno'); // avena 320
     first.nutrition.addFood(2, 'desayuno'); // café 100
@@ -71,9 +71,9 @@ describe('NutritionService · persistencia', () => {
     expect(nutrition.steps()).toBe(9000);
   });
 
-  it('starts a new user with no diet data, only their profile', () => {
+  it('starts a new user with no diet data, only their profile', async () => {
     const { auth, nutrition } = openApp();
-    auth.register('Pedro Pérez', PEDRO);
+    await auth.register('Pedro Pérez', PEDRO, 'secreto123');
     TestBed.tick();
 
     expect(nutrition.profile().name).toBe('Pedro Pérez');
@@ -86,16 +86,16 @@ describe('NutritionService · persistencia', () => {
     expect(saved(PEDRO)).not.toBeNull();
   });
 
-  it('keeps the progress of a user who logs out and back in', () => {
+  it('keeps the progress of a user who logs out and back in', async () => {
     const { auth, nutrition } = openApp();
-    auth.register('Ana', ANA);
+    await auth.register('Ana', ANA, 'secreto123');
     TestBed.tick();
     nutrition.addFood(3, 'almuerzo'); // pollo 250
     nutrition.addWeight(65, nutrition.today);
     TestBed.tick();
 
     auth.logout();
-    auth.register('Pedro', PEDRO); // otra persona en el mismo computador: empieza vacía
+    await auth.register('Pedro', PEDRO, 'secreto123'); // otra persona en el mismo computador: empieza vacía
     TestBed.tick();
     expect(nutrition.consumedKcal()).toBe(0);
 
@@ -106,15 +106,15 @@ describe('NutritionService · persistencia', () => {
     expect(nutrition.currentWeight()).toBe(65);
   });
 
-  it('does not mix the data of two users', () => {
+  it('does not mix the data of two users', async () => {
     const { auth, nutrition } = openApp();
-    auth.register('Ana', ANA);
+    await auth.register('Ana', ANA, 'secreto123');
     TestBed.tick();
     nutrition.addFood(9, 'cena'); // salmón 310
     TestBed.tick();
 
     auth.logout();
-    auth.register('Pedro', PEDRO);
+    await auth.register('Pedro', PEDRO, 'secreto123');
     TestBed.tick();
     expect(nutrition.kcalFor('cena')).toBe(0);
 
@@ -124,9 +124,9 @@ describe('NutritionService · persistencia', () => {
     expect(nutrition.kcalFor('cena')).toBe(310);
   });
 
-  it('ignores saved foods that are no longer in the catalog', () => {
+  it('ignores saved foods that are no longer in the catalog', async () => {
     const { auth } = openApp();
-    auth.register('Ana', ANA);
+    await auth.register('Ana', ANA, 'secreto123');
     TestBed.tick();
     const data = saved(ANA)!;
     data.entries.push({ id: 999, foodId: 12345, meal: 'cena', servings: 1 });
@@ -137,9 +137,9 @@ describe('NutritionService · persistencia', () => {
     expect(nutrition.consumedKcal()).toBe(0);
   });
 
-  it('starts a new day when the saved data is from a previous day', () => {
+  it('starts a new day when the saved data is from a previous day', async () => {
     const first = openApp();
-    first.auth.register('Ana', ANA);
+    await first.auth.register('Ana', ANA, 'secreto123');
     TestBed.tick();
     first.nutrition.addFood(1, 'desayuno'); // avena 320
     TestBed.tick();
@@ -156,9 +156,9 @@ describe('NutritionService · persistencia', () => {
     ]);
   });
 
-  it('resets to the sample data but keeps the name', () => {
+  it('resets to the sample data but keeps the name', async () => {
     const { auth, nutrition } = openApp();
-    auth.register('Ana', ANA);
+    await auth.register('Ana', ANA, 'secreto123');
     TestBed.tick();
     nutrition.removeEntry(1);
     nutrition.updateProfile({ age: 40 });
@@ -172,9 +172,9 @@ describe('NutritionService · persistencia', () => {
     expect(saved(ANA)!.entries.length).toBe(5);
   });
 
-  it('clears the diet data but keeps the profile when starting over', () => {
+  it('clears the diet data but keeps the profile when starting over', async () => {
     const { auth, nutrition } = openApp();
-    auth.register('Ana', ANA);
+    await auth.register('Ana', ANA, 'secreto123');
     TestBed.tick();
     nutrition.updateProfile({ age: 40 });
     nutrition.addFood(7, 'snacks');
@@ -192,9 +192,9 @@ describe('NutritionService · persistencia', () => {
     expect(saved(ANA)!.entries).toEqual([]);
   });
 
-  it('saves a recipe with its recipeId', () => {
+  it('saves a recipe with its recipeId', async () => {
     const { auth, nutrition } = openApp();
-    auth.register('Ana', ANA);
+    await auth.register('Ana', ANA, 'secreto123');
     TestBed.tick();
 
     nutrition.addRecipe(1, 'desayuno', 2); // 2 porciones de pancakes (350 c/u)
@@ -208,9 +208,9 @@ describe('NutritionService · persistencia', () => {
     expect(nutrition.kcalFor('desayuno')).toBe(700);
   });
 
-  it('keeps a recipe after reloading the page', () => {
+  it('keeps a recipe after reloading the page', async () => {
     const first = openApp();
-    first.auth.register('Ana', ANA);
+    await first.auth.register('Ana', ANA, 'secreto123');
     TestBed.tick();
     first.nutrition.addRecipe(1, 'cena');
     TestBed.tick();
@@ -224,9 +224,9 @@ describe('NutritionService · persistencia', () => {
     expect(nutrition.consumedKcal()).toBe(350);
   });
 
-  it('ignores saved recipes that are no longer in the catalog', () => {
+  it('ignores saved recipes that are no longer in the catalog', async () => {
     const { auth } = openApp();
-    auth.register('Ana', ANA);
+    await auth.register('Ana', ANA, 'secreto123');
     TestBed.tick();
     const data = saved(ANA)!;
     data.entries.push({ id: 999, recipeId: 12345, meal: 'cena', servings: 1 });
