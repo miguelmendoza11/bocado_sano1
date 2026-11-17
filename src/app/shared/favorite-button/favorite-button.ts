@@ -1,11 +1,19 @@
-import { Component, booleanAttribute, computed, inject, input, signal } from '@angular/core';
+import { Component, booleanAttribute, computed, inject, input, output, signal } from '@angular/core';
 import { FavoritesService } from '../../core/services/favorites.service';
 import { ToastService } from '../../core/services/toast.service';
+
+/** Lo que el botón le avisa al padre cada vez que cambia. */
+export interface FavoriteChange {
+  recipeId: number;
+  /** true = se agregó a favoritas, false = se quitó. */
+  favorite: boolean;
+}
 
 /**
  * Corazón para marcar una receta como favorita.
  * Uso: <app-favorite-button [recipeId]="receta.id" />
  *      <app-favorite-button [recipeId]="receta.id" overlay describedBy="id-del-titulo" />
+ *      <app-favorite-button [recipeId]="receta.id" (favoriteChange)="onFavorite($event)" />
  * OJO: es un <button>, así que NO debe ir dentro de un <a>.
  */
 @Component({
@@ -30,6 +38,12 @@ export class FavoriteButton {
    */
   readonly describedBy = input<string | null>(null);
 
+  /**
+   * Comunicación hijo → padre: avisa qué receta cambió y si quedó como favorita.
+   * El padre decide qué hacer con eso (por ejemplo, mostrar un aviso con el nombre).
+   */
+  readonly favoriteChange = output<FavoriteChange>();
+
   /** ¿La receta está en favoritas? Cambia sola si se marca desde otro lugar. */
   protected readonly isFavorite = computed(() => this.favorites.ids().has(this.recipeId()));
 
@@ -39,6 +53,7 @@ export class FavoriteButton {
   protected toggle(): void {
     const added = this.favorites.toggle(this.recipeId());
     this.popping.set(added);
+    this.favoriteChange.emit({ recipeId: this.recipeId(), favorite: added });
     if (added) {
       this.toast.success('Agregada a favoritas');
     } else {
