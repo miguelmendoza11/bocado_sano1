@@ -1,0 +1,314 @@
+import { TestBed } from '@angular/core/testing';
+import { Router, provideRouter, withComponentInputBinding } from '@angular/router';
+import { RouterTestingHarness } from '@angular/router/testing';
+import { FavoritesService } from '../../core/services/favorites.service';
+import { NutritionService } from '../../core/services/nutrition.service';
+import { ToastService } from '../../core/services/toast.service';
+import { RecetaDetalle } from './receta-detalle';
+
+describe('RecetaDetalle', () => {
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [RecetaDetalle],
+      providers: [
+        provideRouter(
+          [{ path: 'recetas/:id', component: RecetaDetalle }],
+          withComponentInputBinding(),
+        ),
+      ],
+    }).compileComponents();
+  });
+
+  /** Crea el componente pasándole el id como lo haría la URL (texto). */
+  function create(id: string) {
+    const fixture = TestBed.createComponent(RecetaDetalle);
+    fixture.componentRef.setInput('id', id);
+    fixture.detectChanges();
+    return fixture.nativeElement as HTMLElement;
+  }
+
+  it('should show the recipe name and category', () => {
+    const el = create('5');
+    expect(el.querySelector('h1')?.textContent).toContain('Salmón al horno con verduras');
+    expect(el.textContent).toContain('Recetas · Cena');
+  });
+
+  it('should list every ingredient and numbered step', () => {
+    const el = create('5');
+    expect(el.querySelectorAll('.ingredientes li').length).toBe(5);
+    const nums = [...el.querySelectorAll('.paso-num')].map((n) => n.textContent?.trim());
+    expect(nums).toEqual(['1', '2', '3', '4']);
+  });
+
+  it('should show the kcal and the three macros', () => {
+    const el = create('5');
+    expect(el.querySelector('app-calorie-ring')?.textContent).toContain('510');
+    expect(el.querySelectorAll('.macros-lista .sano-progress').length).toBe(3);
+  });
+
+  it('should use singular "porción" when the recipe serves one', () => {
+    expect(create('2').textContent).toContain('1 porción');
+    expect(create('5').textContent).toContain('2 porciones');
+  });
+
+  it('should have a back button to /recetas', () => {
+    const back = create('5').querySelector('a[aria-label="Volver a recetas"]');
+    expect(back?.getAttribute('href')).toBe('/recetas');
+  });
+
+  it('should show "Receta no encontrada" for an unknown id', () => {
+    const el = create('999');
+    expect(el.textContent).toContain('Receta no encontrada');
+    expect(el.querySelector('.ingredientes')).toBeNull();
+  });
+
+  it('should show "Receta no encontrada" when the id is not a number', () => {
+    expect(create('abc').textContent).toContain('Receta no encontrada');
+  });
+
+  it('should show the not found block with a decorative icon and a way back', () => {
+    const block = create('999').querySelector('.no-encontrada')!;
+    expect(block.querySelector('h2')?.textContent?.trim()).toBe('Receta no encontrada');
+
+    // Ícono SVG decorativo (el texto ya lo explica), sin emoji
+    const icon = block.querySelector('.no-encontrada-icon')!;
+    expect(icon.getAttribute('aria-hidden')).toBe('true');
+    expect(icon.querySelector('svg')).not.toBeNull();
+    expect(/\p{Extended_Pictographic}/u.test(block.textContent ?? '')).toBe(false);
+
+    expect(block.querySelector('a')?.getAttribute('href')).toBe('/recetas');
+  });
+
+  describe('photo', () => {
+    function setup(id: string) {
+      const fixture = TestBed.createComponent(RecetaDetalle);
+      fixture.componentRef.setInput('id', id);
+      fixture.detectChanges();
+      return { fixture, el: fixture.nativeElement as HTMLElement };
+    }
+
+    it('should show the recipe photo with its description, loaded first', () => {
+      const img = setup('5').el.querySelector('.detalle-media img')!;
+      expect(img.getAttribute('src')).toContain('recetas/salmon-verduras.jpg');
+      expect(img.getAttribute('alt')).toBe(
+        'Filete de salmón a la plancha con brócoli, zanahoria, habichuelas y puré',
+      );
+      expect(img.getAttribute('fetchpriority')).toBe('high'); // priority
+    });
+
+    it('should crop vertical photos with their own position', () => {
+      const img = setup('8').el.querySelector<HTMLImageElement>('.detalle-media img')!;
+      expect(img.style.objectPosition).toBe('center 85%');
+    });
+
+    it('should change the photo when another recipe is opened', () => {
+      const { fixture, el } = setup('5');
+      fixture.componentRef.setInput('id', '1');
+      fixture.detectChanges();
+      const img = el.querySelector('.detalle-media img');
+      expect(img?.getAttribute('src')).toContain('recetas/pancakes-avena-banano.jpg');
+      expect(img?.getAttribute('alt')).toContain('Pila de pancakes');
+    });
+
+    it('should show the emoji when the photo fails to load', () => {
+      const { fixture, el } = setup('5');
+      el.querySelector('.detalle-media img')!.dispatchEvent(new Event('error'));
+      fixture.detectChanges();
+
+      expect(el.querySelector('.detalle-media img')).toBeNull();
+      expect(el.querySelector('.detalle-media .detalle-emoji')?.textContent).toBe('🐟');
+    });
+
+    it('should try the photo again when another recipe is opened', () => {
+      const { fixture, el } = setup('5');
+      el.querySelector('.detalle-media img')!.dispatchEvent(new Event('error'));
+      fixture.detectChanges();
+
+      fixture.componentRef.setInput('id', '3');
+      fixture.detectChanges();
+      const img = el.querySelector('.detalle-media img');
+      expect(img?.getAttribute('src')).toContain('recetas/ensalada-quinoa-aguacate.jpg');
+    });
+
+    it('should show an icon, not an emoji, for an unknown recipe', () => {
+      const { el } = setup('999');
+      expect(el.querySelector('img')).toBeNull();
+      expect(el.querySelector('.detalle-emoji')).toBeNull();
+      expect(el.querySelector('.no-encontrada .no-encontrada-icon svg')).not.toBeNull();
+      expect(el.querySelector('.no-encontrada')?.textContent).not.toContain('🍽');
+    });
+  });
+
+  it('should read the id from the URL', async () => {
+    const harness = await RouterTestingHarness.create();
+    await harness.navigateByUrl('/recetas/3', RecetaDetalle);
+    expect(harness.routeNativeElement?.querySelector('h1')?.textContent).toContain(
+      'Ensalada de quinoa y aguacate',
+    );
+  });
+
+  describe('add to diary', () => {
+    /** Crea el detalle y devuelve el HTML, el fixture y algunos atajos para el panel. */
+    function setup(id: string) {
+      const fixture = TestBed.createComponent(RecetaDetalle);
+      fixture.componentRef.setInput('id', id);
+      fixture.detectChanges();
+      const el = fixture.nativeElement as HTMLElement;
+      const click = (selector: string) => {
+        el.querySelector<HTMLButtonElement>(selector)!.click();
+        fixture.detectChanges();
+      };
+      return {
+        el,
+        fixture,
+        nutrition: TestBed.inject(NutritionService),
+        activeMeal: () => el.querySelector('.comidas-tabs .tab.active')?.textContent?.trim(),
+        servings: () => el.querySelector('.porciones-num')?.textContent?.trim(),
+        minus: () => el.querySelector<HTMLButtonElement>('[aria-label="Quitar una porción"]')!,
+        plus: () => el.querySelector<HTMLButtonElement>('[aria-label="Agregar una porción"]')!,
+        clickMeal: (label: string) => {
+          [...el.querySelectorAll<HTMLButtonElement>('.comidas-tabs .tab')]
+            .find((b) => b.textContent?.trim() === label)!
+            .click();
+          fixture.detectChanges();
+        },
+        click,
+      };
+    }
+
+    it('should start with the meal of the recipe and 1 serving', () => {
+      const ui = setup('5'); // salmón: cena
+      expect(ui.activeMeal()).toBe('Cena');
+      expect(ui.servings()).toBe('1');
+      expect(ui.el.querySelector('.agregar-accion .kcal-pill')?.textContent).toContain('510 kcal');
+    });
+
+    it('should mark only the selected meal as pressed', () => {
+      const ui = setup('5');
+      ui.clickMeal('Almuerzo');
+      const pressed = [...ui.el.querySelectorAll('.comidas-tabs .tab[aria-pressed="true"]')];
+      expect(pressed.map((b) => b.textContent?.trim())).toEqual(['Almuerzo']);
+    });
+
+    it('should keep the servings between 1 and 12 and update the kcal', () => {
+      const ui = setup('5');
+      expect(ui.minus().disabled).toBe(true);
+
+      ui.click('[aria-label="Agregar una porción"]');
+      expect(ui.servings()).toBe('2');
+      expect(ui.el.querySelector('.agregar-accion .kcal-pill')?.textContent).toContain('1020 kcal');
+
+      for (let i = 0; i < 20; i++) ui.click('[aria-label="Agregar una porción"]');
+      expect(ui.servings()).toBe('12');
+      expect(ui.plus().disabled).toBe(true);
+    });
+
+    it('should add the recipe to the chosen meal with its servings', () => {
+      const ui = setup('5');
+      ui.clickMeal('Almuerzo');
+      ui.click('[aria-label="Agregar una porción"]');
+      const before = ui.nutrition.kcalFor('almuerzo');
+
+      ui.click('.agregar-accion .btn');
+
+      const entry = ui.nutrition.entries().at(-1)!;
+      expect(entry).toEqual(expect.objectContaining({ recipeId: 5, meal: 'almuerzo', servings: 2 }));
+      expect(ui.nutrition.kcalFor('almuerzo')).toBe(before + 1020);
+    });
+
+    it('should confirm with a toast that links to the diary on the chosen meal', () => {
+      const ui = setup('2'); // yogur: desayuno
+      const toasts = TestBed.inject(ToastService);
+      const navigate = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
+
+      ui.click('.agregar-accion .btn');
+
+      const toast = toasts.toasts().at(-1)!;
+      expect(toast.message).toBe(
+        'Bowl de yogur griego y frutos rojos (1 porción) agregado a Desayuno.',
+      );
+      expect(toast.action?.label).toBe('Ver diario');
+
+      toasts.runAction(toast);
+      expect(navigate).toHaveBeenCalledWith(['/diario'], { queryParams: { comida: 'desayuno' } });
+      expect(toasts.toasts()).toHaveLength(0);
+    });
+
+    it('should reset the panel when another recipe is opened', () => {
+      const ui = setup('5');
+      ui.clickMeal('Snacks');
+      ui.click('[aria-label="Agregar una porción"]');
+      ui.click('.agregar-accion .btn');
+
+      ui.fixture.componentRef.setInput('id', '1'); // pancakes: desayuno
+      ui.fixture.detectChanges();
+
+      expect(ui.activeMeal()).toBe('Desayuno');
+      expect(ui.servings()).toBe('1');
+    });
+  });
+
+  describe('favorite', () => {
+    beforeEach(() => localStorage.clear());
+    afterEach(() => localStorage.clear());
+
+    it('should show the heart next to the title, described by it', () => {
+      const el = create('5');
+      const heart = el.querySelector<HTMLButtonElement>('.detalle-header .detalle-fav button')!;
+      expect(heart.getAttribute('aria-label')).toBe('Agregar a favoritas');
+      expect(heart.getAttribute('aria-describedby')).toBe('detalle-titulo');
+      expect(el.querySelector('#detalle-titulo')?.textContent).toContain('Salmón al horno con verduras');
+    });
+
+    it('should save the recipe as favorite from the detail', () => {
+      const fixture = TestBed.createComponent(RecetaDetalle);
+      fixture.componentRef.setInput('id', '5');
+      fixture.detectChanges();
+      const heart = () => fixture.nativeElement.querySelector('.detalle-fav button') as HTMLButtonElement;
+
+      heart().click();
+      fixture.detectChanges();
+
+      expect(TestBed.inject(FavoritesService).isFavorite(5)).toBe(true);
+      expect(heart().getAttribute('aria-pressed')).toBe('true');
+    });
+
+    it('should show a toast with the recipe name when the heart emits favoriteChange', () => {
+      const fixture = TestBed.createComponent(RecetaDetalle);
+      fixture.componentRef.setInput('id', '5');
+      fixture.detectChanges();
+      const toasts = TestBed.inject(ToastService);
+      const heart = () =>
+        fixture.nativeElement.querySelector('.detalle-fav button') as HTMLButtonElement;
+
+      heart().click();
+      fixture.detectChanges();
+      expect(toasts.toasts().at(-1)).toEqual(
+        expect.objectContaining({
+          message: 'Salmón al horno con verduras agregada a favoritas',
+          type: 'success',
+        }),
+      );
+
+      heart().click();
+      fixture.detectChanges();
+      expect(toasts.toasts().at(-1)).toEqual(
+        expect.objectContaining({
+          message: 'Salmón al horno con verduras quitada de favoritas',
+          type: 'info',
+        }),
+      );
+    });
+
+    it('should show it already filled if it was marked before', () => {
+      TestBed.inject(FavoritesService).toggle(2);
+      const heart = create('2').querySelector('.detalle-fav button')!;
+      expect(heart.getAttribute('aria-pressed')).toBe('true');
+      expect(heart.querySelector('.bi-heart-fill')).not.toBeNull();
+    });
+
+    it('should not show a heart for an unknown recipe', () => {
+      expect(create('999').querySelector('app-favorite-button')).toBeNull();
+    });
+  });
+});

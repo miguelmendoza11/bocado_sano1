@@ -1,0 +1,62 @@
+/* Capa fija sobre toda la pantalla que deja pasar los clics */
+:host {
+  position: fixed;
+  inset: 0;
+  z-index: 1070; // encima del contenido y la barra inferior, debajo de los avisos (1080)
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.papelito {
+  position: absolute;
+  top: 0;
+  width: 0.55rem;
+  height: 0.85rem;
+  border-radius: 2px;
+  opacity: 0;
+  animation-name: caer;
+  animation-timing-function: cubic-bezier(0.25, 0.6, 0.5, 1);
+  animation-fill-mode: forwards;
+
+  &.circle {
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 50%;
+  }
+
+  /* Colores de la marca (tokens: cambian solos en modo oscuro) */
+  &.lime {
+    background: var(--sano-lime);
+  }
+  &.lime-strong {
+    background: var(--sano-lime-strong);
+  }
+  &.orange {
+    background: var(--sano-orange);
+  }
+  &.blue {
+    background: var(--sano-blue);
+  }
+}
+
+/* Cae desde arriba de la pantalla, se corre de lado, gira y se desvanece al final */
+@keyframes caer {
+  0% {
+    opacity: 1;
+    transform: translate3d(0, -2rem, 0) rotate(0deg);
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--drift), 100vh, 0) rotate(var(--spin));
+  }
+}
+
+/* Por si acaso: el servicio ya no lanza confeti con movimiento reducido */
+@media (prefers-reduced-motion: reduce) {
+  :host {
+    display: none;
+  }
+}

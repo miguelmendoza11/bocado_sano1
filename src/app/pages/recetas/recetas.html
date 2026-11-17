@@ -1,0 +1,124 @@
+<header class="mb-4">
+  <h1 class="fs-2xl mb-1">Recetas</h1>
+  <p class="text-secondary-sano mb-0">Ideas saludables para cada comida.</p>
+</header>
+
+<!-- Buscador y filtro por categoría -->
+<div class="recetas-filtros mb-4">
+  <label class="buscador">
+    <i class="bi bi-search" aria-hidden="true"></i>
+    <input
+      type="search"
+      placeholder="Buscar receta o etiqueta…"
+      aria-label="Buscar receta"
+      [value]="search()"
+      (input)="search.set($any($event.target).value)"
+    />
+  </label>
+
+  <div class="tabs-pill categorias" role="group" aria-label="Filtrar por categoría">
+    @for (c of categories; track c.value) {
+      <button
+        type="button"
+        class="tab"
+        [class.active]="category() === c.value"
+        [attr.aria-pressed]="category() === c.value"
+        (click)="category.set(c.value)"
+      >
+        {{ c.label }}
+      </button>
+
+      <!-- "Favoritas" va justo después de "Todas" -->
+      @if ($first) {
+        <button
+          type="button"
+          class="tab tab-fav"
+          [class.active]="showFavorites()"
+          [attr.aria-pressed]="showFavorites()"
+          (click)="category.set('favoritas')"
+        >
+          <i class="bi bi-heart-fill" aria-hidden="true"></i>
+          Favoritas
+          @if (favorites.count() > 0) {
+            <span class="tab-count">({{ favorites.count() }})</span>
+          }
+        </button>
+      }
+    }
+  </div>
+</div>
+
+<div class="row g-3">
+  @for (recipe of filtered(); track recipe.id) {
+    <div class="col-12 md:col-6 lg:col-4">
+      <!--
+        La tarjeta es un contenedor con DOS hermanos: el enlace (foto + textos) y el corazón.
+        El <button> no puede ir dentro del <a>: sería HTML inválido y al tocarlo se abriría la receta.
+      -->
+      <div class="receta-tile">
+        <a [routerLink]="['/recetas', recipe.id]" class="sano-card receta-card">
+          <div class="receta-media {{ recipe.colorClass }}">
+            @if (failedImages().has(recipe.id)) {
+              <!-- Respaldo: si la foto no carga, se ve el emoji como antes -->
+              <span class="receta-emoji" aria-hidden="true">{{ recipe.emoji }}</span>
+            } @else {
+              <img
+                class="receta-foto"
+                [ngSrc]="recipe.image"
+                [alt]="recipe.imageAlt"
+                [style.object-position]="recipe.imagePosition"
+                fill
+                [priority]="priorityIds.has(recipe.id)"
+                sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
+                (error)="onImageError(recipe.id)"
+              />
+            }
+          </div>
+          <div class="receta-body">
+            <h2 class="fs-md fw-bold mb-0 receta-nombre" [id]="'receta-nombre-' + recipe.id">
+              {{ recipe.name }}
+            </h2>
+            <div class="receta-meta">
+              <span class="kcal-pill"><i class="bi bi-fire"></i> {{ recipe.kcal }} kcal</span>
+              <span class="fs-sm text-secondary-sano"><i class="bi bi-clock"></i> {{ recipe.minutes }} min</span>
+            </div>
+            <div class="receta-tags">
+              <span class="chip">{{ recipe.category | titlecase }}</span>
+              @for (tag of recipe.tags; track tag) {
+                <span class="chip">{{ tag }}</span>
+              }
+            </div>
+          </div>
+        </a>
+
+        <!-- Corazón arriba a la derecha, sobre la foto -->
+        <app-favorite-button
+          class="receta-fav"
+          overlay
+          [recipeId]="recipe.id"
+          [describedBy]="'receta-nombre-' + recipe.id"
+          (favoriteChange)="onFavoriteChange(recipe.name, $event)"
+        />
+      </div>
+    </div>
+  } @empty {
+    <div class="col-12">
+      @if (noFavoritesYet()) {
+        <!-- En "Favoritas" sin ninguna guardada -->
+        <div class="sano-card text-center sin-resultados sin-favoritas">
+          <span class="sin-favoritas-icon" aria-hidden="true"><i class="bi bi-heart"></i></span>
+          <p class="fw-semibold mb-1 mt-3">Aún no tienes favoritas</p>
+          <p class="fs-sm text-secondary-sano mb-3">Toca el corazón en una receta para guardarla aquí.</p>
+          <button type="button" class="btn btn-solid theme-warning sano-btn-orange" (click)="clearFilters()">Ver todas</button>
+        </div>
+      } @else {
+        <div class="sano-card text-center sin-resultados">
+          <i class="bi bi-search fs-3xl text-secondary-sano"></i>
+          <p class="fw-semibold mb-1 mt-2">No encontramos recetas</p>
+          <p class="fs-sm text-secondary-sano mb-3">Prueba con otra palabra u otra categoría.</p>
+          <button type="button" class="btn btn-solid theme-warning sano-btn-orange" (click)="clearFilters()">Ver todas</button>
+        </div>
+      }
+    </div>
+  }
+</div>

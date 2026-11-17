@@ -1,0 +1,32 @@
+:host {
+  position: relative;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+svg {
+  transform: rotate(-90deg);
+}
+
+circle {
+  fill: none;
+}
+
+.track {
+  stroke: currentColor;
+  stroke-opacity: 0.12;
+}
+
+.bar {
+  stroke: currentColor;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.6s ease;
+}
+
+.center {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  text-align: center;
+}

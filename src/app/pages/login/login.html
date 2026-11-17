@@ -1,0 +1,77 @@
+<main class="auth-page sano-fondo-acceso">
+  <!-- Fuera del layout no hay barra lateral: el botón de tema va en la esquina -->
+  <app-theme-toggle class="tema-esquina" />
+  <section class="sano-card">
+    <header class="text-center mb-4">
+      <span class="logo"><i class="bi bi-egg-fried"></i></span>
+      <h1 class="fs-2xl mt-3 mb-1">Iniciar sesión</h1>
+      <p class="text-secondary-sano mb-0">Qué bueno verte de nuevo.</p>
+    </header>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+      @let email = form.controls.email;
+      <div class="mb-3">
+        <label for="login-email" class="form-label">Correo electrónico</label>
+        <input
+          id="login-email"
+          type="email"
+          class="form-control"
+          placeholder="tu@correo.com"
+          autocomplete="email"
+          formControlName="email"
+          [class.is-invalid]="email.invalid && email.touched"
+        />
+        @if (email.touched && email.hasError('required')) {
+          <div class="invalid-feedback">Escribe tu correo.</div>
+        } @else if (email.touched && email.hasError('email')) {
+          <div class="invalid-feedback">Escribe un correo válido.</div>
+        }
+      </div>
+
+      @let password = form.controls.password;
+      <div class="mb-4">
+        <label for="login-password" class="form-label">Contraseña</label>
+        <input
+          id="login-password"
+          type="password"
+          class="form-control"
+          placeholder="••••••••"
+          autocomplete="current-password"
+          formControlName="password"
+          [class.is-invalid]="password.invalid && password.touched"
+        />
+        @if (password.touched && password.hasError('required')) {
+          <div class="invalid-feedback">Escribe tu contraseña.</div>
+        } @else if (password.touched && password.hasError('minlength')) {
+          <div class="invalid-feedback">Debe tener al menos 6 caracteres.</div>
+        }
+      </div>
+
+      <button
+        type="submit"
+        class="btn btn-solid theme-warning sano-btn-orange w-100"
+        [disabled]="form.invalid || submitting()"
+      >
+        {{ submitting() ? 'Entrando...' : 'Iniciar sesión' }}
+      </button>
+
+      @if (error(); as e) {
+        <div class="form-error mt-3" role="alert">
+          <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
+          @if (e === 'not-found') {
+            <span>
+              No encontramos una cuenta con ese correo.
+              <a routerLink="/registro" class="form-error-link">Crear cuenta</a>
+            </span>
+          } @else {
+            <span>La contraseña no es correcta.</span>
+          }
+        </div>
+      }
+    </form>
+
+    <p class="text-center text-secondary-sano mt-4 mb-0">
+      ¿No tienes cuenta? <a routerLink="/registro" class="link-sano">Regístrate</a>
+    </p>
+  </section>
+</main>

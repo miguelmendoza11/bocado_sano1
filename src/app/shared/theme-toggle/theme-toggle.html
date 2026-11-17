@@ -1,0 +1,31 @@
+<button
+  type="button"
+  class="icon-btn theme-toggle"
+  [class.is-dark]="theme.isDark()"
+  [attr.aria-label]="theme.isDark() ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'"
+  [attr.title]="theme.isDark() ? 'Modo claro' : 'Modo oscuro'"
+  (click)="theme.toggle()"
+>
+  <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+    <!-- Máscara: un círculo negro "muerde" el centro para formar la luna -->
+    <mask [attr.id]="maskId">
+      <rect width="24" height="24" fill="white" />
+      <circle class="mordida" cx="12" cy="12" r="7.5" fill="black" />
+    </mask>
+
+    <!-- Centro: luna (grande y mordida) o sol (chico y redondo) -->
+    <circle class="centro" cx="12" cy="12" r="8" fill="currentColor" [attr.mask]="'url(#' + maskId + ')'" />
+
+    <!-- Rayos del sol -->
+    <g class="rayos" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <line x1="12" y1="1.5" x2="12" y2="3.5" />
+      <line x1="12" y1="20.5" x2="12" y2="22.5" />
+      <line x1="1.5" y1="12" x2="3.5" y2="12" />
+      <line x1="20.5" y1="12" x2="22.5" y2="12" />
+      <line x1="4.6" y1="4.6" x2="6" y2="6" />
+      <line x1="18" y1="18" x2="19.4" y2="19.4" />
+      <line x1="4.6" y1="19.4" x2="6" y2="18" />
+      <line x1="18" y1="6" x2="19.4" y2="4.6" />
+    </g>
+  </svg>
+</button>

@@ -1,0 +1,227 @@
+<header class="inicio-header mb-4">
+  <div class="saludo">
+    <p class="text-secondary-sano mb-1 capitalize">{{ now() | date: "EEEE, d 'de' MMMM" }}</p>
+    <h1 class="fs-2xl mb-0 saludo-titulo">
+      <span>{{ greetingTitle() }}</span>
+      <!-- Ícono según la hora; @switch lo vuelve a crear al cambiar, así se anima otra vez -->
+      @switch (greeting().icon) {
+        @case ('morning') {
+          <svg class="saludo-icono morning" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="4.5" fill="currentColor" />
+            <g stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <line x1="12" y1="1.5" x2="12" y2="3.5" />
+              <line x1="12" y1="20.5" x2="12" y2="22.5" />
+              <line x1="1.5" y1="12" x2="3.5" y2="12" />
+              <line x1="20.5" y1="12" x2="22.5" y2="12" />
+              <line x1="4.6" y1="4.6" x2="6" y2="6" />
+              <line x1="18" y1="18" x2="19.4" y2="19.4" />
+              <line x1="4.6" y1="19.4" x2="6" y2="18" />
+              <line x1="18" y1="6" x2="19.4" y2="4.6" />
+            </g>
+          </svg>
+        }
+        @case ('afternoon') {
+          <svg class="saludo-icono afternoon" viewBox="0 0 24 24" aria-hidden="true">
+            <!-- Sol detrás (naranja) y nube delante (gris) -->
+            <g class="sol">
+              <circle cx="9" cy="9" r="3.6" fill="currentColor" />
+              <g stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                <line x1="9" y1="1.5" x2="9" y2="3" />
+                <line x1="1.5" y1="9" x2="3" y2="9" />
+                <line x1="3.7" y1="3.7" x2="4.8" y2="4.8" />
+                <line x1="14.3" y1="3.7" x2="13.2" y2="4.8" />
+              </g>
+            </g>
+            <path class="nube" d="M7.5 20h10a4 4 0 0 0 .5-7.97A5.5 5.5 0 0 0 7.4 13.6 3.2 3.2 0 0 0 7.5 20Z" fill="currentColor" />
+          </svg>
+        }
+        @case ('night') {
+          <svg class="saludo-icono night" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M19.5 14.5A8 8 0 0 1 9.5 4.5a8 8 0 1 0 10 10Z" fill="currentColor" />
+            <path class="estrella" d="M18 2.5l.7 1.6 1.6.7-1.6.7-.7 1.6-.7-1.6-1.6-.7 1.6-.7Z" fill="currentColor" />
+          </svg>
+        }
+      }
+    </h1>
+  </div>
+  <div class="inicio-acciones">
+    <!-- En escritorio el botón de tema está en la barra lateral; aquí solo en celular -->
+    <app-theme-toggle class="solo-movil" />
+    <app-reminders-bell />
+  </div>
+</header>
+
+<div class="row g-3">
+  <!-- Calorías del día -->
+  <div class="col-12 lg:col-7">
+    <section class="sano-card sano-card-lime card-calorias">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <h2 class="fs-lg mb-0">Calorías de hoy</h2>
+        <span class="chip"><i class="bi bi-fire"></i> {{ percent() }}%</span>
+      </div>
+
+      <div class="calorias-body">
+        <app-calorie-ring [value]="nutrition.consumedKcal()" [max]="nutrition.calorieGoal()">
+          <span class="fs-3xl fw-bold lh-1">{{ nutrition.remainingKcal() | number }}</span>
+          <span class="fs-sm">kcal restantes</span>
+        </app-calorie-ring>
+
+        <div class="calorias-resumen">
+          <div>
+            <p class="fs-sm mb-0">Consumidas</p>
+            <p class="fs-lg fw-bold mb-0">{{ nutrition.consumedKcal() | number }}</p>
+          </div>
+          <div>
+            <p class="fs-sm mb-0">Quemadas</p>
+            <p class="fs-lg fw-bold mb-0">{{ nutrition.burnedKcal() | number }}</p>
+          </div>
+          <div>
+            <p class="fs-sm mb-0">Meta</p>
+            <p class="fs-lg fw-bold mb-0">{{ nutrition.calorieGoal() | number }}</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Macros -->
+  <div class="col-12 lg:col-5">
+    <section class="sano-card card-macros">
+      <h2 class="fs-lg mb-3">Macronutrientes</h2>
+
+      @for (m of macros(); track m.label) {
+        <div class="macro">
+          <div class="d-flex justify-content-between fs-sm mb-1">
+            <span class="fw-semibold">{{ m.label }}</span>
+            <span class="text-secondary-sano">{{ m.done }} / {{ m.goal }} g</span>
+          </div>
+          <div class="sano-progress"><span [style.width.%]="m.pct"></span></div>
+        </div>
+      }
+    </section>
+  </div>
+
+  <!-- Agua -->
+  <div class="col-6 lg:col-4">
+    <section class="sano-card bg-blue-soft card-mini">
+      <div class="mini-top">
+        <i class="bi bi-droplet-fill mini-icon"></i>
+        <div class="mini-actions">
+          <button type="button" class="mini-btn" aria-label="Quitar 250 ml de agua" (click)="addWater(-250)">
+            <i class="bi bi-dash-lg"></i>
+          </button>
+          <button
+            type="button"
+            class="mini-btn"
+            aria-label="Agregar 250 ml de agua"
+            [disabled]="waterAtMax()"
+            [attr.title]="waterAtMax() ? 'Llegaste al máximo de 6 L' : null"
+            (click)="addWater(250)"
+          >
+            <i class="bi bi-plus-lg"></i>
+          </button>
+        </div>
+      </div>
+      <div class="agua-cuerpo">
+        <div>
+          <p class="fs-sm text-secondary-sano mb-0">Agua</p>
+          <p class="fs-xl fw-bold mb-0">{{ nutrition.waterMl() / 1000 | number: '1.1-2' }} L</p>
+        </div>
+        <app-water-glass [percent]="waterPct()" />
+      </div>
+      <!-- Debajo y a todo el ancho: en celulares angostos no cabe al lado del vaso -->
+      @if (waterDone()) {
+        <p class="meta-ok mb-0" title="Meta cumplida"><i class="bi bi-check-circle-fill"></i> Cumplida</p>
+      } @else {
+        <p class="fs-sm text-secondary-sano mb-0">de {{ nutrition.waterGoalMl / 1000 | number: '1.1-1' }} L</p>
+      }
+    </section>
+  </div>
+
+  <!-- Pasos -->
+  <div class="col-6 lg:col-4">
+    <section class="sano-card bg-orange-soft card-mini">
+      <div class="mini-top">
+        <i class="bi bi-person-walking mini-icon"></i>
+        <div class="mini-actions">
+          <button type="button" class="mini-btn" aria-label="Quitar 1.000 pasos" (click)="addSteps(-1000)">
+            <i class="bi bi-dash-lg"></i>
+          </button>
+          <button
+            type="button"
+            class="mini-btn"
+            aria-label="Agregar 1.000 pasos"
+            [disabled]="stepsAtMax()"
+            [attr.title]="stepsAtMax() ? 'Llegaste al máximo de 60.000 pasos' : null"
+            (click)="addSteps(1000)"
+          >
+            <i class="bi bi-plus-lg"></i>
+          </button>
+        </div>
+      </div>
+      <p class="fs-sm text-secondary-sano mb-0">Pasos</p>
+      <p class="fs-xl fw-bold mb-0">{{ nutrition.steps() | number }}</p>
+      @if (stepsDone()) {
+        <p class="meta-ok mb-2" title="Meta cumplida"><i class="bi bi-check-circle-fill"></i> Cumplida</p>
+      } @else {
+        <p class="fs-sm text-secondary-sano mb-2">de {{ nutrition.stepsGoal | number }}</p>
+      }
+      <div class="sano-progress progress-pasos"><span [style.width.%]="stepsPct()"></span></div>
+    </section>
+  </div>
+
+  <!-- Peso -->
+  <div class="col-12 lg:col-4">
+    <section class="sano-card sano-card-dark card-mini">
+      <i class="bi bi-speedometer2 mini-icon"></i>
+      <p class="fs-sm mb-0 opacity-75">Peso actual</p>
+      <p class="fs-xl fw-bold mb-0">{{ nutrition.currentWeight() | number: '1.1-1' }} kg</p>
+      @if (nutrition.weightHistory().length >= 2) {
+        @let cambio = nutrition.weightChange();
+        <p class="fs-sm mb-0 peso-cambio">
+          <i class="bi" [class.bi-arrow-down-right]="cambio <= 0" [class.bi-arrow-up-right]="cambio > 0"></i>
+          {{ (cambio < 0 ? -cambio : cambio) | number: '1.1-1' }} kg esta semana
+        </p>
+      } @else {
+        <a routerLink="/progreso" class="fs-sm mb-0 peso-cambio link-sano">Registra tu peso</a>
+      }
+    </section>
+  </div>
+
+  <!-- Consejo del día -->
+  <div class="col-12">
+    <!-- Recibe la hora de Inicio: al pasar la medianoche cambia solo al consejo del nuevo día -->
+    <app-daily-tip [date]="now()" />
+  </div>
+
+  <!-- Comidas del día -->
+  <div class="col-12">
+    <section class="sano-card">
+      <div class="d-flex align-items-center justify-content-between mb-2">
+        <h2 class="fs-lg mb-0">Comidas de hoy</h2>
+        <a routerLink="/diario" class="link-sano fs-sm">Ver diario <i class="bi bi-chevron-right"></i></a>
+      </div>
+
+      <ul class="list-unstyled mb-0">
+        @for (meal of nutrition.meals; track meal.type) {
+          <li class="comida">
+            <span class="comida-icon {{ meal.colorClass }}"><i class="bi {{ meal.icon }}"></i></span>
+            <div class="flex-grow-1 min-w-0">
+              <p class="fw-semibold mb-0">{{ meal.label }}</p>
+              <p class="fs-sm text-secondary-sano mb-0 text-truncate">{{ summary(meal.type) }}</p>
+            </div>
+            <span class="kcal-pill">{{ nutrition.kcalFor(meal.type) | number }} kcal</span>
+            <a
+              routerLink="/diario"
+              [queryParams]="{ comida: meal.type }"
+              class="icon-btn"
+              [attr.aria-label]="'Agregar a ' + meal.label"
+            >
+              <i class="bi bi-plus-lg"></i>
+            </a>
+          </li>
+        }
+      </ul>
+    </section>
+  </div>
+</div>

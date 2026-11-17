@@ -1,0 +1,118 @@
+/* ---------- Consejo del día ---------- */
+.card-consejo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+// Ícono en un círculo de color suave según la categoría
+.consejo-icono {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  font-size: 1.3rem;
+  animation: consejo-in 0.35s ease-out;
+}
+
+.consejo-agua {
+  background: var(--sano-blue-soft);
+  color: var(--sano-blue);
+}
+
+.consejo-comida {
+  background: var(--sano-lime-soft);
+  color: var(--sano-lime-ink);
+}
+
+.consejo-movimiento {
+  background: var(--sano-orange-soft);
+  color: var(--sano-orange-ink);
+}
+
+// Descanso: mezcla suave de azul y naranja (atardecer), hecha solo con tokens
+.consejo-descanso {
+  background: color-mix(in srgb, var(--sano-blue-soft) 55%, var(--sano-orange-soft));
+  color: var(--sano-blue);
+}
+
+.consejo-cuerpo {
+  flex: 1;
+  min-width: 0;
+}
+
+.consejo-texto {
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.consejo-anim {
+  display: inline-block;
+  animation: consejo-in 0.35s ease-out;
+}
+
+// Botón de texto: "Otro consejo"
+.btn-otro-consejo {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: 0;
+  border-radius: 999px;
+  padding: 0.45rem 0.9rem;
+  background: none;
+  color: var(--sano-ink);
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background: var(--sano-lime-soft);
+    color: var(--sano-lime-ink);
+  }
+
+  &:hover i {
+    transform: rotate(180deg);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--sano-lime-strong);
+    outline-offset: 2px;
+  }
+
+  i {
+    transition: transform 0.4s ease;
+  }
+}
+
+@keyframes consejo-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+// En celular el botón baja debajo del texto, alineado a la derecha
+@media (max-width: 575.98px) {
+  .card-consejo {
+    flex-wrap: wrap;
+  }
+
+  .btn-otro-consejo {
+    margin-left: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .consejo-icono,
+  .consejo-anim {
+    animation: none;
+  }
+
+  .btn-otro-consejo i {
+    transition: none;
+  }
+}

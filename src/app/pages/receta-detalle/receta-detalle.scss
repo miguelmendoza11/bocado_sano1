@@ -1,0 +1,257 @@
+.detalle-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
+  .icon-btn {
+    flex-shrink: 0;
+    text-decoration: none;
+  }
+}
+
+/* El corazón no se encoge aunque el nombre sea largo */
+.detalle-fav {
+  flex-shrink: 0;
+}
+
+.min-w-0 {
+  min-width: 0;
+}
+
+.detalle-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* ---------- Imagen y datos ---------- */
+/* Foto grande: recuadro 4:3. El fondo de color se ve mientras carga o detrás del emoji. */
+.detalle-media {
+  position: relative; /* necesario para <img fill> */
+  display: grid;
+  place-items: center;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: calc(var(--sano-radius) - 8px);
+}
+
+.detalle-foto {
+  object-fit: cover;
+}
+
+/* En oscuro, un borde sutil para que la foto no se pegue al fondo */
+:host-context([data-bs-theme='dark']) .detalle-media::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--sano-border);
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.detalle-emoji {
+  font-size: 5rem;
+  line-height: 1;
+}
+
+.detalle-datos {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+}
+
+.detalle-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+/* ---------- Macros ---------- */
+.macros-body {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.macros-lista {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.bar-protein > span {
+  background: var(--sano-lime-strong);
+}
+
+.bar-carbs > span {
+  background: var(--sano-orange);
+}
+
+.bar-fat > span {
+  background: var(--sano-blue);
+}
+
+/* ---------- Agregar al diario ---------- */
+.agregar-card {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem 1.5rem;
+}
+
+/* Título arriba; debajo, los controles a la izquierda y la acción a la derecha */
+.agregar-texto {
+  flex: 1 1 100%;
+}
+
+.agregar-controles {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1rem;
+}
+
+.comidas-tabs {
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.tab {
+  flex: 1 0 auto;
+  border: 0;
+  border-radius: 999px;
+  padding: 0.35rem 0.75rem;
+  background: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--sano-muted);
+  cursor: pointer;
+
+  &.active {
+    background: var(--sano-lime);
+    color: var(--sano-on-lime);
+  }
+}
+
+.porciones {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+
+  .icon-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+.porciones-num {
+  min-width: 1.5rem;
+  text-align: center;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.agregar-accion {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-left: auto;
+}
+
+/* ---------- Ingredientes ---------- */
+.ingredientes li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  padding: 0.6rem 0;
+
+  & + li {
+    border-top: 1px solid var(--sano-border);
+  }
+
+  i {
+    color: var(--sano-lime-strong);
+    margin-top: 0.1rem;
+  }
+}
+
+/* ---------- Pasos ---------- */
+.pasos {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+
+  li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.85rem;
+  }
+}
+
+.paso-num {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: 50%;
+  background: var(--sano-gradient-orange);
+  color: var(--sano-on-orange);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+/* ---------- No encontrada ---------- */
+.no-encontrada {
+  padding: 2.5rem 1.25rem;
+}
+
+/* Ícono de "no encontrada": del mismo alto que el emoji que había (5rem) */
+.no-encontrada-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 5rem;
+  height: 5rem;
+  border-radius: 50%;
+  background: var(--sano-orange-soft);
+  color: var(--sano-orange-ink);
+
+  svg {
+    width: 2.9rem;
+    height: 2.9rem;
+  }
+}
+
+/* En celular el anillo va arriba y las barras debajo */
+@media (max-width: 479.98px) {
+  .macros-body {
+    flex-direction: column;
+    align-items: stretch;
+
+    app-calorie-ring {
+      align-self: center;
+    }
+  }
+
+  /* El panel de agregar ocupa todo el ancho y el botón se estira */
+  .agregar-controles,
+  .agregar-accion,
+  .comidas-tabs {
+    width: 100%;
+  }
+
+  .agregar-accion .btn {
+    flex: 1;
+  }
+
+  /* Que las 4 comidas quepan sin cortarse en pantallas angostas */
+  .tab {
+    padding: 0.35rem 0.45rem;
+    font-size: 0.8rem;
+  }
+}
