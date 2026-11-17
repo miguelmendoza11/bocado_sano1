@@ -233,7 +233,7 @@ feature/*         ●──●    ●──●                ●──●
   (por ejemplo `feature/pagina-diario`, `feature/modo-oscuro`, `fix/validar-login`).
 - **Pull Requests**: cada rama vuelve a `Develop` con un PR revisado y aprobado por **otro
   integrante**, unido con *"Create a merge commit"* para conservar el historial. En total,
-  **22 Pull Requests**.
+  **25 Pull Requests** hacia `Develop`, más el de la versión final hacia `main`.
 - **Commits** pequeños y en inglés con la convención `feat:`, `fix:`, `style:`, `refactor:`,
   `test:` y `docs:`.
 - **Plantilla de PR**: título, tipo (Feature / Bug / Hotfix), desarrollador, cambios por archivo
@@ -249,7 +249,7 @@ git log --graph --oneline --all
 
 | Integrante | GitHub | Aportes principales |
 | --- | --- | --- |
-| **Miguel Angel Mendoza** | [@miguelmendoza11](https://github.com/miguelmendoza11) | Base del proyecto, rutas y layout · Pantalla de **Inicio** · **Diario** · **Modo oscuro** · Guardado de datos por usuario y cambio de día · Cuentas nuevas sin datos · **Vaso de agua animado y confeti** · Favicon |
+| **Miguel Angel Mendoza** | [@miguelmendoza11](https://github.com/miguelmendoza11) | Base del proyecto, rutas y layout · Pantalla de **Inicio** · **Diario** · **Modo oscuro** · Guardado de datos por usuario y cambio de día · Cuentas nuevas sin datos · **Vaso de agua animado y confeti** · Favicon · README · Comunicación hijo → padre con `output()` en favoritas |
 | **Juan Montezuma** | [@JuanMontezuma](https://github.com/JuanMontezuma) | **Bienvenida, login y registro** · Servicio de autenticación y guards · **Perfil** · **Avisos (toasts)** · **Campana de recordatorios** · Validación de cuenta y contraseña · **Saludo según la hora y consejo del día** |
 | **Juan Sebastián** | [@Juanse1809](https://github.com/Juanse1809) | **Recetas** y su detalle · **Progreso** con gráficas · **Agregar recetas al diario** · **Fotos de las recetas** · **Favoritas** · Mejoras del detalle de receta |
 
@@ -280,6 +280,9 @@ git log --graph --oneline --all
 | 20 | `feature/recetas-favoritas` | Juan Sebastián |
 | 21 | `fix/detalle-receta` | Juan Sebastián |
 | 22 | `feature/favicon-marca` | Miguel |
+| 23 | `docs/readme` | Miguel |
+| 24 | `feature/favorito-output` | Miguel |
+| 25 | `docs/readme-prs` | Miguel |
 
 </details>
 
