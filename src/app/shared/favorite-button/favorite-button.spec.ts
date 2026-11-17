@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FavoritesService } from '../../core/services/favorites.service';
 import { ToastService } from '../../core/services/toast.service';
-import { FavoriteButton } from './favorite-button';
+import { FavoriteButton, FavoriteChange } from './favorite-button';
 
 describe('FavoriteButton', () => {
   let fixture: ComponentFixture<FavoriteButton>;
@@ -52,15 +52,25 @@ describe('FavoriteButton', () => {
     expect(button.getAttribute('aria-pressed')).toBe('false');
   });
 
-  it('shows a toast when adding and when removing', async () => {
+  it('emits favoriteChange to the parent when adding and when removing', async () => {
+    const emitted: FavoriteChange[] = [];
+    fixture.componentInstance.favoriteChange.subscribe((change) => emitted.push(change));
+
+    await click();
+    await click();
+    expect(emitted).toEqual([
+      { recipeId: 3, favorite: true },
+      { recipeId: 3, favorite: false },
+    ]);
+  });
+
+  it('does not show a toast by itself (the parent decides)', async () => {
     const success = vi.spyOn(toast, 'success');
     const info = vi.spyOn(toast, 'info');
-
     await click();
-    expect(success).toHaveBeenCalledWith('Agregada a favoritas');
-
     await click();
-    expect(info).toHaveBeenCalledWith('Quitada de favoritas');
+    expect(success).not.toHaveBeenCalled();
+    expect(info).not.toHaveBeenCalled();
   });
 
   it('pops only when adding and stops when the animation ends', async () => {

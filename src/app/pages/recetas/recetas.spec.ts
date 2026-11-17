@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 import { FavoritesService } from '../../core/services/favorites.service';
+import { ToastService } from '../../core/services/toast.service';
 import { Recetas } from './recetas';
 
 describe('Recetas', () => {
@@ -207,6 +208,30 @@ describe('Recetas', () => {
 
       expect(cards().length).toBe(0);
       expect(el.querySelector('.sin-favoritas')).not.toBeNull();
+    });
+
+    it('should show a toast with the recipe name when the heart emits favoriteChange', () => {
+      const { fixture, hearts } = setupFavs();
+      const toasts = TestBed.inject(ToastService);
+      // El corazón (hijo) emite favoriteChange y la página (padre) muestra el aviso
+
+      hearts()[2].click();
+      fixture.detectChanges();
+      expect(toasts.toasts().at(-1)).toEqual(
+        expect.objectContaining({
+          message: 'Ensalada de quinoa y aguacate agregada a favoritas',
+          type: 'success',
+        }),
+      );
+
+      hearts()[2].click();
+      fixture.detectChanges();
+      expect(toasts.toasts().at(-1)).toEqual(
+        expect.objectContaining({
+          message: 'Ensalada de quinoa y aguacate quitada de favoritas',
+          type: 'info',
+        }),
+      );
     });
 
     it('should go back to all recipes with "Ver todas"', () => {

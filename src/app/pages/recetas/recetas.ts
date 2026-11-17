@@ -4,7 +4,8 @@ import { RouterLink } from '@angular/router';
 import { RecipeCategoryFilter } from '../../core/models/recipe.models';
 import { FavoritesService } from '../../core/services/favorites.service';
 import { RecipeService } from '../../core/services/recipe.service';
-import { FavoriteButton } from '../../shared/favorite-button/favorite-button';
+import { ToastService } from '../../core/services/toast.service';
+import { FavoriteButton, FavoriteChange, favoriteMessage } from '../../shared/favorite-button/favorite-button';
 
 /** Pestaña elegida: una categoría (o todas) o solo las favoritas. */
 export type RecipeListFilter = RecipeCategoryFilter | 'favoritas';
@@ -18,6 +19,7 @@ export type RecipeListFilter = RecipeCategoryFilter | 'favoritas';
 export class Recetas {
   private readonly recipeService = inject(RecipeService);
   protected readonly favorites = inject(FavoritesService);
+  private readonly toast = inject(ToastService);
 
   /** Pestañas del filtro por categoría. */
   protected readonly categories: { value: RecipeCategoryFilter; label: string }[] = [
@@ -78,5 +80,15 @@ export class Recetas {
   protected clearFilters(): void {
     this.search.set('');
     this.category.set('todas');
+  }
+
+  /** Escucha el output del corazón (hijo → padre) y avisa con el nombre de la receta. */
+  protected onFavoriteChange(recipeName: string, change: FavoriteChange): void {
+    const message = favoriteMessage(recipeName, change.favorite);
+    if (change.favorite) {
+      this.toast.success(message);
+    } else {
+      this.toast.info(message);
+    }
   }
 }
