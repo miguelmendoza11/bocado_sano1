@@ -97,6 +97,7 @@
           overlay
           [recipeId]="recipe.id"
           [describedBy]="'receta-nombre-' + recipe.id"
+          (favoriteChange)="onFavoriteChange(recipe.name, $event)"
         />
       </div>
     </div>

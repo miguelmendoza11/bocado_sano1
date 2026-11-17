@@ -6,7 +6,7 @@ import { NutritionService } from '../../core/services/nutrition.service';
 import { RecipeService } from '../../core/services/recipe.service';
 import { ToastService } from '../../core/services/toast.service';
 import { CalorieRing } from '../../shared/calorie-ring/calorie-ring';
-import { FavoriteButton } from '../../shared/favorite-button/favorite-button';
+import { FavoriteButton, FavoriteChange, favoriteMessage } from '../../shared/favorite-button/favorite-button';
 
 @Component({
   selector: 'app-receta-detalle',
@@ -87,4 +87,14 @@ export class RecetaDetalle {
       { label: 'Grasas', grams: r.macros.fat, goal: goal.fat, colorClass: 'bar-fat' },
     ].map((m) => ({ ...m, pct: Math.min((m.grams / m.goal) * 100, 100) }));
   });
+
+  /** Escucha el output del corazón (hijo → padre) y avisa con el nombre de la receta. */
+  protected onFavoriteChange(recipeName: string, change: FavoriteChange): void {
+    const message = favoriteMessage(recipeName, change.favorite);
+    if (change.favorite) {
+      this.toast.success(message);
+    } else {
+      this.toast.info(message);
+    }
+  }
 }

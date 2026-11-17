@@ -8,7 +8,12 @@
       <h1 id="detalle-titulo" class="fs-2xl mb-0">{{ r.name }}</h1>
     </div>
     <!-- Corazón junto al título (fuera de cualquier enlace) -->
-    <app-favorite-button class="detalle-fav" [recipeId]="r.id" describedBy="detalle-titulo" />
+    <app-favorite-button
+      class="detalle-fav"
+      [recipeId]="r.id"
+      describedBy="detalle-titulo"
+      (favoriteChange)="onFavoriteChange(r.name, $event)"
+    />
   </header>
 
   <div class="row g-3">
