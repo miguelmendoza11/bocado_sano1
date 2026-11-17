@@ -273,6 +273,33 @@ describe('RecetaDetalle', () => {
       expect(heart().getAttribute('aria-pressed')).toBe('true');
     });
 
+    it('should show a toast with the recipe name when the heart emits favoriteChange', () => {
+      const fixture = TestBed.createComponent(RecetaDetalle);
+      fixture.componentRef.setInput('id', '5');
+      fixture.detectChanges();
+      const toasts = TestBed.inject(ToastService);
+      const heart = () =>
+        fixture.nativeElement.querySelector('.detalle-fav button') as HTMLButtonElement;
+
+      heart().click();
+      fixture.detectChanges();
+      expect(toasts.toasts().at(-1)).toEqual(
+        expect.objectContaining({
+          message: 'Salmón al horno con verduras agregada a favoritas',
+          type: 'success',
+        }),
+      );
+
+      heart().click();
+      fixture.detectChanges();
+      expect(toasts.toasts().at(-1)).toEqual(
+        expect.objectContaining({
+          message: 'Salmón al horno con verduras quitada de favoritas',
+          type: 'info',
+        }),
+      );
+    });
+
     it('should show it already filled if it was marked before', () => {
       TestBed.inject(FavoritesService).toggle(2);
       const heart = create('2').querySelector('.detalle-fav button')!;
