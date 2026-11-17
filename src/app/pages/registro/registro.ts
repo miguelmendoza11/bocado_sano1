@@ -1,4 +1,5 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   AbstractControl,
   NonNullableFormBuilder,
@@ -43,14 +44,33 @@ export class Registro {
     { validators: passwordsMatch },
   );
 
+  /** true si el correo ya tiene cuenta (se borra al volver a escribir). */
+  protected readonly emailTaken = signal(false);
+
+  /** true mientras se crea la cuenta: el botón se desactiva para evitar doble clic. */
+  protected readonly submitting = signal(false);
+
+  constructor() {
+    this.form.valueChanges.pipe(takeUntilDestroyed()).subscribe(() => this.emailTaken.set(false));
+  }
+
   async onSubmit(): Promise<void> {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
+    if (this.submitting()) return;
+
+    this.submitting.set(true);
     const { name, email, password } = this.form.getRawValue();
     // Crea la cuenta (con la contraseña protegida con hash) y deja la sesión iniciada
-    await this.auth.register(name, email, password);
+    const result = await this.auth.register(name, email, password);
+    this.submitting.set(false);
+
+    if (!result.ok) {
+      this.emailTaken.set(true);
+      return;
+    }
     this.nutrition.updateProfile({ name: name.trim() });
     this.toast.success(`Cuenta creada. ¡Bienvenido, ${name.trim()}!`);
     this.router.navigate(['/inicio']);

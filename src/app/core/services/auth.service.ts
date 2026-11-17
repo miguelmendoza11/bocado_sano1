@@ -65,12 +65,18 @@ export class AuthService {
   readonly user = this._user.asReadonly();
   readonly isLoggedIn = computed(() => this._user() !== null);
 
-  /** Crea la cuenta con la contraseña protegida con hash e inicia sesión. */
+  /**
+   * Crea la cuenta con la contraseña protegida con hash e inicia sesión.
+   * Si ese correo ya tiene cuenta NO cambia nada ni entra (antes le cambiaba el nombre).
+   */
   async register(name: string, email: string, password: string): Promise<RegisterResult> {
     const user = { name: name.trim(), email: normalize(email) };
+    if (this.readAccounts()[user.email]) return { ok: false, error: 'email-taken' };
+
     const salt = newSalt();
     const passwordHash = await hashPassword(password, salt);
 
+    // Se vuelve a leer después del await, por si algo cambió mientras se calculaba el hash
     const accounts = this.readAccounts();
     accounts[user.email] = { name: user.name, salt, passwordHash };
     writeStorage(USERS_KEY, accounts);

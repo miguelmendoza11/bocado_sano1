@@ -90,6 +90,22 @@ describe('AuthService', () => {
     expect(service.user()?.name).toBe('Juan Carlos');
   });
 
+  it('does not change anything when the email is already registered', async () => {
+    await service.register('Juan', 'juan@mail.com', 'secreto123');
+    service.logout();
+    const before = localStorage.getItem('bocado-sano.users');
+
+    expect(await service.register('Otro', ' JUAN@mail.com ', 'otra-clave')).toEqual({
+      ok: false,
+      error: 'email-taken',
+    });
+    expect(localStorage.getItem('bocado-sano.users')).toBe(before);
+    expect(service.isLoggedIn()).toBe(false);
+    // La contraseña de siempre sigue funcionando
+    expect(await service.login('juan@mail.com', 'secreto123')).toEqual({ ok: true });
+    expect(service.user()?.name).toBe('Juan');
+  });
+
   it('restores the session after a reload', async () => {
     await service.register('Ana', 'ana@mail.com', 'secreto123');
     TestBed.resetTestingModule();

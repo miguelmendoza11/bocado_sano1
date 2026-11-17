@@ -56,12 +56,12 @@
       </button>
 
       @if (error(); as e) {
-        <div class="login-error mt-3" role="alert">
+        <div class="form-error mt-3" role="alert">
           <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
           @if (e === 'not-found') {
             <span>
               No encontramos una cuenta con ese correo.
-              <a routerLink="/registro" class="login-error-link">Crear cuenta</a>
+              <a routerLink="/registro" class="form-error-link">Crear cuenta</a>
             </span>
           } @else {
             <span>La contraseña no es correcta.</span>
