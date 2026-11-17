@@ -2,8 +2,12 @@ import { NgOptimizedImage, TitleCasePipe } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { RecipeCategoryFilter } from '../../core/models/recipe.models';
+import { FavoritesService } from '../../core/services/favorites.service';
 import { RecipeService } from '../../core/services/recipe.service';
 import { FavoriteButton } from '../../shared/favorite-button/favorite-button';
+
+/** Pestaña elegida: una categoría (o todas) o solo las favoritas. */
+export type RecipeListFilter = RecipeCategoryFilter | 'favoritas';
 
 @Component({
   selector: 'app-recetas',
@@ -13,6 +17,7 @@ import { FavoriteButton } from '../../shared/favorite-button/favorite-button';
 })
 export class Recetas {
   private readonly recipeService = inject(RecipeService);
+  protected readonly favorites = inject(FavoritesService);
 
   /** Pestañas del filtro por categoría. */
   protected readonly categories: { value: RecipeCategoryFilter; label: string }[] = [
@@ -27,11 +32,27 @@ export class Recetas {
   protected readonly search = signal('');
 
   /** Pestaña elegida. */
-  protected readonly category = signal<RecipeCategoryFilter>('todas');
+  protected readonly category = signal<RecipeListFilter>('todas');
 
-  /** Recetas visibles: se recalcula sola cuando cambia search o category. */
-  protected readonly filtered = computed(() =>
-    this.recipeService.filter(this.search(), this.category()),
+  /** ¿Está elegida la pestaña "Favoritas"? */
+  protected readonly showFavorites = computed(() => this.category() === 'favoritas');
+
+  /**
+   * Recetas visibles: se recalcula sola cuando cambia el texto, la pestaña
+   * o las favoritas (si quitas una estando en "Favoritas", desaparece al instante).
+   */
+  protected readonly filtered = computed(() => {
+    const category = this.category();
+    if (category !== 'favoritas') {
+      return this.recipeService.filter(this.search(), category);
+    }
+    const ids = this.favorites.ids();
+    return this.recipeService.filter(this.search(), 'todas').filter((r) => ids.has(r.id));
+  });
+
+  /** Estado vacío especial: en "Favoritas" sin ninguna favorita guardada. */
+  protected readonly noFavoritesYet = computed(
+    () => this.showFavorites() && this.favorites.count() === 0,
   );
 
   /**

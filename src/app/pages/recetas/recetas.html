@@ -27,6 +27,23 @@
       >
         {{ c.label }}
       </button>
+
+      <!-- "Favoritas" va justo después de "Todas" -->
+      @if ($first) {
+        <button
+          type="button"
+          class="tab tab-fav"
+          [class.active]="showFavorites()"
+          [attr.aria-pressed]="showFavorites()"
+          (click)="category.set('favoritas')"
+        >
+          <i class="bi bi-heart-fill" aria-hidden="true"></i>
+          Favoritas
+          @if (favorites.count() > 0) {
+            <span class="tab-count">({{ favorites.count() }})</span>
+          }
+        </button>
+      }
     }
   </div>
 </div>
@@ -85,12 +102,22 @@
     </div>
   } @empty {
     <div class="col-12">
-      <div class="sano-card text-center sin-resultados">
-        <i class="bi bi-search fs-3xl text-secondary-sano"></i>
-        <p class="fw-semibold mb-1 mt-2">No encontramos recetas</p>
-        <p class="fs-sm text-secondary-sano mb-3">Prueba con otra palabra u otra categoría.</p>
-        <button type="button" class="btn btn-solid theme-warning sano-btn-orange" (click)="clearFilters()">Ver todas</button>
-      </div>
+      @if (noFavoritesYet()) {
+        <!-- En "Favoritas" sin ninguna guardada -->
+        <div class="sano-card text-center sin-resultados sin-favoritas">
+          <span class="sin-favoritas-icon" aria-hidden="true"><i class="bi bi-heart"></i></span>
+          <p class="fw-semibold mb-1 mt-3">Aún no tienes favoritas</p>
+          <p class="fs-sm text-secondary-sano mb-3">Toca el corazón en una receta para guardarla aquí.</p>
+          <button type="button" class="btn btn-solid theme-warning sano-btn-orange" (click)="clearFilters()">Ver todas</button>
+        </div>
+      } @else {
+        <div class="sano-card text-center sin-resultados">
+          <i class="bi bi-search fs-3xl text-secondary-sano"></i>
+          <p class="fw-semibold mb-1 mt-2">No encontramos recetas</p>
+          <p class="fs-sm text-secondary-sano mb-3">Prueba con otra palabra u otra categoría.</p>
+          <button type="button" class="btn btn-solid theme-warning sano-btn-orange" (click)="clearFilters()">Ver todas</button>
+        </div>
+      }
     </div>
   }
 </div>

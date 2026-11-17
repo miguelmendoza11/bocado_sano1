@@ -79,6 +79,34 @@
   padding: 2.5rem 1.25rem;
 }
 
+/* Pestaña "Favoritas": corazón rojo y el número un poco más suave */
+.tab-fav {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+
+  i {
+    color: var(--sano-danger);
+  }
+}
+
+.tab-count {
+  font-variant-numeric: tabular-nums;
+  opacity: 0.8;
+}
+
+/* Estado vacío de favoritas: corazón dentro de un círculo suave */
+.sin-favoritas-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--sano-danger) 14%, transparent);
+  color: var(--sano-danger);
+  font-size: 1.75rem;
+}
+
 /* ---------- Tarjetas ---------- */
 /*
  * .receta-tile contiene dos hermanos: el enlace (toda la tarjeta) y el corazón.
