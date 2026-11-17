@@ -1,7 +1,8 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { AuthService } from '../../core/services/auth.service';
+import { AuthService, LoginError } from '../../core/services/auth.service';
 import { NutritionService } from '../../core/services/nutrition.service';
 import { ToastService } from '../../core/services/toast.service';
 import { ThemeToggle } from '../../shared/theme-toggle/theme-toggle';
@@ -24,13 +25,34 @@ export class Login {
     password: ['', [Validators.required, Validators.minLength(6)]],
   });
 
-  onSubmit(): void {
+  /** Por qué falló el último intento (null = sin error). */
+  protected readonly error = signal<LoginError | null>(null);
+
+  /** true mientras se revisa la contraseña: el botón se desactiva para evitar doble clic. */
+  protected readonly submitting = signal(false);
+
+  constructor() {
+    // Al volver a escribir, el mensaje de error se borra
+    this.form.valueChanges.pipe(takeUntilDestroyed()).subscribe(() => this.error.set(null));
+  }
+
+  async onSubmit(): Promise<void> {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
-    // Guarda la sesión y pone el nombre del usuario en el perfil (Inicio lo saluda)
-    this.auth.login(this.form.controls.email.value);
+    if (this.submitting()) return;
+
+    this.submitting.set(true);
+    const { email, password } = this.form.getRawValue();
+    const result = await this.auth.login(email, password);
+    this.submitting.set(false);
+
+    if (!result.ok) {
+      this.error.set(result.error);
+      return;
+    }
+    // Pone el nombre del usuario en el perfil (Inicio lo saluda)
     const { name } = this.auth.user()!;
     this.nutrition.updateProfile({ name });
     this.toast.success(`¡Hola de nuevo, ${name}!`);

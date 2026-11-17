@@ -86,9 +86,23 @@
         }
       </div>
 
-      <button type="submit" class="btn btn-solid theme-warning sano-btn-orange w-100" [disabled]="form.invalid">
-        Crear cuenta
+      <button
+        type="submit"
+        class="btn btn-solid theme-warning sano-btn-orange w-100"
+        [disabled]="form.invalid || submitting()"
+      >
+        {{ submitting() ? 'Creando cuenta...' : 'Crear cuenta' }}
       </button>
+
+      @if (emailTaken()) {
+        <div class="form-error mt-3" role="alert">
+          <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
+          <span>
+            Ya existe una cuenta con ese correo.
+            <a routerLink="/login" class="form-error-link">Iniciar sesión</a>
+          </span>
+        </div>
+      }
     </form>
 
     <p class="text-center text-secondary-sano mt-4 mb-0">

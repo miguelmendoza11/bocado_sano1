@@ -26,7 +26,7 @@ describe('RemindersBell', () => {
       imports: [RemindersBell],
       providers: [provideRouter([]), { provide: LOCALE_ID, useValue: 'es' }],
     }).compileComponents();
-    TestBed.inject(AuthService).register('Ana', 'ana@correo.com');
+    await TestBed.inject(AuthService).register('Ana', 'ana@correo.com', 'secreto123');
     nutrition = TestBed.inject(NutritionService);
     reminders = TestBed.inject(RemindersService);
     TestBed.tick(); // carga los datos del usuario (vacíos: es nuevo)

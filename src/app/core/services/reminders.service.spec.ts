@@ -17,7 +17,7 @@ describe('RemindersService', () => {
   let nutrition: NutritionService;
   let auth: AuthService;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     // Solo se falsea Date: así "hoy" y la hora son siempre las mismas
     vi.useFakeTimers({ toFake: ['Date'] });
     vi.setSystemTime(at(9));
@@ -25,7 +25,7 @@ describe('RemindersService', () => {
 
     TestBed.configureTestingModule({ providers: [{ provide: LOCALE_ID, useValue: 'es' }] });
     auth = TestBed.inject(AuthService);
-    auth.register('Ana', 'ana@correo.com');
+    await auth.register('Ana', 'ana@correo.com', 'secreto123');
     nutrition = TestBed.inject(NutritionService);
     service = TestBed.inject(RemindersService);
     TestBed.tick(); // NutritionService carga los datos del usuario (vacíos: es nuevo)
@@ -136,14 +136,14 @@ describe('RemindersService', () => {
       expect(service.unreadCount()).toBe(1);
     });
 
-    it('keeps the read ones per user', () => {
+    it('keeps the read ones per user', async () => {
       service.markAsRead('agua');
 
-      auth.login('luis@correo.com');
+      await auth.register('Luis', 'luis@correo.com', 'secreto123');
       TestBed.tick();
       expect(service.isRead('agua')).toBe(false);
 
-      auth.login('ana@correo.com');
+      await auth.login('ana@correo.com', 'secreto123');
       TestBed.tick();
       expect(service.isRead('agua')).toBe(true);
     });

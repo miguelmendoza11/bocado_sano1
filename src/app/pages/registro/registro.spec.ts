@@ -46,28 +46,70 @@ describe('Registro', () => {
     expect((fixture.nativeElement as HTMLElement).textContent).toContain('Las contraseñas no coinciden.');
   });
 
-  it('should save the name and navigate to /inicio on submit', () => {
+  it('should save the name and navigate to /inicio on submit', async () => {
     const { component } = setup();
     const navigate = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
     const nutrition = TestBed.inject(NutritionService);
     component.form.setValue({ ...valid, name: '  Ana  ' });
-    component.onSubmit();
+    await component.onSubmit();
     expect(nutrition.profile().name).toBe('Ana');
     expect(navigate).toHaveBeenCalledWith(['/inicio']);
   });
 
-  it('should save the session with name and email', () => {
+  it('should save the session with name and email', async () => {
     const { component } = setup();
     vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
     component.form.setValue(valid);
-    component.onSubmit();
+    await component.onSubmit();
     expect(TestBed.inject(AuthService).user()).toEqual({ name: 'Ana', email: 'ana@correo.com' });
   });
 
-  it('should not navigate when the form is invalid', () => {
+  it('should not navigate when the form is invalid', async () => {
     const { component } = setup();
     const navigate = vi.spyOn(TestBed.inject(Router), 'navigate');
-    component.onSubmit();
+    await component.onSubmit();
     expect(navigate).not.toHaveBeenCalled();
+  });
+
+  // ---------- Correo ya registrado ----------
+
+  describe('email already registered', () => {
+    async function submitTwice() {
+      // Primera vez: Ana crea su cuenta y luego cierra sesión
+      const auth = TestBed.inject(AuthService);
+      await auth.register('Ana', 'ana@correo.com', '123456');
+      auth.logout();
+
+      const { fixture, component } = setup();
+      const navigate = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
+      component.form.setValue({ ...valid, name: 'Otra persona', password: 'abcdef', confirmPassword: 'abcdef' });
+      await component.onSubmit();
+      fixture.detectChanges();
+      const el = fixture.nativeElement as HTMLElement;
+      return { fixture, component, navigate, alert: () => el.querySelector('[role="alert"]') };
+    }
+
+    it('shows the message with a link to the login and does not enter', async () => {
+      const { alert, navigate } = await submitTwice();
+      expect(alert()?.textContent).toContain('Ya existe una cuenta con ese correo.');
+      expect(alert()?.querySelector('a')?.textContent?.trim()).toBe('Iniciar sesión');
+      expect(alert()?.querySelector('a')?.getAttribute('href')).toBe('/login');
+      expect(navigate).not.toHaveBeenCalled();
+      expect(TestBed.inject(AuthService).isLoggedIn()).toBe(false);
+    });
+
+    it('does not change the name of the existing account', async () => {
+      await submitTwice();
+      const users = JSON.parse(localStorage.getItem('bocado-sano.users')!);
+      expect(users['ana@correo.com'].name).toBe('Ana');
+      expect(TestBed.inject(NutritionService).profile().name).not.toBe('Otra persona');
+    });
+
+    it('clears the message when the user types again', async () => {
+      const { fixture, component, alert } = await submitTwice();
+      component.form.controls.email.setValue('otra@correo.com');
+      fixture.detectChanges();
+      expect(alert()).toBeNull();
+    });
   });
 });

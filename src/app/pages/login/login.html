@@ -47,9 +47,27 @@
         }
       </div>
 
-      <button type="submit" class="btn btn-solid theme-warning sano-btn-orange w-100" [disabled]="form.invalid">
-        Iniciar sesión
+      <button
+        type="submit"
+        class="btn btn-solid theme-warning sano-btn-orange w-100"
+        [disabled]="form.invalid || submitting()"
+      >
+        {{ submitting() ? 'Entrando...' : 'Iniciar sesión' }}
       </button>
+
+      @if (error(); as e) {
+        <div class="form-error mt-3" role="alert">
+          <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
+          @if (e === 'not-found') {
+            <span>
+              No encontramos una cuenta con ese correo.
+              <a routerLink="/registro" class="form-error-link">Crear cuenta</a>
+            </span>
+          } @else {
+            <span>La contraseña no es correcta.</span>
+          }
+        </div>
+      }
     </form>
 
     <p class="text-center text-secondary-sano mt-4 mb-0">
