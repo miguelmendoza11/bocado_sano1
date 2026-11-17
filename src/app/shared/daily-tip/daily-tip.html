@@ -1,0 +1,22 @@
+<section class="sano-card card-consejo" aria-labelledby="consejo-titulo">
+  <!-- Al cambiar de consejo se crea de nuevo este bloque, así la transición se repite -->
+  @for (t of [tip()]; track t.text) {
+    <span class="consejo-icono" [class]="'consejo-' + t.category" aria-hidden="true">
+      <i class="bi" [class]="t.icon"></i>
+    </span>
+  }
+
+  <div class="consejo-cuerpo">
+    <h2 id="consejo-titulo" class="fs-sm text-secondary-sano fw-semibold mb-1">Consejo del día</h2>
+    <!-- aria-live: el lector de pantalla lee el consejo nuevo al tocar "Otro consejo" -->
+    <p class="consejo-texto mb-0" aria-live="polite">
+      @for (t of [tip()]; track t.text) {
+        <span class="consejo-anim">{{ t.text }}</span>
+      }
+    </p>
+  </div>
+
+  <button type="button" class="btn-otro-consejo" (click)="nextTip()">
+    <i class="bi bi-arrow-repeat" aria-hidden="true"></i> Otro consejo
+  </button>
+</section>
