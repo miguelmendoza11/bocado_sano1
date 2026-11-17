@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { Router, provideRouter } from '@angular/router';
+import { FavoritesService } from '../../core/services/favorites.service';
 import { Recetas } from './recetas';
 
 describe('Recetas', () => {
@@ -105,5 +106,116 @@ describe('Recetas', () => {
     fixture.detectChanges();
     expect(cards()[0].querySelector('.receta-emoji')?.textContent).toBe('🥕');
     expect(cards()[1].querySelector('img.receta-foto')).not.toBeNull();
+  });
+
+  describe('favorites', () => {
+    beforeEach(() => localStorage.clear());
+    afterEach(() => localStorage.clear());
+
+    /** setup() + atajos para el corazón y la pestaña "Favoritas". */
+    function setupFavs(favoriteIds: number[] = []) {
+      const favorites = TestBed.inject(FavoritesService);
+      favoriteIds.forEach((id) => favorites.toggle(id));
+      const ui = setup();
+      const favTab = () => ui.el.querySelector<HTMLButtonElement>('.tab-fav')!;
+      const hearts = () => [...ui.el.querySelectorAll<HTMLButtonElement>('.receta-fav button')];
+      const openFavorites = () => {
+        favTab().click();
+        ui.fixture.detectChanges();
+      };
+      return { ...ui, favorites, favTab, hearts, openFavorites };
+    }
+
+    const clean = (text: string | null | undefined) => text?.replace(/\s+/g, ' ').trim();
+
+    it('should put one heart per card, outside the link', () => {
+      const { hearts, cards } = setupFavs();
+      expect(hearts().length).toBe(8);
+      expect(hearts().every((b) => b.closest('a') === null)).toBe(true);
+      // Cada corazón está junto a su tarjeta, dentro del mismo contenedor
+      expect(hearts()[0].closest('.receta-tile')!.contains(cards()[0])).toBe(true);
+    });
+
+    it('should not open the recipe when the heart is clicked', () => {
+      const { fixture, hearts, favorites } = setupFavs();
+      const navigate = vi.spyOn(TestBed.inject(Router), 'navigateByUrl');
+
+      hearts()[2].click();
+      fixture.detectChanges();
+
+      expect(navigate).not.toHaveBeenCalled();
+      expect(favorites.isFavorite(3)).toBe(true);
+      expect(hearts()[2].getAttribute('aria-pressed')).toBe('true');
+    });
+
+    it('should describe each heart with the name of its recipe', () => {
+      const { el, hearts } = setupFavs();
+      const id = hearts()[0].getAttribute('aria-describedby')!;
+      expect(el.querySelector('#' + id)?.textContent?.trim()).toBe('Pancakes de avena y banano');
+    });
+
+    it('should place the "Favoritas" tab right after "Todas"', () => {
+      const { el } = setupFavs();
+      const labels = [...el.querySelectorAll('.categorias .tab')].map((b) => clean(b.textContent));
+      expect(labels.slice(0, 3)).toEqual(['Todas', 'Favoritas', 'Desayuno']);
+    });
+
+    it('should show the counter only when there are favorites', () => {
+      const { fixture, favTab, favorites } = setupFavs();
+      expect(favTab().querySelector('.tab-count')).toBeNull();
+
+      favorites.toggle(5);
+      favorites.toggle(7);
+      fixture.detectChanges();
+      expect(clean(favTab().textContent)).toBe('Favoritas (2)');
+    });
+
+    it('should show only the favorites in the "Favoritas" tab', () => {
+      const { openFavorites, names, favTab, tab } = setupFavs([7, 5]);
+      openFavorites();
+      expect(names()).toEqual(['Salmón al horno con verduras', 'Hummus con bastones de zanahoria']);
+      expect(favTab().getAttribute('aria-pressed')).toBe('true');
+      expect(tab('Todas').getAttribute('aria-pressed')).toBe('false');
+    });
+
+    it('should combine the "Favoritas" tab with the search', () => {
+      const { openFavorites, search, names, el } = setupFavs([5, 7]);
+      openFavorites();
+      search('hummus');
+      expect(names()).toEqual(['Hummus con bastones de zanahoria']);
+
+      search('pancakes'); // existe, pero no es favorita
+      expect(names()).toEqual([]);
+      expect(el.textContent).toContain('No encontramos recetas');
+    });
+
+    it('should show the empty state when there are no favorites', () => {
+      const { openFavorites, cards, el } = setupFavs();
+      openFavorites();
+      expect(cards().length).toBe(0);
+      expect(el.querySelector('.sin-favoritas')?.textContent).toContain('Aún no tienes favoritas');
+      expect(el.querySelector('.sin-favoritas .bi-heart')).not.toBeNull();
+    });
+
+    it('should show the empty state after removing the last favorite in that tab', () => {
+      const { fixture, openFavorites, hearts, cards, el } = setupFavs([3]);
+      openFavorites();
+      expect(cards().length).toBe(1);
+
+      hearts()[0].click();
+      fixture.detectChanges();
+
+      expect(cards().length).toBe(0);
+      expect(el.querySelector('.sin-favoritas')).not.toBeNull();
+    });
+
+    it('should go back to all recipes with "Ver todas"', () => {
+      const { fixture, openFavorites, el, cards, tab } = setupFavs();
+      openFavorites();
+      el.querySelector<HTMLButtonElement>('.sin-favoritas button')!.click();
+      fixture.detectChanges();
+      expect(cards().length).toBe(8);
+      expect(tab('Todas').classList).toContain('active');
+    });
   });
 });

@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { Router, provideRouter, withComponentInputBinding } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
+import { FavoritesService } from '../../core/services/favorites.service';
 import { NutritionService } from '../../core/services/nutrition.service';
 import { ToastService } from '../../core/services/toast.service';
 import { RecetaDetalle } from './receta-detalle';
@@ -229,6 +230,43 @@ describe('RecetaDetalle', () => {
 
       expect(ui.activeMeal()).toBe('Desayuno');
       expect(ui.servings()).toBe('1');
+    });
+  });
+
+  describe('favorite', () => {
+    beforeEach(() => localStorage.clear());
+    afterEach(() => localStorage.clear());
+
+    it('should show the heart next to the title, described by it', () => {
+      const el = create('5');
+      const heart = el.querySelector<HTMLButtonElement>('.detalle-header .detalle-fav button')!;
+      expect(heart.getAttribute('aria-label')).toBe('Agregar a favoritas');
+      expect(heart.getAttribute('aria-describedby')).toBe('detalle-titulo');
+      expect(el.querySelector('#detalle-titulo')?.textContent).toContain('Salmón al horno con verduras');
+    });
+
+    it('should save the recipe as favorite from the detail', () => {
+      const fixture = TestBed.createComponent(RecetaDetalle);
+      fixture.componentRef.setInput('id', '5');
+      fixture.detectChanges();
+      const heart = () => fixture.nativeElement.querySelector('.detalle-fav button') as HTMLButtonElement;
+
+      heart().click();
+      fixture.detectChanges();
+
+      expect(TestBed.inject(FavoritesService).isFavorite(5)).toBe(true);
+      expect(heart().getAttribute('aria-pressed')).toBe('true');
+    });
+
+    it('should show it already filled if it was marked before', () => {
+      TestBed.inject(FavoritesService).toggle(2);
+      const heart = create('2').querySelector('.detalle-fav button')!;
+      expect(heart.getAttribute('aria-pressed')).toBe('true');
+      expect(heart.querySelector('.bi-heart-fill')).not.toBeNull();
+    });
+
+    it('should not show a heart for an unknown recipe', () => {
+      expect(create('999').querySelector('app-favorite-button')).toBeNull();
     });
   });
 });

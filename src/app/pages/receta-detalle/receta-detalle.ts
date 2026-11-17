@@ -6,10 +6,11 @@ import { NutritionService } from '../../core/services/nutrition.service';
 import { RecipeService } from '../../core/services/recipe.service';
 import { ToastService } from '../../core/services/toast.service';
 import { CalorieRing } from '../../shared/calorie-ring/calorie-ring';
+import { FavoriteButton } from '../../shared/favorite-button/favorite-button';
 
 @Component({
   selector: 'app-receta-detalle',
-  imports: [RouterLink, TitleCasePipe, CalorieRing, NgOptimizedImage],
+  imports: [RouterLink, TitleCasePipe, CalorieRing, NgOptimizedImage, FavoriteButton],
   templateUrl: './receta-detalle.html',
   styleUrl: './receta-detalle.scss',
 })
