@@ -21,6 +21,8 @@ export interface StoredAccount {
 type Accounts = Record<string, StoredAccount | string>;
 
 export type RegisterResult = { ok: true } | { ok: false; error: 'email-taken' };
+export type LoginError = 'not-found' | 'wrong-password';
+export type LoginResult = { ok: true } | { ok: false; error: LoginError };
 
 const SESSION_KEY = `${STORAGE_PREFIX}session`;
 const USERS_KEY = `${STORAGE_PREFIX}users`;
@@ -51,10 +53,6 @@ export async function hashPassword(password: string, salt: string): Promise<stri
 
 const normalize = (email: string) => email.trim().toLowerCase();
 
-/** Nombre de una cuenta, sea nueva (objeto) o vieja (texto). */
-const nameOf = (account: StoredAccount | string) =>
-  typeof account === 'string' ? account : account.name;
-
 /**
  * Sesión del usuario, solo en el frontend (no hay backend).
  * Se guarda en localStorage para que sobreviva a un F5.
@@ -80,12 +78,21 @@ export class AuthService {
     return { ok: true };
   }
 
-  /** Inicia sesión: usa el nombre registrado con ese correo, o la parte antes de la @. */
-  login(email: string): void {
+  /**
+   * Inicia sesión SOLO si el correo está registrado y la contraseña coincide:
+   * se calcula el hash de lo que escribió (con el salt de esa cuenta) y se compara.
+   */
+  async login(email: string, password: string): Promise<LoginResult> {
     const clean = normalize(email);
     const account = this.readAccounts()[clean];
-    const name = account ? nameOf(account) : clean.split('@')[0];
-    this.setUser({ name, email: clean });
+    // Cuenta vieja sin contraseña (texto): se resuelve en el siguiente commit
+    if (!account || typeof account === 'string') return { ok: false, error: 'not-found' };
+
+    const hash = await hashPassword(password, account.salt);
+    if (hash !== account.passwordHash) return { ok: false, error: 'wrong-password' };
+
+    this.setUser({ name: account.name, email: clean });
+    return { ok: true };
   }
 
   /** Cambia SOLO el nombre de la cuenta actual (lo usa Perfil); la contraseña no se toca. */

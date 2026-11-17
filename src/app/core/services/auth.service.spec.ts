@@ -24,20 +24,40 @@ describe('AuthService', () => {
     expect(localStorage.getItem('bocado-sano.session')).toContain('juan@mail.com');
   });
 
-  it('uses the registered name on login', async () => {
+  it('logs in with the right password and uses the registered name', async () => {
     await service.register('Juan', 'juan@mail.com', 'secreto123');
     service.logout();
-    service.login('juan@mail.com');
-    expect(service.user()?.name).toBe('Juan');
+    expect(await service.login('juan@mail.com', 'secreto123')).toEqual({ ok: true });
+    expect(service.user()).toEqual({ name: 'Juan', email: 'juan@mail.com' });
   });
 
-  it('uses the part before @ when the email was not registered', () => {
-    service.login('ana.gomez@mail.com');
-    expect(service.user()).toEqual({ name: 'ana.gomez', email: 'ana.gomez@mail.com' });
+  it('rejects a wrong password', async () => {
+    await service.register('Juan', 'juan@mail.com', 'secreto123');
+    service.logout();
+    expect(await service.login('juan@mail.com', 'otra-clave')).toEqual({
+      ok: false,
+      error: 'wrong-password',
+    });
+    expect(service.isLoggedIn()).toBe(false);
   });
 
-  it('clears the session on logout', () => {
-    service.login('ana@mail.com');
+  it('rejects an email that was never registered', async () => {
+    expect(await service.login('nadie@noexiste.test', 'secreto123')).toEqual({
+      ok: false,
+      error: 'not-found',
+    });
+    expect(service.isLoggedIn()).toBe(false);
+  });
+
+  it('accepts the email with capital letters or spaces', async () => {
+    await service.register('Juan', 'juan@mail.com', 'secreto123');
+    service.logout();
+    expect(await service.login('  JUAN@Mail.com ', 'secreto123')).toEqual({ ok: true });
+    expect(service.user()?.email).toBe('juan@mail.com');
+  });
+
+  it('clears the session on logout', async () => {
+    await service.register('Ana', 'ana@mail.com', 'secreto123');
     service.logout();
     expect(service.isLoggedIn()).toBe(false);
     expect(localStorage.getItem('bocado-sano.session')).toBeNull();
@@ -70,8 +90,8 @@ describe('AuthService', () => {
     expect(service.user()?.name).toBe('Juan Carlos');
   });
 
-  it('restores the session after a reload', () => {
-    service.login('ana@mail.com');
+  it('restores the session after a reload', async () => {
+    await service.register('Ana', 'ana@mail.com', 'secreto123');
     TestBed.resetTestingModule();
     const reloaded = TestBed.inject(AuthService);
     expect(reloaded.user()?.email).toBe('ana@mail.com');

@@ -136,14 +136,14 @@ describe('RemindersService', () => {
       expect(service.unreadCount()).toBe(1);
     });
 
-    it('keeps the read ones per user', () => {
+    it('keeps the read ones per user', async () => {
       service.markAsRead('agua');
 
-      auth.login('luis@correo.com');
+      await auth.register('Luis', 'luis@correo.com', 'secreto123');
       TestBed.tick();
       expect(service.isRead('agua')).toBe(false);
 
-      auth.login('ana@correo.com');
+      await auth.login('ana@correo.com', 'secreto123');
       TestBed.tick();
       expect(service.isRead('agua')).toBe(true);
     });

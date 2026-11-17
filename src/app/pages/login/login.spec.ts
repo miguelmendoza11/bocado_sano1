@@ -41,27 +41,36 @@ describe('Login', () => {
     expect(text).toContain('Escribe tu correo.');
   });
 
-  it('should navigate to /inicio when the form is valid', () => {
+  /** Crea la cuenta de Ana y cierra la sesión, como si ya se hubiera registrado antes. */
+  async function registerAna() {
+    const auth = TestBed.inject(AuthService);
+    await auth.register('Ana Gómez', 'ana@correo.com', '123456');
+    auth.logout();
+  }
+
+  it('should navigate to /inicio with the right email and password', async () => {
+    await registerAna();
     const { component } = setup();
     const navigate = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
     component.form.setValue({ email: 'ana@correo.com', password: '123456' });
-    component.onSubmit();
+    await component.onSubmit();
     expect(navigate).toHaveBeenCalledWith(['/inicio']);
   });
 
-  it('should save the session and greet with the name before @', () => {
+  it('should save the session and greet with the registered name', async () => {
+    await registerAna();
     const { component } = setup();
     vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
     component.form.setValue({ email: 'ana@correo.com', password: '123456' });
-    component.onSubmit();
-    expect(TestBed.inject(AuthService).user()).toEqual({ name: 'ana', email: 'ana@correo.com' });
-    expect(TestBed.inject(NutritionService).profile().name).toBe('ana');
+    await component.onSubmit();
+    expect(TestBed.inject(AuthService).user()).toEqual({ name: 'Ana Gómez', email: 'ana@correo.com' });
+    expect(TestBed.inject(NutritionService).profile().name).toBe('Ana Gómez');
   });
 
-  it('should not navigate when the form is invalid', () => {
+  it('should not navigate when the form is invalid', async () => {
     const { component } = setup();
     const navigate = vi.spyOn(TestBed.inject(Router), 'navigate');
-    component.onSubmit();
+    await component.onSubmit();
     expect(navigate).not.toHaveBeenCalled();
     expect(component.form.controls.email.touched).toBe(true);
   });

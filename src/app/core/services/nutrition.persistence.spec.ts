@@ -100,7 +100,7 @@ describe('NutritionService · persistencia', () => {
     expect(nutrition.consumedKcal()).toBe(0);
 
     auth.logout();
-    auth.login(ANA);
+    await auth.login(ANA, 'secreto123');
     TestBed.tick();
     expect(nutrition.consumedKcal()).toBe(250);
     expect(nutrition.currentWeight()).toBe(65);
@@ -119,7 +119,7 @@ describe('NutritionService · persistencia', () => {
     expect(nutrition.kcalFor('cena')).toBe(0);
 
     auth.logout();
-    auth.login(ANA);
+    await auth.login(ANA, 'secreto123');
     TestBed.tick();
     expect(nutrition.kcalFor('cena')).toBe(310);
   });

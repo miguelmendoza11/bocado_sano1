@@ -27,8 +27,8 @@ describe('auth guards', () => {
       expect(urlOf(run(authGuard))).toBe('/bienvenida');
     });
 
-    it('lets the user in with a session', () => {
-      auth.login('ana@correo.com');
+    it('lets the user in with a session', async () => {
+      await auth.register('Ana', 'ana@correo.com', 'secreto123');
       expect(run(authGuard)).toBe(true);
     });
   });
@@ -38,13 +38,13 @@ describe('auth guards', () => {
       expect(run(guestGuard)).toBe(true);
     });
 
-    it('redirects to /inicio with a session', () => {
-      auth.login('ana@correo.com');
+    it('redirects to /inicio with a session', async () => {
+      await auth.register('Ana', 'ana@correo.com', 'secreto123');
       expect(urlOf(run(guestGuard))).toBe('/inicio');
     });
 
-    it('lets the user in again after logout', () => {
-      auth.login('ana@correo.com');
+    it('lets the user in again after logout', async () => {
+      await auth.register('Ana', 'ana@correo.com', 'secreto123');
       auth.logout();
       expect(run(guestGuard)).toBe(true);
     });
