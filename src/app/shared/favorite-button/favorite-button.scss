@@ -1,0 +1,61 @@
+:host {
+  display: inline-flex;
+}
+
+.fav-btn {
+  color: var(--sano-ink);
+  transition:
+    transform 0.15s ease,
+    color 0.2s ease;
+
+  &:hover {
+    color: var(--sano-danger);
+  }
+
+  &:active {
+    transform: scale(0.92);
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--sano-lime-strong);
+    outline-offset: 2px;
+  }
+
+  i {
+    display: inline-block;
+    line-height: 1;
+  }
+}
+
+/* Corazón lleno */
+.is-fav {
+  color: var(--sano-danger);
+}
+
+/* "Pop" al marcar: crece un poco y vuelve */
+.pop i {
+  animation: fav-pop 0.4s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+
+@keyframes fav-pop {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.35);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Sin animaciones si el sistema pide reducir movimiento */
+@media (prefers-reduced-motion: reduce) {
+  .fav-btn {
+    transition: none;
+  }
+
+  .pop i {
+    animation: none;
+  }
+}

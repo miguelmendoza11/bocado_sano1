@@ -1,0 +1,18 @@
+<button
+  type="button"
+  class="icon-btn fav-btn"
+  [class.is-fav]="isFavorite()"
+  [class.pop]="popping()"
+  [attr.aria-pressed]="isFavorite()"
+  [attr.aria-label]="isFavorite() ? 'Quitar de favoritas' : 'Agregar a favoritas'"
+  [attr.title]="isFavorite() ? 'Quitar de favoritas' : 'Agregar a favoritas'"
+  (click)="toggle()"
+>
+  <i
+    class="bi"
+    [class.bi-heart]="!isFavorite()"
+    [class.bi-heart-fill]="isFavorite()"
+    aria-hidden="true"
+    (animationend)="popping.set(false)"
+  ></i>
+</button>
